@@ -1,15 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #030712;
-  --foreground: #f9fafb;
-  --accent-purple: #8b5cf6;
-  --accent-blue: #06b6d4;
-  --accent-indigo: #6366f1;
+  --background: #000000;
+  --foreground: #ffffff;
+  --accent-primary: #7c3aed;
+  --accent-secondary: #c084fc;
   
-  --card-bg: rgba(255, 255, 255, 0.05);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --card-glow: rgba(99, 102, 241, 0.15);
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.05);
+  --card-glow: rgba(124, 58, 237, 0.1);
 }
 
 body {
@@ -17,6 +16,8 @@ body {
   color: var(--foreground);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom Scrollbars */
@@ -47,19 +48,21 @@ body {
 }
 
 .glass-card {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, border-color, box-shadow;
+  transform: translateZ(0); /* Hardware acceleration */
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 40px 0 rgba(99, 102, 241, 0.15);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 30px var(--card-glow);
+  transform: translateY(-2px) translateZ(0);
 }
 
 .glass-input {
@@ -109,18 +112,18 @@ body {
 
 /* Gradients */
 .text-gradient-primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
+  background: linear-gradient(135deg, #e9d5ff 0%, #c084fc 40%, #7c3aed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .bg-gradient-primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
+  background: linear-gradient(135deg, #6d28d9 0%, #9333ea 50%, #c084fc 100%);
 }
 
 .bg-gradient-secondary {
-  background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
+  background: linear-gradient(135deg, #1e1b4b 0%, #3b0764 100%);
 }
 
 .border-gradient-glow {
@@ -130,8 +133,8 @@ body {
 }
 
 /* Calendar Heatmap Cell custom classes */
-.heatmap-level-0 { background: rgba(255, 255, 255, 0.05); }
-.heatmap-level-1 { background: rgba(99, 102, 241, 0.2); }
-.heatmap-level-2 { background: rgba(99, 102, 241, 0.4); }
-.heatmap-level-3 { background: rgba(99, 102, 241, 0.7); }
-.heatmap-level-4 { background: rgba(99, 102, 241, 1.0); }
+.heatmap-level-0 { background: rgba(255, 255, 255, 0.04); }
+.heatmap-level-1 { background: rgba(168, 85, 247, 0.2); }
+.heatmap-level-2 { background: rgba(168, 85, 247, 0.5); }
+.heatmap-level-3 { background: rgba(168, 85, 247, 0.8); }
+.heatmap-level-4 { background: rgba(168, 85, 247, 1.0); }

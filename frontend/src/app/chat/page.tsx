@@ -349,7 +349,7 @@ export default function DocumentChat() {
           <button 
             type="submit"
             disabled={!activeDocId || !inputValue.trim()}
-            className="bg-gradient-primary hover:scale-102 hover:shadow-lg hover:shadow-indigo-600/25 p-3 rounded-xl text-white cursor-pointer transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-primary hover:scale-[1.02] hover:shadow-lg hover:shadow-indigo-600/25 p-3 rounded-xl text-white cursor-pointer transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send size={16} />
           </button>

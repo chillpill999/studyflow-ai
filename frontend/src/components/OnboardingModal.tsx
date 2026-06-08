@@ -163,7 +163,7 @@ export default function OnboardingModal() {
                 px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all duration-300
                 ${(step === 1 && (!subject || !username.trim())) 
                   ? 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5' 
-                  : 'bg-gradient-primary text-white shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 hover:scale-102 cursor-pointer'
+                  : 'bg-gradient-primary text-white shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 hover:scale-[1.02] cursor-pointer'
                 }
               `}
             >
