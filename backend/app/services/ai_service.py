@@ -11,10 +11,10 @@ from app.core.config import settings
 # ---------------------------------------------------------------------------
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL   = "llama3-70b-8192"   # Best free model — high quality, fast
+GROQ_MODEL   = "llama-3.3-70b-versatile"   # Best free model — Llama 3.3 70B
 
 # Fallback chain for when one model is at rate limit
-GROQ_FALLBACK_MODELS = ["llama3-8b-8192", "gemma2-9b-it"]
+GROQ_FALLBACK_MODELS = ["meta-llama/llama-4-scout-17b-16e-instruct", "llama-3.1-8b-instant"]
 
 
 class AIService:
