@@ -92,7 +92,7 @@ interface StudyFlowState {
   // Actions
   checkBackendOnline: () => Promise<boolean>;
   initUser: (userId?: string, username?: string, email?: string, image?: string) => Promise<void>;
-  setOnboarding: (subject: string, hours: number) => Promise<void>;
+  setOnboarding: (username: string, subject: string, hours: number) => Promise<void>;
   addStudyHours: (hours: number) => Promise<void>;
   
   // Doc actions
@@ -220,10 +220,10 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
     }
   },
 
-  setOnboarding: async (subject: string, hours: number) => {
+  setOnboarding: async (username: string, subject: string, hours: number) => {
     const user = get().user;
     if (!user) return;
-    const updatedUser = { ...user, preference_subject: subject, onboarding_completed: true };
+    const updatedUser = { ...user, username: username, preference_subject: subject, onboarding_completed: true };
     set({ user: updatedUser });
 
     const online = get().isBackendOnline;
@@ -234,7 +234,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             id: user.id,
-            username: user.username,
+            username: username,
             email: user.email,
             preference_subject: subject,
             onboarding_completed: 1

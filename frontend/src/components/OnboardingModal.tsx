@@ -10,6 +10,7 @@ export default function OnboardingModal() {
   const setOnboarding = useStudyStore(state => state.setOnboarding);
   
   const [step, setStep] = useState(1);
+  const [username, setUsername] = useState(user?.username || '');
   const [subject, setSubject] = useState('');
   const [hours, setHours] = useState(2);
 
@@ -29,10 +30,10 @@ export default function OnboardingModal() {
 
   const handleNext = () => {
     if (step === 1) {
-      if (!subject) return; // Must select subject
+      if (!subject || !username.trim()) return; // Must select subject and enter name
       setStep(2);
     } else {
-      setOnboarding(subject, hours);
+      setOnboarding(username.trim(), subject, hours);
     }
   };
 
@@ -70,13 +71,24 @@ export default function OnboardingModal() {
               >
                 <div className="flex items-center gap-2">
                   <BookOpen className="text-indigo-400 h-6 w-6" />
-                  <h2 className="text-xl font-bold text-white">Select Your primary Subject</h2>
+                  <h2 className="text-xl font-bold text-white">Welcome to StudyFlow</h2>
                 </div>
                 <p className="text-white/60 text-sm leading-relaxed">
-                  We'll customize your study schedules, flashcards, and quizzes to match your core subject domain.
+                  Let's personalize your workspace. What should we call you, and what is your primary focus?
                 </p>
 
-                <div className="grid grid-cols-2 gap-3 pt-2">
+                <div className="pt-2">
+                  <label className="block text-xs text-white/50 font-semibold uppercase tracking-wider mb-1.5">Display Name</label>
+                  <input 
+                    type="text" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Your name"
+                    className="w-full bg-white/5 border border-white/10 px-3.5 py-2.5 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500/50"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-4">
                   {subjects.map((sub) => {
                     const isSelected = subject === sub.name;
                     return (
@@ -146,10 +158,10 @@ export default function OnboardingModal() {
           <div className="mt-8 pt-4 border-t border-white/8 flex justify-end">
             <button
               onClick={handleNext}
-              disabled={step === 1 && !subject}
+              disabled={step === 1 && (!subject || !username.trim())}
               className={`
                 px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all duration-300
-                ${(step === 1 && !subject) 
+                ${(step === 1 && (!subject || !username.trim())) 
                   ? 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5' 
                   : 'bg-gradient-primary text-white shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 hover:scale-102 cursor-pointer'
                 }
