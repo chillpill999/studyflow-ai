@@ -14,14 +14,18 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  Zap
+  Zap,
+  Edit2
 } from 'lucide-react';
 import { useStudyStore } from '../store/studyStore';
+import ProfileModal from './ProfileModal';
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
   const user = useStudyStore(state => state.user);
+  
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -114,8 +118,11 @@ export default function Sidebar() {
       {/* User Streak Profile Widget */}
       <div className="border-t border-white/8 pt-4">
         {user && (
-          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3 px-2'}`}>
-            <div className="h-9 w-9 rounded-full bg-gradient-secondary flex items-center justify-center font-bold text-white text-sm relative border border-cyan-400/30">
+          <div 
+            className={`flex items-center group cursor-pointer hover:bg-white/5 p-2 rounded-xl transition-colors ${isCollapsed ? 'justify-center' : 'gap-3 px-2'}`}
+            onClick={() => setIsProfileModalOpen(true)}
+          >
+            <div className="h-9 w-9 rounded-full bg-gradient-secondary flex items-center justify-center font-bold text-white text-sm relative border border-cyan-400/30 shrink-0">
               {user.image ? (
                 <img src={user.image} alt={user.username} className="h-full w-full rounded-full object-cover" />
               ) : (
@@ -137,9 +144,21 @@ export default function Sidebar() {
                 </div>
               </motion.div>
             )}
+            
+            {/* Hover Edit Icon */}
+            {!isCollapsed && (
+              <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                <Edit2 size={14} className="text-white/40" />
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      <ProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+      />
     </motion.div>
   );
 }
