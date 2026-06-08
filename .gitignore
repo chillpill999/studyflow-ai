@@ -1,0 +1,32 @@
+# Next.js Build & Dependencies
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.preview.local
+frontend/.env.production.local
+
+# Python Virtual Environment & Cache
+backend/venv/
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/api/__pycache__/
+backend/app/core/__pycache__/
+backend/app/services/__pycache__/
+backend/.env
+
+# Local Storage & Database files
+backend/uploads/
+backend/studyflow.db
+backend/studyflow.db-journal
+
+# Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
