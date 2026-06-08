@@ -255,14 +255,16 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
         console.error(err);
       }
     } else {
-      // Mock documents
-      set({
-        documents: [
-          { id: 'doc-1', filename: 'Quantum_Physics_Notes.pdf', file_type: 'pdf', created_at: '2026-06-05T10:00:00Z' },
-          { id: 'doc-2', filename: 'Data_Structures_Lecture_3.pptx', file_type: 'pptx', created_at: '2026-06-06T14:30:00Z' },
-          { id: 'doc-3', filename: 'Calculus_CheatSheet.txt', file_type: 'txt', created_at: '2026-06-07T09:15:00Z' },
-        ]
-      });
+      // Mock documents - only load if list is empty to prevent overwriting uploads
+      if (get().documents.length === 0) {
+        set({
+          documents: [
+            { id: 'doc-1', filename: 'Quantum_Physics_Notes.pdf', file_type: 'pdf', created_at: '2026-06-05T10:00:00Z' },
+            { id: 'doc-2', filename: 'Data_Structures_Lecture_3.pptx', file_type: 'pptx', created_at: '2026-06-06T14:30:00Z' },
+            { id: 'doc-3', filename: 'Calculus_CheatSheet.txt', file_type: 'txt', created_at: '2026-06-07T09:15:00Z' },
+          ]
+        });
+      }
     }
   },
 
@@ -353,12 +355,15 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
       const data = await res.json();
       set({ notes: data });
     } else {
-      set({
-        notes: [
-          { id: 'note-1', title: 'Calculus Limits', content: '# Calculus Limits\n\nStudy limits definition and squeeze theorem.\n\n- Limit laws apply when both individual limits exist.\n- Squeeze theorem helps calculate complex limits by bounding.', folder: 'Mathematics' },
-          { id: 'note-2', title: 'React Hooks Overview', content: '# React Hooks\n\n- **useState**: local reactive states.\n- **useEffect**: handle side-effects and cleanup operations.\n- **useMemo**: cache expensive calculations.', folder: 'Computer Science' }
-        ]
-      });
+      // Seed default notes only if empty
+      if (get().notes.length === 0) {
+        set({
+          notes: [
+            { id: 'note-1', title: 'Calculus Limits', content: '# Calculus Limits\n\nStudy limits definition and squeeze theorem.\n\n- Limit laws apply when both individual limits exist.\n- Squeeze theorem helps calculate complex limits by bounding.', folder: 'Mathematics' },
+            { id: 'note-2', title: 'React Hooks Overview', content: '# React Hooks\n\n- **useState**: local reactive states.\n- **useEffect**: handle side-effects and cleanup operations.\n- **useMemo**: cache expensive calculations.', folder: 'Computer Science' }
+          ]
+        });
+      }
     }
   },
 
@@ -400,13 +405,16 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
       const data = await res.json();
       set({ tasks: data.map((t: any) => ({ ...t, is_completed: t.is_completed === 1 })) });
     } else {
-      set({
-        tasks: [
-          { id: 'task-1', title: 'Read Chapter 4 of Calculus', is_completed: false, date: '2026-06-08' },
-          { id: 'task-2', title: 'Complete Math Quiz 1', is_completed: true, date: '2026-06-08' },
-          { id: 'task-3', title: 'Draw Mind Map for Physics', is_completed: false, date: '2026-06-09' }
-        ]
-      });
+      // Seed default tasks only if empty
+      if (get().tasks.length === 0) {
+        set({
+          tasks: [
+            { id: 'task-1', title: 'Read Chapter 4 of Calculus', is_completed: false, date: '2026-06-08' },
+            { id: 'task-2', title: 'Complete Math Quiz 1', is_completed: true, date: '2026-06-08' },
+            { id: 'task-3', title: 'Draw Mind Map for Physics', is_completed: false, date: '2026-06-09' }
+          ]
+        });
+      }
     }
   },
 
@@ -455,14 +463,16 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
       const data = await res.json();
       set({ flashcards: data });
     } else {
-      // Mock cards
-      set({
-        flashcards: [
-          { id: 'fc-1', doc_id: 'doc-1', question: 'What is Quantum Superposition?', answer: 'It is a fundamental principle of quantum mechanics where a system can exist in multiple states simultaneously until it is measured.', box: 1 },
-          { id: 'fc-2', doc_id: 'doc-1', question: 'Explain Heisenberg\'s Uncertainty Principle.', answer: 'It states that you cannot simultaneously measure the exact position and momentum of a particle with absolute precision.', box: 2 },
-          { id: 'fc-3', doc_id: 'doc-2', question: 'What is the average time complexity of Quick Sort?', answer: 'O(n log n) is the average time complexity. Worst case is O(n^2).', box: 1 }
-        ]
-      });
+      // Mock cards - seed only if empty
+      if (get().flashcards.length === 0) {
+        set({
+          flashcards: [
+            { id: 'fc-1', doc_id: 'doc-1', question: 'What is Quantum Superposition?', answer: 'It is a fundamental principle of quantum mechanics where a system can exist in multiple states simultaneously until it is measured.', box: 1 },
+            { id: 'fc-2', doc_id: 'doc-1', question: 'Explain Heisenberg\'s Uncertainty Principle.', answer: 'It states that you cannot simultaneously measure the exact position and momentum of a particle with absolute precision.', box: 2 },
+            { id: 'fc-3', doc_id: 'doc-2', question: 'What is the average time complexity of Quick Sort?', answer: 'O(n log n) is the average time complexity. Worst case is O(n^2).', box: 1 }
+          ]
+        });
+      }
     }
   },
 
@@ -515,21 +525,23 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
       const data = await res.json();
       set({ quizzes: data });
     } else {
-      set({
-        quizzes: [
-          {
-            id: 'quiz-1',
-            doc_id: 'doc-1',
-            filename: 'Quantum_Physics_Notes.pdf',
-            score: 4,
-            total: 5,
-            created_at: '2026-06-07T16:00:00Z',
-            quiz: [
-              { type: 'mcq', question: 'Is superposition stable?', options: ['Yes', 'No', 'Depends on temperature', 'Only in vacuums'], correct_answer: 'Only in vacuums', explanation: 'Environmental interaction causes decoherence.' }
-            ]
-          }
-        ]
-      });
+      if (get().quizzes.length === 0) {
+        set({
+          quizzes: [
+            {
+              id: 'quiz-1',
+              doc_id: 'doc-1',
+              filename: 'Quantum_Physics_Notes.pdf',
+              score: 4,
+              total: 5,
+              created_at: '2026-06-07T16:00:00Z',
+              quiz: [
+                { type: 'mcq', question: 'Is superposition stable?', options: ['Yes', 'No', 'Depends on temperature', 'Only in vacuums'], correct_answer: 'Only in vacuums', explanation: 'Environmental interaction causes decoherence.' }
+              ]
+            }
+          ]
+        });
+      }
     }
   },
 
@@ -603,20 +615,22 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
       const data = await res.json();
       set({ studyPlans: data });
     } else {
-      set({
-        studyPlans: [
-          {
-            id: 'plan-1',
-            topic: 'Organic Chemistry',
-            duration_days: 3,
-            plan: [
-              { day: 1, title: 'Alkane & Alkene Mechanisms', tasks: ['Study hybridizations', 'Draw resonance structures'], time_needed: 40 },
-              { day: 2, title: 'Electrophilic Addition', tasks: ['Review Markovnikov rule', 'Practice stereochemistry'], time_needed: 45 },
-              { day: 3, title: 'Spectroscopy Analysis', tasks: ['Solve 3 IR spectra puzzles', 'Self quiz on key peaks'], time_needed: 60 },
-            ]
-          }
-        ]
-      });
+      if (get().studyPlans.length === 0) {
+        set({
+          studyPlans: [
+            {
+              id: 'plan-1',
+              topic: 'Organic Chemistry',
+              duration_days: 3,
+              plan: [
+                { day: 1, title: 'Alkane & Alkene Mechanisms', tasks: ['Study hybridizations', 'Draw resonance structures'], time_needed: 40 },
+                { day: 2, title: 'Electrophilic Addition', tasks: ['Review Markovnikov rule', 'Practice stereochemistry'], time_needed: 45 },
+                { day: 3, title: 'Spectroscopy Analysis', tasks: ['Solve 3 IR spectra puzzles', 'Self quiz on key peaks'], time_needed: 60 },
+              ]
+            }
+          ]
+        });
+      }
     }
   },
 
