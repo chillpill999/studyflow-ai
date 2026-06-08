@@ -145,3 +145,21 @@ h1, h2, h3, h4, h5, h6 {
 .heatmap-level-2 { background: #818cf8; } /* indigo-400 */
 .heatmap-level-3 { background: #6366f1; } /* indigo-500 */
 .heatmap-level-4 { background: #4f46e5; } /* indigo-600 */
+
+/* 3D Flip Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotateY-180 {
+  transform: rotateY(180deg);
+}
