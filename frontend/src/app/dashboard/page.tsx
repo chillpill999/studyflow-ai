@@ -143,16 +143,15 @@ export default function Dashboard() {
   // Quick stats calculation
   const totalDocs = documents.length;
   const completedQuizzes = quizzes.length;
-  const totalStreak = user?.streak || 3;
+  const totalStreak = user?.streak || 0;
   const targetHours = 8.0;
-  const studyHours = user?.study_hours || 4.5;
+  const studyHours = user?.study_hours || 0;
   const targetPercent = Math.min(100, Math.round((studyHours / targetHours) * 100));
 
-  // Generate simple heatmap grid data (5 weeks, 7 days)
+  // Generate empty heatmap grid data (5 weeks, 7 days)
   const heatmapData = Array.from({ length: 35 }, (_, i) => {
     const isToday = i === 32;
-    const value = [0, 1, 0, 3, 2, 4, 0, 0, 1, 2, 0, 0, 4, 1, 0, 3, 2, 1, 0, 2, 1, 3, 4, 0, 1, 2, 0, 2, 3, 0, 1, 2, 4, 0, 0][i];
-    return { id: i, level: value, isToday };
+    return { id: i, level: 0, isToday };
   });
 
   return (
@@ -189,7 +188,9 @@ export default function Dashboard() {
           <div className="space-y-1">
             <span className="text-xs text-white/40 font-semibold tracking-wider uppercase">Active Streak</span>
             <h3 className="text-3xl font-extrabold text-white">{totalStreak} Days</h3>
-            <p className="text-xs text-amber-500 font-medium">Top 5% of active learners</p>
+            <p className="text-xs text-amber-500 font-medium">
+              {totalStreak > 0 ? 'Keep it up!' : 'Start studying today'}
+            </p>
           </div>
           <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
             <Zap className="fill-amber-500/10" size={24} />
@@ -239,7 +240,9 @@ export default function Dashboard() {
           <div className="space-y-1">
             <span className="text-xs text-white/40 font-semibold tracking-wider uppercase">Quizzes Done</span>
             <h3 className="text-3xl font-extrabold text-white">{completedQuizzes}</h3>
-            <p className="text-xs text-emerald-400 font-medium">Average score: 80%</p>
+            <p className="text-xs text-emerald-400 font-medium">
+              {completedQuizzes > 0 ? 'Average score: 80%' : 'No quizzes yet'}
+            </p>
           </div>
           <div className="h-12 w-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
             <Award size={24} />
