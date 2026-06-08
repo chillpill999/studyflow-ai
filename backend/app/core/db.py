@@ -124,7 +124,7 @@ class DBManager:
                 )
             else:
                 conn.execute(
-                    "INSERT INTO users (id, username, email, streak, study_hours, preference_subject, onboarding_completed) VALUES (?, ?, ?, 3, 4.5, ?, ?)",
+                    "INSERT INTO users (id, username, email, streak, study_hours, preference_subject, onboarding_completed) VALUES (?, ?, ?, 0, 0.0, ?, ?)",
                     (user_id, username, email, preference_subject, onboarding_completed)
                 )
             conn.commit()
