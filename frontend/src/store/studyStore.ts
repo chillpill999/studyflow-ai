@@ -9,6 +9,7 @@ export interface UserProfile {
   study_hours: number;
   preference_subject: string;
   onboarding_completed: boolean;
+  image?: string;
 }
 
 export interface DocumentInfo {
@@ -90,7 +91,7 @@ interface StudyFlowState {
 
   // Actions
   checkBackendOnline: () => Promise<boolean>;
-  initUser: (userId?: string, username?: string, email?: string) => Promise<void>;
+  initUser: (userId?: string, username?: string, email?: string, image?: string) => Promise<void>;
   setOnboarding: (subject: string, hours: number) => Promise<void>;
   addStudyHours: (hours: number) => Promise<void>;
   
@@ -158,7 +159,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
     }
   },
 
-  initUser: async (userId = 'user_demo_123', username = 'Scholar', email = 'scholar@studyflow.ai') => {
+  initUser: async (userId = 'user_demo_123', username = 'Scholar', email = 'scholar@studyflow.ai', image?: string) => {
     set({ loading: true });
     const online = await get().checkBackendOnline();
     if (online) {
@@ -194,6 +195,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
             study_hours: data.study_hours,
             preference_subject: data.preference_subject || '',
             onboarding_completed: data.onboarding_completed === 1,
+            image: image,
           },
           loading: false
         });
@@ -211,6 +213,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
           study_hours: 4.5,
           preference_subject: "Computer Science",
           onboarding_completed: true,
+          image: image,
         },
         loading: false
       });

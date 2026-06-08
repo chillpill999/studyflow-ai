@@ -20,7 +20,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     if (session?.user) {
       // Use email as unique ID, or user.id if available from callbacks
       const uid = (session.user as any).id || session.user.email || 'user_demo_123';
-      initUser(uid, session.user.name || 'Student', session.user.email || '');
+      initUser(uid, session.user.name || 'Student', session.user.email || '', session.user.image || undefined);
     } else {
       // Not logged in, maybe redirect or just init mock (handled by landing page redirect eventually)
       initUser();

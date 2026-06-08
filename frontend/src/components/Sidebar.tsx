@@ -116,7 +116,11 @@ export default function Sidebar() {
         {user && (
           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3 px-2'}`}>
             <div className="h-9 w-9 rounded-full bg-gradient-secondary flex items-center justify-center font-bold text-white text-sm relative border border-cyan-400/30">
-              {user.username.substring(0, 2).toUpperCase()}
+              {user.image ? (
+                <img src={user.image} alt={user.username} className="h-full w-full rounded-full object-cover" />
+              ) : (
+                user.username.substring(0, 2).toUpperCase()
+              )}
               <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-emerald-500 rounded-full border-2 border-[#030712]" />
             </div>
 
