@@ -364,7 +364,7 @@ export default function DocumentChat() {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as any }}
               className="w-full max-w-xl h-full bg-[#0B1120]/95 border-l border-white/10 p-6 flex flex-col justify-between overflow-hidden shadow-2xl relative"
             >
               {/* Glow block inside drawer */}

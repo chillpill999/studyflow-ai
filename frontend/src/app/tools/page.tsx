@@ -286,7 +286,7 @@ export default function StudyTools() {
                     >
                       <motion.div 
                         animate={{ rotateY: isFlipped ? 180 : 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as any }}
                         className="w-full h-full relative preserve-3d transition-transform duration-500"
                       >
                         {/* Front Side */}
