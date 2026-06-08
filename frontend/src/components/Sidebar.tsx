@@ -40,7 +40,7 @@ export default function Sidebar() {
     <motion.div 
       animate={{ width: isCollapsed ? 76 : 240 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as any }}
-      className="h-screen sticky top-0 bg-[#0A0A0F]/80 backdrop-blur-xl border-r border-white/5 flex flex-col justify-between p-4 z-40 shrink-0"
+      className="h-screen sticky top-0 bg-[#0F1117]/90 backdrop-blur-xl border-r border-white/5 flex flex-col justify-between p-4 z-40 shrink-0"
     >
       {/* Upper Brand Section */}
       <div>
@@ -50,18 +50,18 @@ export default function Sidebar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="flex items-center gap-2 font-bold text-xl tracking-tight text-white relative"
+              className="flex items-center gap-2 font-bold text-xl tracking-tight relative"
             >
-              <div className="absolute -left-1 top-1 h-1.5 w-1.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-pulse" />
-              <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-lg shadow-indigo-500/20 ml-2">
-                <Sparkles className="h-4 w-4 text-white" />
+              <div className="absolute -left-1 top-1 h-1.5 w-1.5 bg-[#C9956A] rounded-full shadow-[0_0_8px_rgba(201,149,106,0.8)] animate-pulse" />
+              <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-lg shadow-[#C9956A]/20 ml-2">
+                <Sparkles className="h-4 w-4 text-[#0F1117]" />
               </div>
-              <span className="text-white font-extrabold tracking-tight">StudyFlow</span>
+              <span className="text-[#C9956A] font-playfair italic font-bold tracking-tight">StudyFlow AI</span>
             </motion.div>
           )}
           {isCollapsed && (
-            <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-lg shadow-indigo-500/20 mx-auto">
-              <Sparkles className="h-4 w-4 text-white animate-pulse" />
+            <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-lg shadow-[#C9956A]/20 mx-auto">
+              <Sparkles className="h-4 w-4 text-[#0F1117] animate-pulse" />
             </div>
           )}
 
@@ -83,13 +83,19 @@ export default function Sidebar() {
               <Link key={item.path} href={item.path}>
                 <div className="relative group">
                   <div className={`
-                    flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-300
+                    flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-300 relative
                     ${isActive 
-                      ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.1)]' 
-                      : 'text-white/50 hover:bg-white/5 hover:text-white border border-transparent'
+                      ? 'bg-[rgba(201,149,106,0.08)] text-[#C9956A]' 
+                      : 'text-[#8A8F9E] hover:bg-white/5 hover:text-[#F5F0EB]'
                     }
                   `}>
-                    <Icon size={18} className={`${isActive ? 'text-indigo-400' : 'group-hover:text-white transition-colors duration-300'}`} />
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeNav"
+                        className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#C9956A] rounded-r-full shadow-[0_0_10px_rgba(201,149,106,0.5)]" 
+                      />
+                    )}
+                    <Icon size={18} className={`${isActive ? 'text-[#C9956A]' : 'group-hover:text-[#F5F0EB] transition-colors duration-300'}`} />
                     
                     {!isCollapsed && (
                       <motion.span 
@@ -122,13 +128,13 @@ export default function Sidebar() {
             className={`flex items-center group cursor-pointer hover:bg-white/5 p-2 rounded-xl transition-colors ${isCollapsed ? 'justify-center' : 'gap-3 px-2'}`}
             onClick={() => setIsProfileModalOpen(true)}
           >
-            <div className="h-9 w-9 rounded-full bg-gradient-primary flex items-center justify-center font-bold text-white text-sm relative border border-white/10 shrink-0">
+            <div className="h-9 w-9 rounded-full flex items-center justify-center font-bold text-[#F5F0EB] text-sm relative border-2 border-[#C9956A]/50 shrink-0 bg-[#161B27]">
               {user.image ? (
                 <img src={user.image} alt={user.username} className="h-full w-full rounded-full object-cover" />
               ) : (
                 user.username.substring(0, 2).toUpperCase()
               )}
-              <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-emerald-500 rounded-full border-2 border-[#0A0A0F]" />
+              <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-[#6EBF8B] rounded-full border-2 border-[#0F1117]" />
             </div>
 
             {!isCollapsed && (
@@ -137,10 +143,10 @@ export default function Sidebar() {
                 animate={{ opacity: 1 }}
                 className="flex-1 min-w-0"
               >
-                <h4 className="text-sm font-semibold text-white truncate leading-tight">{user.username}</h4>
+                <h4 className="text-sm font-semibold text-[#F5F0EB] truncate leading-tight">{user.username}</h4>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <Zap size={12} className="text-amber-500 fill-amber-500 animate-pulse" />
-                  <span className="text-xs text-amber-500 font-semibold">{user.streak} Day Streak</span>
+                  <Zap size={12} className="text-[#D4A853] fill-[#D4A853] animate-pulse" />
+                  <span className="text-xs text-[#8A8F9E]">{user.streak} Day Streak</span>
                 </div>
               </motion.div>
             )}
