@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Brain, ArrowRight, Zap, Target, BookOpen, Lock, Chrome } from 'lucide-react';
+import { Sparkles, Brain, ArrowRight, Zap, Target, BookOpen, Lock, Globe } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -184,7 +184,7 @@ export default function LandingPage() {
                 onClick={handleDemoLogin}
                 className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/8 hover:bg-white/10 transition-colors p-3 rounded-xl font-medium text-sm text-white/90"
               >
-                <Chrome size={18} className="text-cyan-400" />
+                <Globe size={18} className="text-cyan-400" />
                 Continue with Google
               </button>
 
