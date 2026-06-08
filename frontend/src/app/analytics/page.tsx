@@ -47,8 +47,8 @@ export default function AnalyticsWorkspace() {
   };
 
   // Stats Calculations
-  const studyHours = user?.study_hours || 4.5;
-  const streak = user?.streak || 3;
+  const studyHours = user?.study_hours || 0;
+  const streak = user?.streak || 0;
   const completedTasks = tasks.filter(t => t.is_completed).length;
   const totalTasks = tasks.length;
   
