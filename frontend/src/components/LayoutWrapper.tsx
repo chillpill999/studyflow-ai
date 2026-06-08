@@ -2,19 +2,30 @@
 
 import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useStudyStore } from '../store/studyStore';
 import Sidebar from './Sidebar';
 import OnboardingModal from './OnboardingModal';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
   const initUser = useStudyStore(state => state.initUser);
   const user = useStudyStore(state => state.user);
   const loading = useStudyStore(state => state.loading);
 
   useEffect(() => {
-    initUser();
-  }, [initUser]);
+    if (status === 'loading') return;
+    
+    if (session?.user) {
+      // Use email as unique ID, or user.id if available from callbacks
+      const uid = (session.user as any).id || session.user.email || 'user_demo_123';
+      initUser(uid, session.user.name || 'Student', session.user.email || '');
+    } else {
+      // Not logged in, maybe redirect or just init mock (handled by landing page redirect eventually)
+      initUser();
+    }
+  }, [initUser, session, status]);
 
   const isLandingPage = pathname === '/';
 

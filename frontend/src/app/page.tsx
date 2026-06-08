@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { signIn } from 'next-auth/react';
 import { Sparkles, Brain, ArrowRight, Zap, Target, BookOpen, Lock, Globe } from 'lucide-react';
 
 export default function LandingPage() {
@@ -179,9 +180,9 @@ export default function LandingPage() {
                 </button>
               </div>
 
-              {/* Google OAuth simulation */}
+              {/* Google OAuth actual implementation */}
               <button 
-                onClick={handleDemoLogin}
+                onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
                 className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/8 hover:bg-white/10 transition-colors p-3 rounded-xl font-medium text-sm text-white/90"
               >
                 <Globe size={18} className="text-cyan-400" />

@@ -90,7 +90,7 @@ interface StudyFlowState {
 
   // Actions
   checkBackendOnline: () => Promise<boolean>;
-  initUser: (userId?: string) => Promise<void>;
+  initUser: (userId?: string, username?: string, email?: string) => Promise<void>;
   setOnboarding: (subject: string, hours: number) => Promise<void>;
   addStudyHours: (hours: number) => Promise<void>;
   
@@ -158,13 +158,33 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
     }
   },
 
-  initUser: async (userId = 'user_demo_123') => {
+  initUser: async (userId = 'user_demo_123', username = 'Scholar', email = 'scholar@studyflow.ai') => {
     set({ loading: true });
     const online = await get().checkBackendOnline();
     if (online) {
       try {
-        const res = await fetch(`${API_BASE}/user/${userId}`);
-        const data = await res.json();
+        // Try getting the user
+        let res = await fetch(`${API_BASE}/user/${userId}`);
+        let data = null;
+
+        if (res.ok) {
+           data = await res.json();
+        } else {
+           // Not found, so register (upsert) the new Google user
+           const createRes = await fetch(`${API_BASE}/user`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({
+               id: userId,
+               username: username,
+               email: email,
+               preference_subject: 'General',
+               onboarding_completed: 0
+             })
+           });
+           data = await createRes.json();
+        }
+
         set({
           user: {
             id: data.id,
@@ -185,8 +205,8 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
       set({
         user: {
           id: userId,
-          username: "Scholar",
-          email: "scholar@studyflow.ai",
+          username: username,
+          email: email,
           streak: 3,
           study_hours: 4.5,
           preference_subject: "Computer Science",
