@@ -35,7 +35,7 @@ export default function Sidebar() {
   return (
     <motion.div 
       animate={{ width: isCollapsed ? 76 : 260 }}
-      transition={{ duration: 0.4, cubicBezier: [0.4, 0, 0.2, 1] }}
+      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] as any }}
       className="h-screen sticky top-0 bg-[#0B1120]/80 backdrop-blur-xl border-r border-white/8 flex flex-col justify-between p-4 z-40"
     >
       {/* Upper Brand Section */}
