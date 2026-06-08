@@ -17,6 +17,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useStudyStore, Flashcard, QuizQuestion } from '../../store/studyStore';
+import { API_BASE } from '../../lib/api';
 
 export default function StudyTools() {
   const {
@@ -146,7 +147,7 @@ export default function StudyTools() {
 
     if (isBackendOnline) {
       try {
-        const res = await fetch('http://localhost:8000/api/tutor/explain', {
+        const res = await fetch(`${API_BASE}/tutor/explain`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ concept: tutorTopic, difficulty: tutorDiff })

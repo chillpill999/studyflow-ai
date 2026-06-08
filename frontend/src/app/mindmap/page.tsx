@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BrainCircuit, BookOpen, Sparkles, RefreshCw, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
+import { API_BASE } from '../../lib/api';
 
 interface MindNode {
   id: string;
@@ -46,8 +47,8 @@ export default function MindMap() {
     if (isBackendOnline) {
       try {
         const endpoint = selectedSourceType === 'document' 
-          ? `http://localhost:8000/api/document/${selectedSourceId}/mindmap`
-          : `http://localhost:8000/api/notes/${selectedSourceId}/mindmap`;
+          ? `${API_BASE}/document/${selectedSourceId}/mindmap`
+          : `${API_BASE}/notes/${selectedSourceId}/mindmap`;
           
         const res = await fetch(endpoint, { method: 'POST' });
         const data = await res.json();

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { API_BASE, apiUrl } from '../lib/api';
 
 export interface UserProfile {
   id: string;
@@ -127,7 +128,7 @@ interface StudyFlowState {
   setActivePlan: (plan: StudyPlan | null) => void;
 }
 
-const API_BASE = 'http://localhost:8000/api';
+// API_BASE is imported from ../lib/api (reads NEXT_PUBLIC_API_URL env var)
 
 export const useStudyStore = create<StudyFlowState>((set, get) => ({
   user: null,
@@ -146,7 +147,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
 
   checkBackendOnline: async () => {
     try {
-      const res = await fetch('http://localhost:8000/');
+      const res = await fetch(apiUrl('/'));
       const data = await res.json();
       const online = data.status === 'online';
       set({ isBackendOnline: online });

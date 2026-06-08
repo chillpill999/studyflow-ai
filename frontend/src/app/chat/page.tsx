@@ -15,6 +15,7 @@ import {
   FileTextIcon
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
+import { API_BASE } from '../../lib/api';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -67,7 +68,7 @@ export default function DocumentChat() {
       try {
         const history = newMessages.map(m => ({ role: m.role, content: m.content }));
         
-        const res = await fetch(`http://localhost:8000/api/document/${activeDocId}/chat`, {
+        const res = await fetch(`${API_BASE}/document/${activeDocId}/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -127,7 +128,7 @@ export default function DocumentChat() {
 
     if (isBackendOnline) {
       try {
-        const res = await fetch(`http://localhost:8000/api/document/${activeDocId}/summarize`, {
+        const res = await fetch(`${API_BASE}/document/${activeDocId}/summarize`, {
           method: 'POST'
         });
         const data = await res.json();

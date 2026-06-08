@@ -17,6 +17,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
+import { API_BASE } from '../../lib/api';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function Dashboard() {
   const loadInsights = async () => {
     if (isBackendOnline) {
       try {
-        const res = await fetch('http://localhost:8000/api/analytics/insights');
+        const res = await fetch(`${API_BASE}/analytics/insights`);
         const data = await res.json();
         setAiInsights(data.insights || []);
       } catch (err) {
@@ -188,7 +189,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-2 bg-white/5 border border-white/8 rounded-full px-3 py-1.5 self-start text-xs font-medium">
           <span className={`h-2 w-2 rounded-full ${isBackendOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
           <span className="text-white/60">
-            {isBackendOnline ? 'AI Model Online (Gemini)' : 'Mock Mode (Local Offline)'}
+            {isBackendOnline ? 'AI Online (Live)' : 'Mock Mode (Offline)'}
           </span>
         </div>
       </div>
