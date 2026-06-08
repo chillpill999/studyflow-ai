@@ -38,9 +38,9 @@ export default function Sidebar() {
 
   return (
     <motion.div 
-      animate={{ width: isCollapsed ? 76 : 260 }}
-      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] as any }}
-      className="h-screen sticky top-0 bg-[#0B1120]/80 backdrop-blur-xl border-r border-white/8 flex flex-col justify-between p-4 z-40"
+      animate={{ width: isCollapsed ? 76 : 240 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as any }}
+      className="h-screen sticky top-0 bg-[#0A0A0F]/80 backdrop-blur-xl border-r border-white/5 flex flex-col justify-between p-4 z-40 shrink-0"
     >
       {/* Upper Brand Section */}
       <div>
@@ -50,13 +50,13 @@ export default function Sidebar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="flex items-center gap-2 font-bold text-xl tracking-tight text-white"
+              className="flex items-center gap-2 font-bold text-xl tracking-tight text-white relative"
             >
-              <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                <Sparkles className="h-4 w-4 text-white animate-pulse" />
+              <div className="absolute -left-1 top-1 h-1.5 w-1.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-pulse" />
+              <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-lg shadow-indigo-500/20 ml-2">
+                <Sparkles className="h-4 w-4 text-white" />
               </div>
-              <span className="text-gradient-primary font-bold">StudyFlow</span>
-              <span className="text-xs text-white/50 border border-white/10 rounded px-1 py-0.2 bg-white/5">AI</span>
+              <span className="text-white font-extrabold tracking-tight">StudyFlow</span>
             </motion.div>
           )}
           {isCollapsed && (
@@ -83,13 +83,13 @@ export default function Sidebar() {
               <Link key={item.path} href={item.path}>
                 <div className="relative group">
                   <div className={`
-                    flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-300
+                    flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-300
                     ${isActive 
-                      ? 'bg-gradient-primary text-white shadow-lg shadow-indigo-600/15' 
-                      : 'text-white/60 hover:bg-white/5 hover:text-white'
+                      ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.1)]' 
+                      : 'text-white/50 hover:bg-white/5 hover:text-white border border-transparent'
                     }
                   `}>
-                    <Icon size={20} className={`${isActive ? 'scale-105' : 'group-hover:scale-105 transition-transform duration-300'}`} />
+                    <Icon size={18} className={`${isActive ? 'text-indigo-400' : 'group-hover:text-white transition-colors duration-300'}`} />
                     
                     {!isCollapsed && (
                       <motion.span 
@@ -122,13 +122,13 @@ export default function Sidebar() {
             className={`flex items-center group cursor-pointer hover:bg-white/5 p-2 rounded-xl transition-colors ${isCollapsed ? 'justify-center' : 'gap-3 px-2'}`}
             onClick={() => setIsProfileModalOpen(true)}
           >
-            <div className="h-9 w-9 rounded-full bg-gradient-secondary flex items-center justify-center font-bold text-white text-sm relative border border-cyan-400/30 shrink-0">
+            <div className="h-9 w-9 rounded-full bg-gradient-primary flex items-center justify-center font-bold text-white text-sm relative border border-white/10 shrink-0">
               {user.image ? (
                 <img src={user.image} alt={user.username} className="h-full w-full rounded-full object-cover" />
               ) : (
                 user.username.substring(0, 2).toUpperCase()
               )}
-              <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-emerald-500 rounded-full border-2 border-[#030712]" />
+              <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-emerald-500 rounded-full border-2 border-[#0A0A0F]" />
             </div>
 
             {!isCollapsed && (
