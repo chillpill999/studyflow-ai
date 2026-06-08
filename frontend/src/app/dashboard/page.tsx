@@ -58,26 +58,13 @@ export default function Dashboard() {
       }
     } else {
       // Mock insights fallback
+      // Minimal mock insights fallback
       setAiInsights([
         {
           id: "1",
-          type: "recommendation",
-          subject: "Optimal Learning Window",
-          text: "Your focus is highest between 9:00 AM and 11:30 AM. Schedule complex Mathematics problems during this block.",
-          status: "success"
-        },
-        {
-          id: "2",
-          type: "warning",
-          subject: "Topic Recall Drop",
-          text: "Organic Chemistry recall has dropped by 14% based on recent quizzes. We recommend revision tomorrow.",
-          status: "warning"
-        },
-        {
-          id: "3",
           type: "action",
-          subject: "Next Study Goal",
-          text: "You are 1 day away from hitting a 5-day study streak! Complete your planned Computer Science task today.",
+          subject: "Welcome",
+          text: "Upload your first document to begin generating personalized insights.",
           status: "info"
         }
       ]);

@@ -87,7 +87,7 @@ export default function LandingPage() {
           variants={itemVariants} 
           className="text-white/60 text-base md:text-lg max-w-2xl mx-auto leading-relaxed"
         >
-          Upload files, converse with custom documents in real time, auto-generate flashcard decks, attempt quizzes, build visual mind maps, and trace progress inside an elegant workspace.
+          Upload documents, generate instant flashcards, and interact with a personalized AI tutor in a distraction-free environment.
         </motion.p>
 
         <motion.div 
@@ -96,17 +96,10 @@ export default function LandingPage() {
         >
           <button 
             onClick={() => { setAuthMode('signup'); setShowAuthModal(true); }}
-            className="bg-gradient-primary text-white font-semibold px-8 py-4 rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/35 hover:shadow-indigo-600/50 hover:scale-103 cursor-pointer transition-all duration-300 w-full sm:w-auto justify-center"
+            className="bg-gradient-primary text-white font-semibold px-10 py-4 rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/35 hover:shadow-indigo-600/50 hover:scale-103 cursor-pointer transition-all duration-300 w-full sm:w-auto justify-center"
           >
             Start Studying Free
             <ArrowRight size={18} />
-          </button>
-          
-          <button 
-            onClick={handleDemoLogin}
-            className="glass-card text-white/90 font-semibold px-8 py-4 rounded-xl hover:bg-white/8 hover:text-white cursor-pointer transition-all duration-300 w-full sm:w-auto justify-center border border-white/8"
-          >
-            Launch Demo Workspace
           </button>
         </motion.div>
       </motion.div>
@@ -183,56 +176,11 @@ export default function LandingPage() {
               {/* Google OAuth actual implementation */}
               <button 
                 onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
-                className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/8 hover:bg-white/10 transition-colors p-3 rounded-xl font-medium text-sm text-white/90"
+                className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/8 hover:bg-white/10 transition-colors py-4 rounded-xl font-medium text-sm text-white/90 shadow-lg shadow-black/20"
               >
                 <Globe size={18} className="text-cyan-400" />
                 Continue with Google
               </button>
-
-              <div className="relative my-6 text-center">
-                <hr className="border-white/8" />
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0B1120] px-3 text-xs text-white/40">OR EMAIL</span>
-              </div>
-
-              {/* Credentials inputs */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs text-white/50 font-semibold uppercase tracking-wider mb-1.5">Email Address</label>
-                  <input 
-                    type="email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="student@studyflow.ai"
-                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-white/50 font-semibold uppercase tracking-wider mb-1.5">Password</label>
-                  <input 
-                    type="password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-sm"
-                  />
-                </div>
-
-                <button 
-                  onClick={handleDemoLogin}
-                  className="w-full bg-gradient-primary text-white font-semibold py-3 rounded-xl hover:shadow-lg hover:shadow-indigo-600/25 hover:scale-101 cursor-pointer transition-all duration-300 mt-2 text-sm"
-                >
-                  {authMode === 'login' ? 'Access Workspace' : 'Sign Up Free'}
-                </button>
-              </div>
-
-              <div className="text-center mt-6">
-                <button 
-                  onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
-                >
-                  {authMode === 'login' ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
-                </button>
-              </div>
             </motion.div>
           </div>
         )}
