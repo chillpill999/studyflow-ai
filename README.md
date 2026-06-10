@@ -96,3 +96,8 @@ npm run dev
 I'm always looking for ways to improve StudyFlow AI! If you find a bug, have a feature request, or want to contribute some code, feel free to open an issue or submit a pull request. Let's build the ultimate study tool together.
 
 Enjoy studying smarter, not harder! 🚀
+
+---
+
+**Made by rockstar 🎸** 
+*(with a little help from AI ✨)*
