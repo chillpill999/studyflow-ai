@@ -2,6 +2,8 @@
 
 Hey there! Welcome to **StudyFlow AI**, a project I built to change the way we interact with our study materials. 
 
+🚀 **[Try the Live Demo on Vercel!](https://studyflow-ai-tawny.vercel.app)**
+
 If you've ever felt overwhelmed by massive PDF readings, endless lecture slides, or disorganized notes, StudyFlow AI is for you. It's an intelligent academic workspace that acts like a personal tutor, transforming static documents into interactive conversations, flashcards, quizzes, and mind maps. I wanted to build something that not only works incredibly well but also feels premium and enjoyable to use—taking inspiration from the clean aesthetics of tools like Notion, Linear, and Apple.
 
 ---
