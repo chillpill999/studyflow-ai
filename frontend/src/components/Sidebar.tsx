@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Sparkles,
   Zap,
-  Edit2
+  Edit2,
+  ImagePlus
 } from 'lucide-react';
 import { useStudyStore } from '../store/studyStore';
 import ProfileModal from './ProfileModal';
@@ -44,6 +45,7 @@ export default function Sidebar({ isMobileOpen = false, setIsMobileOpen }: Sideb
     { name: 'Document Chat', icon: MessageSquare, path: '/chat' },
     { name: 'Study Tools', icon: BookOpen, path: '/tools' },
     { name: 'Mind Map', icon: BrainCircuit, path: '/mindmap' },
+    { name: 'Image Studio', icon: ImagePlus, path: '/image-studio' },
     { name: 'Notes System', icon: FileText, path: '/notes' },
     { name: 'Analytics', icon: LineChart, path: '/analytics' },
   ];
