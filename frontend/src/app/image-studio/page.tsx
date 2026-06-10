@@ -8,39 +8,22 @@ export default function ImageStudio() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const generateImage = async () => {
+  const generateImage = () => {
     if (!prompt.trim()) return;
     
     setLoading(true);
     setImageUrl(null);
     
-    try {
-      const encodedPrompt = encodeURIComponent(prompt);
-      // We append a random seed so that identical prompts don't just return the browser cache
-      const seed = Math.floor(Math.random() * 1000000);
-      const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${seed}`;
-      
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      
-      setImageUrl(objectUrl);
-    } catch (error) {
-      console.error("Error generating image:", error);
-      alert("Failed to generate image. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    const encodedPrompt = encodeURIComponent(prompt);
+    const seed = Math.floor(Math.random() * 1000000);
+    const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${seed}`;
+    
+    setImageUrl(url);
   };
 
   const handleDownload = () => {
     if (!imageUrl) return;
-    const a = document.createElement('a');
-    a.href = imageUrl;
-    a.download = `studyflow-image-${Date.now()}.jpg`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    window.open(imageUrl, '_blank');
   };
 
   return (
@@ -96,24 +79,39 @@ export default function ImageStudio() {
         {/* Display Section */}
         <div className="lg:col-span-2">
           <div className="glass-card p-4 h-full min-h-[500px] flex flex-col items-center justify-center relative overflow-hidden">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center text-[#8A8F9E]">
+            {loading && imageUrl && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-[#8A8F9E] bg-[#0A0A0F]/50 backdrop-blur-sm rounded-xl">
                 <Loader2 className="w-12 h-12 animate-spin text-[#C9956A] mb-4" />
                 <p>Synthesizing image...</p>
+              </div>
+            )}
+            
+            {loading && !imageUrl ? (
+              <div className="flex flex-col items-center justify-center text-[#8A8F9E]">
+                <Loader2 className="w-12 h-12 animate-spin text-[#C9956A] mb-4" />
+                <p>Preparing canvas...</p>
               </div>
             ) : imageUrl ? (
               <div className="relative w-full h-full flex flex-col items-center">
                 <img 
                   src={imageUrl} 
                   alt={prompt} 
-                  className="rounded-xl max-h-[600px] w-auto object-contain shadow-2xl"
+                  onLoad={() => setLoading(false)}
+                  onError={() => {
+                    setLoading(false);
+                    setImageUrl(null);
+                    alert("Failed to load image. Please try again.");
+                  }}
+                  className={`rounded-xl max-h-[600px] w-auto object-contain shadow-2xl transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
                 />
-                <button
-                  onClick={handleDownload}
-                  className="absolute bottom-4 right-4 bg-[#1E1E2E]/90 backdrop-blur border border-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" /> Download
-                </button>
+                {!loading && (
+                  <button
+                    onClick={handleDownload}
+                    className="absolute bottom-4 right-4 bg-[#1E1E2E]/90 backdrop-blur border border-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" /> Download
+                  </button>
+                )}
               </div>
             ) : (
               <div className="text-center text-[#8A8F9E] flex flex-col items-center max-w-sm">
