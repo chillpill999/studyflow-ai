@@ -1,102 +1,96 @@
-# StudyFlow AI - Premium AI Study Assistant Workspace
+# 🎓 StudyFlow AI
 
-StudyFlow AI is a production-ready, highly polished, AI-powered academic assistant workspace. Designed with premium liquid glassmorphism, fluid interactive animations, and a high-performance FastAPI backend, this platform delivers a startup-grade learning experience inspired by Apple, Stripe, and Linear.
+Hey there! Welcome to **StudyFlow AI**, a project I built to change the way we interact with our study materials. 
 
----
-
-## 🚀 Key Features
-
-1. **AI Document Chat (RAG)**: Chat with uploaded PDFs, DOCX, PPTX, and TXT files. Clicking source reference cards highlights the exact text block in the side-by-side reader.
-2. **AI Document Summarizer**: Generate executive summaries, detailed synopsis paragraphs, key concept lists, and main highlight bullets.
-3. **Leitner Flashcard Decks**: Automate active recall card generation. Employs spaced repetition box scheduling (Boxes 1-5) and 3D CSS flip animations.
-4. **Practice Quiz Generator**: Create structured MCQs, True/False, and fill-in-the-blank question sets. Features correct-answer grading and detailed explanations.
-5. **AI Tutor Explainer**: Select custom difficulty levels (Beginner, Intermediate, Elite) and receive concept breakdowns with real-world analogies.
-6. **Study Planner Scheduler**: Synthesize structured day-by-day roadmap study goals and checklists for complex topics.
-7. **Mind Map Generator**: Convert files and notes into interactive radial vector maps with SVG connectors, zoom/pan controls, and branch collapse selectors.
-8. **Notes Workspace**: Organization folders, live search, and a dual-mode Editor (Edit markdown vs. Live formatted HTML preview rendering).
-9. **Analytics & Task Boards**: Apple-style SVG line trend graphs, subject proficiency scales, and an interactive checklist Task Board.
+If you've ever felt overwhelmed by massive PDF readings, endless lecture slides, or disorganized notes, StudyFlow AI is for you. It's an intelligent academic workspace that acts like a personal tutor, transforming static documents into interactive conversations, flashcards, quizzes, and mind maps. I wanted to build something that not only works incredibly well but also feels premium and enjoyable to use—taking inspiration from the clean aesthetics of tools like Notion, Linear, and Apple.
 
 ---
 
-## 🛠️ Technology Stack
+## 🌟 What problem does this solve?
 
-* **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS, Framer Motion, Zustand.
-* **Backend**: FastAPI (Python 3.12+), SQLite database, RAG vector index.
-* **AI Models**: Google Gemini API (`gemini-1.5-flash`), with high-fidelity local fallback mocks if API keys are not provided.
+Studying is often passive: you read a document, maybe highlight a few things, and hope you remember it for the exam. StudyFlow AI flips that script by forcing active recall and providing instant feedback. 
+
+Instead of just reading a 50-page PDF, you can:
+- **Chat with it**: Ask questions and get answers with direct citations back to the source text.
+- **Test yourself**: Let the AI automatically generate quizzes and Leitner-style flashcards based on the document's content.
+- **Visualize it**: Turn complex topics into interactive mind maps.
+- **Plan it out**: Tell the AI what you need to learn, and it'll build a day-by-day study schedule.
 
 ---
 
-## 📂 Project Structure
+## ✨ Features You'll Love
 
+- **RAG-Powered Document Chat**: Upload PDFs, Word docs, PowerPoints, or text files. When you ask a question, the AI retrieves the exact context and gives you an answer. Clicking a citation jumps you straight to that paragraph in the document viewer!
+- **Automated Summarizer**: Too long; didn't read? Get quick executive summaries, bullet points, or key concepts instantly.
+- **Smart Flashcards (Leitner System)**: It doesn't just create flashcards; it schedules them. The built-in Leitner system helps you practice active recall using spaced repetition (Boxes 1-5) to move facts into your long-term memory.
+- **Practice Quizzes**: Generate multiple-choice, true/false, or fill-in-the-blank quizzes. It even grades your answers and explains *why* you got them right or wrong.
+- **AI Tutor**: Struggling to understand a concept? Ask the AI Tutor to explain it to you like you're a beginner, an intermediate learner, or an expert, complete with real-world analogies.
+- **Study Planner**: Auto-generate a structured roadmap with daily checklists to keep you on track.
+- **Interactive Mind Maps**: Automatically convert your notes into visual radial maps. You can zoom, pan, and collapse branches to see the big picture.
+- **Notes & Analytics**: Keep your thoughts organized in folders, write in Markdown with a live preview, and track your study streaks and proficiency on beautiful trend graphs.
+
+---
+
+## 💻 How it's built (The Tech Stack)
+
+I wanted this app to be blazingly fast and beautifully animated, so here's what's under the hood:
+
+### Frontend
+- **Next.js 15 (App Router)**: For server-side rendering and fast page loads.
+- **TypeScript**: Because type safety is a lifesaver.
+- **Tailwind CSS & Vanilla JS Animations**: For that butter-smooth, Apple-style liquid glassmorphism and spring physics.
+- **Zustand**: For lightweight, painless global state management.
+
+### Backend
+- **FastAPI (Python 3.12+)**: Super fast, asynchronous, and perfect for handling AI requests.
+- **SQLite**: A lightweight, file-based database for storing your documents and progress.
+- **RAG Vector Indexing**: The secret sauce that lets the AI "read" your documents and find the exact paragraphs needed to answer your questions.
+
+### AI Integration
+- **Google Gemini API (`gemini-1.5-flash`)**: Powers the intelligence behind the chat, summaries, and generation tools. 
+- *Pro tip: I also built a **Local Fallback Mode**! If you don't have an API key set up, the app will gracefully fall back to local text chunking and keyword searches so you can still test out the UI and features completely offline.*
+
+---
+
+## 🚀 Getting Started Locally
+
+Want to run this on your own machine? It's pretty straightforward.
+
+### 1. Set up the Backend
+First, let's get the FastAPI server running.
+
+```bash
+cd backend
 ```
-studyflow-ai/
-├── backend/
-│   ├── app/
-│   │   ├── api/            # FastAPI routes (endpoints.py)
-│   │   ├── core/           # config.py, SQLite db.py initializations
-│   │   ├── services/       # document_service.py, rag_service.py, ai_service.py
-│   │   └── main.py         # App entry point
-│   ├── requirements.txt    # Python requirements
-│   ├── .env                # Local configuration values
-│   └── .env.example        # Environment template
-└── frontend/
-    ├── src/
-    │   ├── app/            # App Router pages (Landing, Dashboard, Chat, etc.)
-    │   ├── components/     # Sidebar, OnboardingModal, LayoutWrapper
-    │   └── store/          # Zustand state store (studyStore.ts)
-    ├── package.json        # Frontend config
-    ├── tailwind.config.ts  # Tailwind style rules
-    └── globals.css         # Liquid glassmorphism CSS templates
-```
-
----
-
-## ⚙️ Environment Configuration
-
-### Backend Setup (`backend/.env`)
-Create a file named `.env` in the `backend/` directory:
+Create a `.env` file inside the `backend` folder and add your Gemini API key:
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 DB_FILE=studyflow.db
 CORS_ORIGINS=["*"]
 ```
+Activate the virtual environment and run the server:
+- **Windows**: `.\venv\Scripts\Activate.ps1`
+- **macOS/Linux**: `source venv/bin/activate`
+
+```bash
+python app/main.py
+```
+*The backend is now live at [http://localhost:8000](http://localhost:8000).*
+
+### 2. Set up the Frontend
+Open a new terminal window and head into the frontend folder.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*Your frontend is now live at [http://localhost:3000](http://localhost:3000).*
 
 ---
 
-## 🏃 Setup & Run Instructions
+## 🤝 Contributing
 
-### 1. Launch FastAPI Backend
-1. Open a terminal and navigate to the backend folder:
-   ```bash
-   cd backend
-   ```
-2. Activate the virtual environment:
-   * **Windows Powershell**:
-     ```powershell
-     .\venv\Scripts\Activate.ps1
-     ```
-   * **macOS/Linux**:
-     ```bash
-     source venv/bin/activate
-     ```
-3. Run the FastAPI development server:
-   ```bash
-   python app/main.py
-   ```
-   *The backend will boot on [http://localhost:8000](http://localhost:8000). You can inspect the OpenAPI documentation at [http://localhost:8000/docs](http://localhost:8000/docs).*
+I'm always looking for ways to improve StudyFlow AI! If you find a bug, have a feature request, or want to contribute some code, feel free to open an issue or submit a pull request. Let's build the ultimate study tool together.
 
-### 2. Launch Next.js Frontend
-1. Open a new terminal and navigate to the frontend folder:
-   ```bash
-   cd frontend
-   ```
-2. Start the local development server:
-   ```bash
-   npm run dev
-   ```
-   *The frontend will launch on [http://localhost:3000](http://localhost:3000).*
-
----
-
-## 🧩 Local Fallback Mode
-If no `GEMINI_API_KEY` is provided, StudyFlow AI automatically operates in **Local Mock Mode**. In this mode, the platform utilizes high-fidelity local text chunkers, keyword similarity searches, and pre-constructed quiz/flashcard generators. This guarantees that you can review and demonstrate the full user experience (uploading, chatting, mind mapping, grading) completely out-of-the-box.
+Enjoy studying smarter, not harder! 🚀
