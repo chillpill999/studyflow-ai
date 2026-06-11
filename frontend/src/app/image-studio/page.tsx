@@ -32,10 +32,12 @@ export default function ImageStudio() {
         throw new Error(errorMsg);
       }
 
-      // Convert the raw image blob returned by our Edge route to an object URL
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      setImageUrl(objectUrl);
+      const data = await response.json();
+      if (data.url) {
+        setImageUrl(data.url);
+      } else {
+        throw new Error(data.error || "Failed to generate image URL.");
+      }
 
     } catch (error: any) {
       console.error("Image generation failed:", error);

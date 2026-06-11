@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
@@ -36,27 +37,27 @@ export async function POST(req: Request) {
       try {
           const js = JSON.parse(errorText);
           if (js.error && js.estimated_time) {
-              errorText = `Model is warming up. Please try again in ${Math.ceil(js.estimated_time)} seconds.`;
-          } else {
-              errorText = js.error || errorText;
+              return NextResponse.json({ 
+                  error: `Model is warming up. Please wait ${Math.ceil(js.estimated_time)} seconds and try again.` 
+              }, { status: 503 });
           }
+          errorText = js.error || errorText;
       } catch(e) {}
       
       return NextResponse.json({ error: errorText }, { status: response.status });
     }
 
-    // Stream the response directly to bypass Edge memory / size limits!
-    return new Response(response.body, {
-      status: 200,
-      headers: {
-        'Content-Type': response.headers.get('content-type') || 'image/jpeg',
-        'Cache-Control': 'no-store, max-age=0',
-      },
-    });
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    const base64 = buffer.toString('base64');
+    const mimeType = response.headers.get('content-type') || 'image/jpeg';
+    
+    return NextResponse.json({ url: `data:${mimeType};base64,${base64}` });
 
   } catch (error: any) {
     return NextResponse.json(
-      { error: `Edge runtime error: ${error.message || String(error)}` },
+      { error: `Server error: ${error.message || String(error)}` },
       { status: 500 }
     );
   }
