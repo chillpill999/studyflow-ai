@@ -32,16 +32,24 @@ export async function POST(req: Request) {
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      return NextResponse.json({ error: `HF API Error: ${errorText}` }, { status: response.status });
+      let errorText = await response.text();
+      try {
+          const js = JSON.parse(errorText);
+          if (js.error && js.estimated_time) {
+              errorText = `Model is warming up. Please try again in ${Math.ceil(js.estimated_time)} seconds.`;
+          } else {
+              errorText = js.error || errorText;
+          }
+      } catch(e) {}
+      
+      return NextResponse.json({ error: errorText }, { status: response.status });
     }
 
-    const arrayBuffer = await response.arrayBuffer();
-    
-    return new Response(arrayBuffer, {
+    // Stream the response directly to bypass Edge memory / size limits!
+    return new Response(response.body, {
       status: 200,
       headers: {
-        'Content-Type': 'image/jpeg',
+        'Content-Type': response.headers.get('content-type') || 'image/jpeg',
         'Cache-Control': 'no-store, max-age=0',
       },
     });
