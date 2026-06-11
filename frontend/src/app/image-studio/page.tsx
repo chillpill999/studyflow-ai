@@ -2,23 +2,34 @@
 
 import React, { useState } from 'react';
 import { ImagePlus, Download, Sparkles, Loader2 } from 'lucide-react';
+import Script from 'next/script';
 
 export default function ImageStudio() {
   const [prompt, setPrompt] = useState('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const generateImage = () => {
+  const generateImage = async () => {
     if (!prompt.trim()) return;
     
     setLoading(true);
     setImageUrl(null);
     
-    const encodedPrompt = encodeURIComponent(prompt);
-    const seed = Math.floor(Math.random() * 1000000);
-    const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&seed=${seed}`;
-    
-    setImageUrl(url);
+    try {
+      // @ts-ignore
+      if (typeof window !== 'undefined' && window.puter) {
+        // @ts-ignore
+        const imageElement = await window.puter.ai.txt2img(prompt);
+        setImageUrl(imageElement.src);
+      } else {
+        throw new Error("Puter.js not loaded");
+      }
+    } catch (error) {
+      console.error("Image generation failed:", error);
+      alert("Failed to generate image. Please try again or check your browser console.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDownload = () => {
@@ -28,6 +39,7 @@ export default function ImageStudio() {
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto min-h-[calc(100vh-4rem)]">
+      <Script src="https://js.puter.com/v2/" strategy="beforeInteractive" />
       <div className="flex items-center gap-3 mb-8">
         <div className="h-10 w-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg shadow-[#C9956A]/20">
           <ImagePlus className="h-5 w-5 text-[#0A0A0F]" />
