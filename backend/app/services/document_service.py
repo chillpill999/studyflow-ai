@@ -43,7 +43,7 @@ class DocumentService:
                         if uploaded_file.state.name == "FAILED":
                             raise ValueError("Gemini File processing failed.")
                             
-                        model = genai.GenerativeModel("gemini-1.5-flash")
+                        model = genai.GenerativeModel("gemini-2.5-flash")
                         response = model.generate_content([
                             uploaded_file, 
                             "Extract all the text from this document accurately. Respond ONLY with the raw extracted text."
