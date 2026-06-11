@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { ImagePlus, Download, Sparkles, Loader2 } from 'lucide-react';
-import Script from 'next/script';
 
 export default function ImageStudio() {
   const [prompt, setPrompt] = useState('');
@@ -16,17 +15,22 @@ export default function ImageStudio() {
     setImageUrl(null);
     
     try {
-      // @ts-ignore
-      if (typeof window !== 'undefined' && window.puter) {
-        // @ts-ignore
-        const imageElement = await window.puter.ai.txt2img(prompt);
-        setImageUrl(imageElement.src);
-      } else {
-        throw new Error("Puter.js not loaded");
+      const response = await fetch('/api/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate image");
       }
-    } catch (error) {
+
+      setImageUrl(data.url);
+    } catch (error: any) {
       console.error("Image generation failed:", error);
-      alert("Failed to generate image. Please try again or check your browser console.");
+      alert(`Failed to generate image: ${error.message || "Please check your backend API key"}`);
     } finally {
       setLoading(false);
     }
@@ -39,7 +43,6 @@ export default function ImageStudio() {
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto min-h-[calc(100vh-4rem)]">
-      <Script src="https://js.puter.com/v2/" strategy="beforeInteractive" />
       <div className="flex items-center gap-3 mb-8">
         <div className="h-10 w-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg shadow-[#C9956A]/20">
           <ImagePlus className="h-5 w-5 text-[#0A0A0F]" />
