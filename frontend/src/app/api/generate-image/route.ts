@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+
 export async function POST(req: Request) {
   try {
     const { prompt } = await req.json();
@@ -17,9 +19,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Using openjourney which is very fast and won't trigger the 10s timeout
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/prompthero/openjourney",
+      "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
       {
         headers: {
           "Authorization": `Bearer ${apiKey}`,
@@ -31,29 +32,23 @@ export async function POST(req: Request) {
     );
 
     if (!response.ok) {
-      let errorText = await response.text();
-      try {
-        const json = JSON.parse(errorText);
-        errorText = json.error || errorText;
-      } catch (e) {}
-      
-      return NextResponse.json(
-        { error: `HF API Error: ${errorText}` },
-        { status: response.status }
-      );
+      const errorText = await response.text();
+      return NextResponse.json({ error: `HF API Error: ${errorText}` }, { status: response.status });
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64 = buffer.toString('base64');
-    const dataUri = `data:image/jpeg;base64,${base64}`;
-
-    return NextResponse.json({ url: dataUri });
+    
+    return new Response(arrayBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/jpeg',
+        'Cache-Control': 'no-store, max-age=0',
+      },
+    });
 
   } catch (error: any) {
-    console.error("Error generating image:", error);
     return NextResponse.json(
-      { error: `Internal server error: ${error.message || String(error)}` },
+      { error: `Edge runtime error: ${error.message || String(error)}` },
       { status: 500 }
     );
   }
