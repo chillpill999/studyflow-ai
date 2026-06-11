@@ -1,5 +1,6 @@
 import os
 import re
+import time
 from typing import List, Dict, Any
 import PyPDF2
 import docx2txt
@@ -25,6 +26,30 @@ class DocumentService:
                         page_text = page.extract_text()
                         if page_text:
                             text += page_text + "\n"
+                
+                # Fallback to Gemini OCR for scanned PDFs
+                if len(text.strip()) < 50:
+                    from app.core.config import settings
+                    if settings.GEMINI_API_KEY:
+                        import google.generativeai as genai
+                        genai.configure(api_key=settings.GEMINI_API_KEY)
+                        uploaded_file = genai.upload_file(file_path)
+                        
+                        # Wait for processing
+                        while uploaded_file.state.name == "PROCESSING":
+                            time.sleep(2)
+                            uploaded_file = genai.get_file(uploaded_file.name)
+                            
+                        if uploaded_file.state.name == "FAILED":
+                            raise ValueError("Gemini File processing failed.")
+                            
+                        model = genai.GenerativeModel("gemini-1.5-flash")
+                        response = model.generate_content([
+                            uploaded_file, 
+                            "Extract all the text from this document accurately. Respond ONLY with the raw extracted text."
+                        ])
+                        text = response.text
+                        genai.delete_file(uploaded_file.name)
             except Exception as e:
                 raise ValueError(f"Failed to parse PDF: {str(e)}")
 

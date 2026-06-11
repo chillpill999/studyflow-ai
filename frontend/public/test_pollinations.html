@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Test Pollinations</h1>
+    <img id="img1" src="https://image.pollinations.ai/prompt/cute%20dog?seed=123" />
+    <script>
+        document.getElementById('img1').onload = () => console.log('Loaded!');
+        document.getElementById('img1').onerror = () => console.log('Failed!');
+    </script>
+</body>
+</html>

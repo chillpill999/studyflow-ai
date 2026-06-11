@@ -5,6 +5,7 @@ import { ImagePlus, Download, Sparkles, Loader2 } from 'lucide-react';
 
 export default function ImageStudio() {
   const [prompt, setPrompt] = useState('');
+  const [selectedModel, setSelectedModel] = useState<'nanobanana' | 'basic'>('nanobanana');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -15,29 +16,42 @@ export default function ImageStudio() {
     setImageUrl(null);
     
     try {
-      // Create a unique seed to prevent caching
-      const seed = Math.floor(Math.random() * 1000000);
-      const encodedPrompt = encodeURIComponent(prompt);
-      
-      // Use Pollinations AI. 
-      // It allows direct image embedding without CORS issues or API keys.
-      const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?seed=${seed}&nologo=true&width=1024&height=1024`;
-      
-      const img = new window.Image();
-      img.onload = () => {
-        setImageUrl(url);
-        setLoading(false);
-      };
-      img.onerror = () => {
-        setLoading(false);
-        alert("The image generation service is currently overloaded. Please try again in a few minutes.");
-      };
-      // Setting src triggers the browser to download the image, completely bypassing fetch/CORS
-      img.src = url;
+      if (selectedModel === 'nanobanana') {
+        // Use the dedicated NanoBanana backend proxy which enforces the 3/day rate limit
+        const response = await fetch('/api/generate-nanobanana', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt }),
+        });
 
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || `Server Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setImageUrl(data.url);
+        setLoading(false);
+      } else {
+        // Fallback: Pollinations AI. 
+        const seed = Math.floor(Math.random() * 1000000);
+        const encodedPrompt = encodeURIComponent(prompt);
+        const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?seed=${seed}&nologo=true&width=1024&height=1024`;
+        
+        const img = new window.Image();
+        img.onload = () => {
+          setImageUrl(url);
+          setLoading(false);
+        };
+        img.onerror = () => {
+          setLoading(false);
+          alert("The basic image generation service is currently overloaded. Please try again in a few minutes.");
+        };
+        img.src = url;
+      }
     } catch (error: any) {
       console.error("Image generation failed:", error);
-      alert(`Failed to generate image: ${error.message}`);
+      alert(`Generation Failed: ${error.message}`);
       setLoading(false);
     }
   };
@@ -67,7 +81,21 @@ export default function ImageStudio() {
         {/* Controls Section */}
         <div className="lg:col-span-1 space-y-6">
           <div className="glass-card p-6">
-            <h3 className="text-lg font-semibold mb-4 text-[#F0EEF6]">Prompt Engineering</h3>
+            <h3 className="text-lg font-semibold mb-4 text-[#F0EEF6]">Settings</h3>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-[#8A8F9E] mb-2">Select Model</label>
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value as any)}
+                className="w-full glass-input p-3 rounded-xl focus:ring-2 focus:ring-[#C9956A] outline-none text-[#F0EEF6] bg-[#1E1E2E]/50"
+              >
+                <option value="nanobanana">NanoBanana Pro (3/day)</option>
+                <option value="basic">Basic AI (Unlimited)</option>
+              </select>
+            </div>
+
+            <h3 className="text-lg font-semibold mb-4 mt-6 text-[#F0EEF6]">Prompt Engineering</h3>
             <textarea
               className="w-full glass-input p-4 rounded-xl resize-none h-40 focus:ring-2 focus:ring-[#C9956A] outline-none"
               placeholder="E.g. A highly detailed, realistic watercolor diagram of the human heart, white background, textbook style."
