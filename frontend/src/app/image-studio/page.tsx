@@ -15,39 +15,26 @@ export default function ImageStudio() {
     setImageUrl(null);
     
     try {
-      // 1. Get the securely stored HF key from our backend
-      const keyResponse = await fetch('/api/generate-image', { method: 'GET' });
-      const keyData = await keyResponse.json();
-      if (!keyResponse.ok) {
-        throw new Error(keyData.error || "Failed to load API key");
-      }
+      // 1. Fetch image securely through our Edge API route (avoids CORS and protects API key)
+      const response = await fetch('/api/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
 
-      // 2. Fetch directly from HF to bypass Vercel's 10-second server timeout limit
-      const hfResponse = await fetch(
-        "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
-        {
-          headers: {
-            "Authorization": `Bearer ${keyData.key}`,
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: JSON.stringify({ inputs: prompt }),
-        }
-      );
-
-      if (!hfResponse.ok) {
-        let errorMsg = hfResponse.statusText;
+      if (!response.ok) {
+        let errorMsg = response.statusText;
         try {
-            const errBody = await hfResponse.json();
+            const errBody = await response.json();
             errorMsg = errBody.error || errorMsg;
         } catch(e) {
-            errorMsg = await hfResponse.text() || errorMsg;
+            errorMsg = await response.text() || errorMsg;
         }
-        throw new Error(`HF API: ${errorMsg}`);
+        throw new Error(errorMsg);
       }
 
-      // 3. Convert blob to URL
-      const blob = await hfResponse.blob();
+      // 2. The Edge function streams the image blob directly back to us
+      const blob = await response.blob();
       const objectUrl = URL.createObjectURL(blob);
       setImageUrl(objectUrl);
 
