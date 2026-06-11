@@ -16,7 +16,7 @@ export default function ImageStudio() {
     
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://studyflow-ai-production.up.railway.app";
-      const response = await fetch(`${apiUrl}/api/v1/image/generate`, {
+      const response = await fetch(`${apiUrl}/api/image/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
