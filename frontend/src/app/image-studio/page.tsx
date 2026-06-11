@@ -15,56 +15,29 @@ export default function ImageStudio() {
     setImageUrl(null);
     
     try {
-      // 1. Fetch HF key from our backend securely
-      const keyRes = await fetch('/api/hf-key');
-      if (!keyRes.ok) throw new Error("Could not retrieve API key");
-      const { key } = await keyRes.json();
-
-      // 2. Call Hugging Face API directly from client
-      // Using openjourney as it loads significantly faster and is more reliable than FLUX
-      let retries = 5;
-      let blob: Blob | null = null;
+      // Create a unique seed to prevent caching
+      const seed = Math.floor(Math.random() * 1000000);
+      const encodedPrompt = encodeURIComponent(prompt);
       
-      while (retries > 0 && !blob) {
-        try {
-          const response = await fetch("https://api-inference.huggingface.co/models/prompthero/openjourney", {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${key}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ inputs: prompt })
-          });
-
-          if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            throw new Error(err.error || `HTTP error ${response.status}`);
-          }
-          
-          blob = await response.blob();
-        } catch (err: any) {
-          // If TypeError (CORS block due to 503) or explicit 503
-          if (err.name === 'TypeError' || err.message.includes('503') || err.message.includes('loading')) {
-            console.log("Model might be loading. Retrying in 10s...", err.message);
-            retries--;
-            if (retries === 0) throw new Error("Model is taking too long to load. Please try again later.");
-            // Wait 10 seconds before retrying
-            await new Promise(r => setTimeout(r, 10000));
-          } else {
-            throw err;
-          }
-        }
-      }
-
-      if (blob) {
-        const objectUrl = URL.createObjectURL(blob);
-        setImageUrl(objectUrl);
-      }
+      // Use Pollinations AI. 
+      // It allows direct image embedding without CORS issues or API keys.
+      const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?seed=${seed}&nologo=true&width=1024&height=1024`;
+      
+      const img = new window.Image();
+      img.onload = () => {
+        setImageUrl(url);
+        setLoading(false);
+      };
+      img.onerror = () => {
+        setLoading(false);
+        alert("The image generation service is currently overloaded. Please try again in a few minutes.");
+      };
+      // Setting src triggers the browser to download the image, completely bypassing fetch/CORS
+      img.src = url;
 
     } catch (error: any) {
       console.error("Image generation failed:", error);
       alert(`Failed to generate image: ${error.message}`);
-    } finally {
       setLoading(false);
     }
   };
