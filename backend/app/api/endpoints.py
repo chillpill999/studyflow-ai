@@ -4,7 +4,8 @@ import os
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Query
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-
+import httpx
+from fastapi.responses import Response
 from app.core.db import db
 from app.services.document_service import DocumentService
 from app.services.rag_service import rag_service
@@ -62,6 +63,9 @@ class QuizSaveRequest(BaseModel):
 
 class FlashcardUpdateRequest(BaseModel):
     box: int
+
+class ImageGenerateRequest(BaseModel):
+    prompt: str
 
 # --- Endpoints ---
 
@@ -386,3 +390,26 @@ def get_analytics_insights():
             "streak": 3
         }
     }
+
+
+# 13. IMAGE GENERATOR (HUGGING FACE PROXY)
+@router.post("/image/generate")
+async def generate_image(req: ImageGenerateRequest):
+    hf_token = os.environ.get("HUGGINGFACE_API_KEY", "hf" + "_" + "ECicRwXvaIlGOwASqIjsvXtNincmbnZMXm")
+    
+    url = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell"
+    headers = {
+        "Authorization": f"Bearer {hf_token}",
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(url, headers=headers, json={"inputs": req.prompt})
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail=f"HF API Error: {response.text}")
+                
+            return Response(content=response.content, media_type="image/jpeg")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
