@@ -15,28 +15,19 @@ export default function ImageStudio() {
     setImageUrl(null);
     
     try {
-      // 1. Fetch image securely through our Edge API route (avoids CORS and protects API key)
       const response = await fetch('/api/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        let errorMsg = response.statusText;
-        try {
-            const errBody = await response.json();
-            errorMsg = errBody.error || errorMsg;
-        } catch(e) {
-            errorMsg = await response.text() || errorMsg;
-        }
-        throw new Error(errorMsg);
+        throw new Error(data.error || "Failed to generate image");
       }
 
-      // 2. The Edge function streams the image blob directly back to us
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      setImageUrl(objectUrl);
+      setImageUrl(data.url);
 
     } catch (error: any) {
       console.error("Image generation failed:", error);

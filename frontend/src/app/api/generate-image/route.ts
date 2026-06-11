@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'edge';
-
 export async function POST(req: Request) {
   try {
     const { prompt } = await req.json();
@@ -19,6 +17,7 @@ export async function POST(req: Request) {
       );
     }
 
+    // Using openjourney which is very fast and won't trigger the 10s timeout
     const response = await fetch(
       "https://api-inference.huggingface.co/models/prompthero/openjourney",
       {
@@ -44,13 +43,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // Return the image blob directly to stream it back to the client
-    return new Response(response.body, {
-      status: 200,
-      headers: {
-        'Content-Type': 'image/jpeg',
-      },
-    });
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64 = buffer.toString('base64');
+    const dataUri = `data:image/jpeg;base64,${base64}`;
+
+    return NextResponse.json({ url: dataUri });
 
   } catch (error: any) {
     console.error("Error generating image:", error);
