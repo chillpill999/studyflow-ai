@@ -15,19 +15,47 @@ export default function ImageStudio() {
     setImageUrl(null);
     
     try {
-      const response = await fetch('/api/generate-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to generate image");
+      // 1. Get the securely stored HF key from our backend
+      const keyResponse = await fetch('/api/hf-key');
+      const keyData = await keyResponse.json();
+      if (!keyResponse.ok) {
+        throw new Error(keyData.error || "Failed to load API key");
       }
 
-      setImageUrl(data.url);
+      // 2. Fetch directly from HF via a CORS proxy to bypass Vercel's 10s server timeout limit
+      // AND prevent browser CORS errors when HF returns 503 Model Loading without CORS headers.
+      const targetUrl = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+
+      const hfResponse = await fetch(proxyUrl, {
+          headers: {
+            "Authorization": `Bearer ${keyData.key}`,
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify({ inputs: prompt }),
+      });
+
+      if (!hfResponse.ok) {
+        let errorMsg = hfResponse.statusText;
+        try {
+            const errBody = await hfResponse.json();
+            // If model is loading, show the estimated time!
+            if (errBody.error && errBody.estimated_time) {
+                errorMsg = `Model is warming up. Please try again in ${Math.ceil(errBody.estimated_time)} seconds.`;
+            } else {
+                errorMsg = errBody.error || errorMsg;
+            }
+        } catch(e) {
+            errorMsg = await hfResponse.text() || errorMsg;
+        }
+        throw new Error(errorMsg);
+      }
+
+      // 3. Convert blob to URL
+      const blob = await hfResponse.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      setImageUrl(objectUrl);
 
     } catch (error: any) {
       console.error("Image generation failed:", error);
