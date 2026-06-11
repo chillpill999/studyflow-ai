@@ -21,14 +21,13 @@ export default function ImageStudio() {
       const { key } = await keyRes.json();
 
       // 2. Call Hugging Face API directly from client
-      // We use a retry loop because HF returns 503 without CORS headers when loading,
-      // which causes a "Failed to fetch" TypeError in the browser.
-      let retries = 3;
+      // Using openjourney as it loads significantly faster and is more reliable than FLUX
+      let retries = 5;
       let blob: Blob | null = null;
       
       while (retries > 0 && !blob) {
         try {
-          const response = await fetch("https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell", {
+          const response = await fetch("https://api-inference.huggingface.co/models/prompthero/openjourney", {
             method: "POST",
             headers: {
               "Authorization": `Bearer ${key}`,
