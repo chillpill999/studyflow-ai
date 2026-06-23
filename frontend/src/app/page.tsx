@@ -90,7 +90,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3">Document RAG Chat</h3>
               <p className="text-[#8A8F9E] leading-relaxed">
-                Upload PDFs & lecture slides. Chat with Gemini AI for sourced answers mapped perfectly to your curriculum.
+                Upload PDFs & lecture slides to our free study AI. Chat with our Gemini model for sourced answers mapped perfectly to your curriculum.
               </p>
             </div>
 
@@ -100,7 +100,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3">Flashcard Studio</h3>
               <p className="text-[#8A8F9E] leading-relaxed">
-                Auto-generate spaced-repetition flashcards from any text in seconds using our advanced cognitive engine.
+                Auto-generate spaced-repetition flashcards from any text or case study AI notes in seconds using the best study AI engine.
               </p>
             </div>
 
@@ -110,7 +110,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3">Visual Mind Maps</h3>
               <p className="text-[#8A8F9E] leading-relaxed">
-                Turn complex topics into interactive node maps with one click. Understand the big picture instantly.
+                Turn complex topics into interactive node maps with one click. The ultimate study ai tool for understanding the big picture instantly.
               </p>
             </div>
 
@@ -121,7 +121,7 @@ export default function LandingPage() {
       {/* 5. Footer */}
       <footer className="border-t border-white/5 py-8 mt-12 z-10 text-center">
         <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-[#4A4F5E] text-sm">© 2026 StudyFlow AI. Designed for elite learning.</p>
+          <p className="text-[#4A4F5E] text-sm">© 2026 StudyFlow AI. The best free study AI platform designed for elite learning.</p>
           <div className="flex gap-6 text-sm text-[#4A4F5E]">
             <a href="#" className="hover:text-[#C9956A] transition-colors">Privacy</a>
             <a href="#" className="hover:text-[#C9956A] transition-colors">Terms</a>

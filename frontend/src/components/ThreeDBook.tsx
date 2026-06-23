@@ -99,7 +99,7 @@ export default function ThreeDBook() {
                 {authMode === 'login' ? 'Welcome Back' : 'Create Account'}
               </h2>
               <p className="text-[#8A8F9E] text-xs sm:text-sm">
-                {authMode === 'login' ? 'Sign in to your workspace' : 'Join the elite learning platform'}
+                {authMode === 'login' ? 'Sign in to your workspace' : 'Join the best study AI platform'}
               </p>
             </div>
 
@@ -202,7 +202,7 @@ export default function ThreeDBook() {
                 <span className="text-[#0A0A0F] font-bold text-2xl" style={{ fontFamily: 'var(--font-playfair)' }}>S</span>
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4 text-[#F0EEF6]" style={{ fontFamily: 'var(--font-playfair)' }}>
-                StudyFlow <span className="text-[#C9956A] font-sans text-xs sm:text-sm block mt-3 tracking-[0.3em] uppercase">The AI Copilot</span>
+                StudyFlow <span className="text-[#C9956A] font-sans text-xs sm:text-sm block mt-3 tracking-[0.3em] uppercase">The Best Study AI</span>
               </h1>
               <div className="w-12 h-1 bg-gradient-primary mx-auto rounded-full mt-8 mb-8" />
               
@@ -239,7 +239,7 @@ export default function ThreeDBook() {
                 </h2>
                 
                 <p className="text-[#8A8F9E] text-sm sm:text-base leading-relaxed max-w-[250px]">
-                  Turn textbooks into interactive intelligence. Flashcards, mind maps, and AI tutoring built directly into your notes.
+                  Turn textbooks into interactive intelligence with this free study AI tool. Flashcards, mind maps, and AI tutoring built directly into your notes.
                 </p>
                 
                 {/* Close Button / Return */}
