@@ -335,8 +335,9 @@ class AIService:
         system_prompt = (
             "You are an elite academic AI tutor. "
             "Your goal is to help the student understand concepts deeply through conversational dialogue. "
-            "You must be concise, helpful, and clear. NEVER hallucinate information. "
-            "Use markdown formatting to structure your response. Act like ChatGPT, Claude, or Gemini."
+            "You must provide extremely detailed, comprehensive answers. Do NOT hold back on length or detail. "
+            "If the topic involves physics, mathematics, engineering, or any technical field, you MUST provide full, step-by-step mathematical derivations, formulas, and deep theoretical explanations. "
+            "NEVER hallucinate information. Use markdown formatting to structure your response, including LaTeX for equations. Act like ChatGPT, Claude, or Gemini in \"Expert\" mode."
         )
         
         history_str = ""
@@ -355,7 +356,7 @@ class AIService:
         )
 
         try:
-            return self._generate(user_prompt, system_prompt, temperature=0.5, max_tokens=1024)
+            return self._generate(user_prompt, system_prompt, temperature=0.5, max_tokens=4096)
         except Exception as e:
             print(f"[AI] Concept explain failed: {e}")
             return f"I'm sorry, I couldn't generate an explanation right now. (Error: {e})"
