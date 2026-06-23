@@ -328,17 +328,21 @@ class AIService:
             print(f"[AI] Study plan parse failed: {e}")
             return self._mock_study_plan(topic, days)
 
-    def explain_concept(self, concept: str, difficulty: str = "medium") -> Dict[str, str]:
+    def explain_concept(self, concept: str, difficulty: str = "medium", context: str = "") -> Dict[str, str]:
         system_prompt = (
-            "You are an elite AI tutor who excels at making complex concepts easy to understand. "
+            "You are an elite academic AI tutor. "
+            "You must be extremely concise, stay strictly on topic, and NEVER hallucinate or diverge into unrelated subjects. "
             "You always respond with valid JSON only. No markdown. No explanation outside the JSON."
         )
+        context_str = f"Document Context (use this to ground your answer if relevant):\n{context}\n\n" if context else ""
         user_prompt = (
-            f"Explain the concept \"{concept}\" at a {difficulty} difficulty level.\n"
+            f"{context_str}"
+            f"Explain the core academic concept of \"{concept}\" at a {difficulty} difficulty level.\n"
+            f"Do not include any off-topic information. Be direct and precise.\n"
             f"Respond ONLY with a JSON object with these keys:\n"
-            f"- \"explanation\": Clear, thorough explanation (3-5 sentences)\n"
-            f"- \"example\": A concrete, real-world example\n"
-            f"- \"analogy\": A simple, memorable real-world analogy\n"
+            f"- \"explanation\": Clear, focused explanation strictly about the concept (3-4 sentences)\n"
+            f"- \"example\": A concrete, highly relevant real-world example\n"
+            f"- \"analogy\": A simple, direct analogy\n"
             f"- \"summary\": A 1-sentence quick-review summary\n\n"
             f"Output raw JSON only. Start with {{."
         )

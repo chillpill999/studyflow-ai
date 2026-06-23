@@ -54,6 +54,7 @@ class StudyPlanRequest(BaseModel):
 class TutorRequest(BaseModel):
     concept: str
     difficulty: Optional[str] = "medium"
+    doc_id: Optional[str] = None
 
 class QuizSaveRequest(BaseModel):
     doc_id: str
@@ -262,7 +263,13 @@ def get_quizzes():
 # 7. AI TUTOR CONCEPT EXPLAINER
 @router.post("/tutor/explain")
 def tutor_explain(req: TutorRequest):
-    explanation = ai_service.explain_concept(req.concept, req.difficulty)
+    context = ""
+    if req.doc_id:
+        doc = db.get_document(req.doc_id)
+        if doc:
+            context = doc["text_content"][:15000]
+
+    explanation = ai_service.explain_concept(req.concept, req.difficulty, context)
     return explanation
 
 

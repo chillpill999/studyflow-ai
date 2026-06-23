@@ -9,7 +9,7 @@ import { API_BASE } from '../lib/api';
 type Message = { role: 'user' | 'assistant', content: string };
 
 export default function AITutorBubble() {
-  const { isBackendOnline, addStudyHours } = useStudyStore();
+  const { isBackendOnline, addStudyHours, activeDocId } = useStudyStore();
   const [isOpen, setIsOpen] = useState(false);
   
   const [tutorTopic, setTutorTopic] = useState('');
@@ -33,7 +33,7 @@ export default function AITutorBubble() {
         const res = await fetch(`${API_BASE}/tutor/explain`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ concept: userMessage, difficulty: tutorDiff })
+          body: JSON.stringify({ concept: userMessage, difficulty: tutorDiff, doc_id: activeDocId })
         });
         const data = await res.json();
         fullAnswer = `### Core Explanation\n${data.explanation}\n\n### Analogy Metaphor\n${data.analogy}\n\n### Applied Case Study\n${data.example}\n\n*${data.summary}*`;
@@ -44,7 +44,7 @@ export default function AITutorBubble() {
     } else {
       // Mock Tutor response
       await new Promise(resolve => setTimeout(resolve, 800)); // artificial delay
-      fullAnswer = `Absolutely! Let's break down **${userMessage}**.\n\n### Core Concept\nIn computer systems and mathematics, ${userMessage} is a key framework representing structural patterns. At a ${tutorDiff} difficulty level, it involves balancing nodes, optimizing search operations, and managing resources efficiently so that overall system latency is reduced.\n\n### Real-World Analogy\nThink of ${userMessage} like organizing a massive grocery store. Instead of throwing all items into one giant pile, you categorize them into aisles, shelves, and sections so that customers don't search aimlessly. It transforms an O(N) search into an O(1) or O(log N) lookup.\n\n### Practical Example\nAn industry example includes indexing large SQL databases, caching frequent queries in Redis, or balancing network traffic under peak server load. Without ${userMessage}, the system would bottleneck entirely.\n\n*Summary: ${userMessage} improves operational efficiency by structuring loose datasets into highly optimized lookup paths.*`;
+      fullAnswer = `Absolutely! Let's break down **${userMessage}**.\n\n### Core Concept\n${userMessage} is a fundamental concept that underpins many principles in its field. At a ${tutorDiff} difficulty level, it involves understanding its core mechanisms and the principles governing its behavior.\n\n### Real-World Analogy\nThink of ${userMessage} like a recipe in cooking — it defines specific inputs, a precise process, and a predictable output every time.\n\n### Practical Example\nA practical example of ${userMessage} can be found in standard textbook problems and industry applications where its properties are leveraged for real-world solutions.\n\n*Summary: ${userMessage} is a key building block that connects theory and practice in its domain.*`;
     }
 
     setIsStreaming(true);
