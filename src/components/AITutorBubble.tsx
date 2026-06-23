@@ -33,31 +33,25 @@ export default function AITutorBubble() {
 
     let fullAnswer = "";
 
-    if (isBackendOnline) {
-      try {
-        const res = await fetch(`/api/tutor`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            concept: userMessage, 
-            difficulty: tutorDiff, 
-            doc_id: activeDocId,
-            chat_history: [...tutorMessages, { role: 'user', content: userMessage }]
-          })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.detail || "Backend error");
-        }
-        fullAnswer = data.response || data.explanation || "Sorry, I received an empty response. Please try again.";
-      } catch (err) {
-        console.error(err);
-        fullAnswer = "Sorry, I encountered an error communicating with the server.";
+    try {
+      const res = await fetch(`/api/tutor`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          concept: userMessage, 
+          difficulty: tutorDiff, 
+          doc_id: activeDocId,
+          chat_history: [...tutorMessages, { role: 'user', content: userMessage }]
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Backend error");
       }
-    } else {
-      // Mock Tutor response
-      await new Promise(resolve => setTimeout(resolve, 800)); // artificial delay
-      fullAnswer = `Absolutely! Let's break down **${userMessage}**.\n\n${userMessage} is a fundamental concept. Think of it like a recipe in cooking — it defines specific inputs, a precise process, and a predictable output every time.`;
+      fullAnswer = data.response || data.explanation || "Sorry, I received an empty response. Please try again.";
+    } catch (err) {
+      console.error(err);
+      fullAnswer = "Sorry, I encountered an error communicating with the server. Please make sure your API key is configured in Vercel.";
     }
 
     setIsStreaming(true);
