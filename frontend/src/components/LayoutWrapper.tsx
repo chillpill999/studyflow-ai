@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { useStudyStore } from '../store/studyStore';
 import Sidebar from './Sidebar';
 import OnboardingModal from './OnboardingModal';
+import AITutorBubble from './AITutorBubble';
 import { Menu, Sparkles } from 'lucide-react';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -77,6 +78,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         {children}
       </main>
 
+      {!isLandingPage && <AITutorBubble />}
       {!isLandingPage && <OnboardingModal />}
     </div>
   );
