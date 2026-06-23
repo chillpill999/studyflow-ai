@@ -19,14 +19,14 @@
 </p>
 
 <p align="center">
-  <a href="https://studyflow-ai-tawny.vercel.app"><img src="https://img.shields.io/badge/🚀_Live_Demo-C9956A?style=for-the-badge" alt="Live Demo"></a>
+  <a href="https://www.thestudyflow.in"><img src="https://img.shields.io/badge/🚀_Live_Demo-C9956A?style=for-the-badge" alt="Live Demo"></a>
   <a href="#-getting-started"><img src="https://img.shields.io/badge/📖_Documentation-1E1E2E?style=for-the-badge" alt="Documentation"></a>
   <a href="https://github.com/chillpill999/studyflow-ai/issues"><img src="https://img.shields.io/badge/🐛_Report_Bug-1E1E2E?style=for-the-badge" alt="Report Bug"></a>
 </p>
 
 ## 📸 Demo
 
-> 🎬 *GIF walkthrough coming soon — [try the live demo](https://studyflow-ai-tawny.vercel.app) in the meantime!*
+> 🎬 *GIF walkthrough coming soon — [try the live demo](https://www.thestudyflow.in) in the meantime!*
 
 | Feature | Preview |
 |---|---|
