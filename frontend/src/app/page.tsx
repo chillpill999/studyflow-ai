@@ -121,7 +121,11 @@ export default function LandingPage() {
       {/* 5. Footer */}
       <footer className="border-t border-white/5 py-8 mt-12 z-10 text-center">
         <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-[#4A4F5E] text-sm">© 2026 StudyFlow AI. The best free study AI platform designed for elite learning.</p>
+          <div className="text-center space-y-1">
+            <p className="text-[#4A4F5E] text-sm">© 2026 StudyFlow AI. The best free study AI platform designed for elite learning.</p>
+            <p className="text-[#C9956A]/70 text-xs">Made with Love of Hothlali Members</p>
+            <p className="text-[#C9956A]/70 text-xs">developed by Civil Community</p>
+          </div>
           <div className="flex gap-6 text-sm text-[#4A4F5E]">
             <a href="#" className="hover:text-[#C9956A] transition-colors">Privacy</a>
             <a href="#" className="hover:text-[#C9956A] transition-colors">Terms</a>
