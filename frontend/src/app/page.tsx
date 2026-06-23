@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn, useSession } from 'next-auth/react';
-import { ArrowRight, FileText, Layers, Network, X } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { FileText, Layers, Network } from 'lucide-react';
 import ThreeDBook from '@/components/ThreeDBook';
 
 export default function LandingPage() {

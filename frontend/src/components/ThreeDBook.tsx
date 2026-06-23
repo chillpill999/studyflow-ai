@@ -39,7 +39,7 @@ export default function ThreeDBook() {
 
   // Define spring physics configuration
   const springTransition = {
-    type: "spring",
+    type: "spring" as const,
     stiffness: 80,
     damping: 20,
     mass: 1.5,
