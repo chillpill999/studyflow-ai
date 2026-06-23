@@ -242,7 +242,7 @@ export default function StudyTools() {
                     {/* Card container */}
                     <div 
                       onClick={() => setIsFlipped(!isFlipped)}
-                      className="w-full max-w-lg aspect-[8/5] cursor-pointer perspective-1000"
+                      className="w-full max-w-2xl min-h-[350px] cursor-pointer perspective-1000"
                     >
                       <motion.div 
                         animate={{ rotateY: isFlipped ? 180 : 0 }}
@@ -255,9 +255,11 @@ export default function StudyTools() {
                             <span>Concept Recall Question</span>
                             <span className="bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full">Box {activeCards[currentCardIdx]?.box}</span>
                           </div>
-                          <p className="text-center text-lg font-bold text-white px-4">
-                            {activeCards[currentCardIdx]?.question}
-                          </p>
+                          <div className="flex-1 flex items-center justify-center overflow-y-auto my-4 px-4">
+                            <p className="text-center text-lg font-bold text-white whitespace-pre-wrap">
+                              {activeCards[currentCardIdx]?.question}
+                            </p>
+                          </div>
                           <div className="text-center text-xs text-white/30 font-medium tracking-wide">
                             Click to flip and view explanation
                           </div>
@@ -271,9 +273,9 @@ export default function StudyTools() {
                             <span>Recall Answer Explanation</span>
                             <span>Spaced Repetition Review</span>
                           </div>
-                          <p className="text-center text-[15px] leading-relaxed text-white/90 px-4 overflow-y-auto max-h-[120px]">
+                          <div className="flex-1 overflow-y-auto my-4 px-4 text-left text-[15px] leading-relaxed text-white/90 whitespace-pre-wrap">
                             {activeCards[currentCardIdx]?.answer}
-                          </p>
+                          </div>
                           <div className="text-center text-xs text-white/30 font-medium tracking-wide">
                             Click anywhere to flip back
                           </div>

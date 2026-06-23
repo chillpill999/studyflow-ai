@@ -36,9 +36,6 @@ export default function DocumentChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isAiTyping, setIsAiTyping] = useState(false);
-  const [summaryData, setSummaryData] = useState<any | null>(null);
-  const [showSummaryDrawer, setShowSummaryDrawer] = useState(false);
-  const [loadingSummary, setLoadingSummary] = useState(false);
   const [highlightedChunkId, setHighlightedChunkId] = useState<number | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -123,8 +120,26 @@ export default function DocumentChat() {
 
   const handleGenerateSummary = async () => {
     if (!activeDocId) return;
-    setLoadingSummary(true);
-    setShowSummaryDrawer(true);
+    
+    // Inject user message
+    const userText = "Please generate a comprehensive summary of this document.";
+    const newMessages: Message[] = [...messages, { role: 'user', content: userText }];
+    setMessages(newMessages);
+    setIsAiTyping(true);
+
+    const formatSummaryToMarkdown = (data: any) => {
+      let md = `**Executive Summary**\n${data.short}\n\n`;
+      md += `**Detailed Synopsis**\n${data.detailed}\n\n`;
+      md += `**Key Highlights**\n`;
+      data.bullets?.forEach((b: string) => {
+        md += `- ${b}\n`;
+      });
+      md += `\n**Core Terminology**\n`;
+      data.key_concepts?.forEach((c: any) => {
+        md += `- **${c.concept}:** ${c.explanation}\n`;
+      });
+      return md;
+    };
 
     if (isBackendOnline) {
       try {
@@ -132,16 +147,14 @@ export default function DocumentChat() {
           method: 'POST'
         });
         const data = await res.json();
-        setSummaryData(data);
+        streamResponse(formatSummaryToMarkdown(data));
       } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingSummary(false);
+        streamResponse("Failed to generate summary. Please verify FastAPI is running.");
       }
     } else {
       // Mock summary
       setTimeout(() => {
-        setSummaryData({
+        const mockData = {
           short: "This document is a comprehensive guide to active memory consolidation, Leitner systems, and visual mind mapping structures.",
           detailed: "The study materials analyze cognitive load theory and memory decay curves. It advocates for active testing over passive highlighting. Synthesizing visual maps connects discrete subfields, while spaced repetition schedules reviews at expanding gaps to reinforce neurological pathways.",
           bullets: [
@@ -155,8 +168,8 @@ export default function DocumentChat() {
             { concept: "Leitner Box System", explanation: "A flashcard tracking layout that schedules card reviews based on box weights (1 to 5)." },
             { concept: "Forgetting Curve", explanation: "The exponential rate at which new information fades from memory unless active retrieval is done." }
           ]
-        });
-        setLoadingSummary(false);
+        };
+        streamResponse(formatSummaryToMarkdown(mockData));
       }, 1200);
     }
   };
@@ -356,95 +369,6 @@ export default function DocumentChat() {
         </form>
 
       </div>
-
-      {/* SUMMARY DRAWER MODAL OVERLAY */}
-      <AnimatePresence>
-        {showSummaryDrawer && (
-          <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-end z-50">
-            <motion.div 
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as any }}
-              className="w-full max-w-xl h-full bg-[#0B1120]/95 border-l border-white/10 p-6 flex flex-col justify-between overflow-hidden shadow-2xl relative"
-            >
-              {/* Glow block inside drawer */}
-              <div className="absolute top-0 left-0 -ml-16 -mt-16 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl animate-pulse-glow" />
-
-              {/* Close & Title */}
-              <div className="flex justify-between items-center border-b border-white/8 pb-4 mb-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="text-indigo-400 h-5 w-5" />
-                  <h3 className="text-lg font-bold text-white">AI Document Synthesis</h3>
-                </div>
-                <button 
-                  onClick={() => setShowSummaryDrawer(false)}
-                  className="text-white/40 hover:text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-white/8 hover:bg-white/5 cursor-pointer"
-                >
-                  Close Synthesis
-                </button>
-              </div>
-
-              {/* Drawer Content */}
-              <div className="flex-1 overflow-y-auto space-y-6 pr-1">
-                {loadingSummary ? (
-                  <div className="h-full flex flex-col items-center justify-center gap-3">
-                    <div className="h-8 w-8 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-                    <span className="text-xs text-white/40 font-semibold animate-pulse">Running text summarizer models...</span>
-                  </div>
-                ) : (
-                  summaryData && (
-                    <div className="space-y-6 text-sm leading-relaxed text-white/70">
-                      
-                      {/* Short Executive summary */}
-                      <div className="glass-card p-4 rounded-xl border border-indigo-500/15">
-                        <span className="text-[10px] text-indigo-300 font-bold uppercase tracking-wider block mb-1">Executive Summary</span>
-                        <p className="text-white text-sm font-medium">{summaryData.short}</p>
-                      </div>
-
-                      {/* Detailed summary */}
-                      <div>
-                        <span className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-2">Detailed Synopsis</span>
-                        <p className="bg-white/3 border border-white/5 p-4 rounded-xl">{summaryData.detailed}</p>
-                      </div>
-
-                      {/* Bullet summary */}
-                      <div>
-                        <span className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-2">Key Highlights</span>
-                        <ul className="space-y-2">
-                          {summaryData.bullets?.map((item: string, i: number) => (
-                            <li key={i} className="flex gap-2.5 items-start">
-                              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-400 flex-shrink-0" />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Key concepts */}
-                      <div>
-                        <span className="text-xs text-white/40 font-semibold uppercase tracking-wider block mb-2">Core Terminology</span>
-                        <div className="grid grid-cols-1 gap-3">
-                          {summaryData.key_concepts?.map((c: any, i: number) => (
-                            <div key={i} className="bg-white/3 border border-white/5 p-3 rounded-xl">
-                              <h5 className="font-bold text-white flex items-center gap-1.5 text-xs">
-                                <span className="h-1 w-1 bg-indigo-400 rounded-full" />
-                                {c.concept}
-                              </h5>
-                              <p className="text-xs text-white/50 mt-1">{c.explanation}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                    </div>
-                  )
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
     </div>
   );
