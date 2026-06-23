@@ -140,7 +140,7 @@ export default function StudyTools() {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
       
       {/* Title */}
       <div>
