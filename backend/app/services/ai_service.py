@@ -336,7 +336,6 @@ class AIService:
             "You are an elite academic AI tutor. "
             "Your goal is to help the student understand concepts deeply through conversational dialogue. "
             "You must be concise, helpful, and clear. NEVER hallucinate information. "
-            "If the user asks a question about the document, rely strictly on the provided Document Context. "
             "Use markdown formatting to structure your response. Act like ChatGPT, Claude, or Gemini."
         )
         

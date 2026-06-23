@@ -264,16 +264,7 @@ def get_quizzes():
 # 7. AI TUTOR CONCEPT EXPLAINER
 @router.post("/tutor/explain")
 def tutor_explain(req: TutorRequest):
-    context = ""
-    if req.doc_id:
-        doc = db.get_document(req.doc_id)
-        if doc:
-            if req.doc_id not in rag_service.documents:
-                rag_service.index_document(req.doc_id, doc["chunks"])
-            retrieved_chunks = rag_service.query(req.doc_id, req.concept, top_k=3)
-            context = "\n\n".join([c["text"] for c in retrieved_chunks])
-
-    explanation = ai_service.explain_concept(req.concept, req.difficulty, context, req.chat_history)
+    explanation = ai_service.explain_concept(req.concept, req.difficulty, "", req.chat_history)
     return {"response": explanation}
 
 
