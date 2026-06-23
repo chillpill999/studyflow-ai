@@ -176,8 +176,10 @@ class AIService:
 
         system_prompt = (
             "You are StudyFlow AI, an elite academic assistant. "
-            "Answer the user's question using the provided source chunks. "
-            "If the answer is not in the context, say so briefly and provide a general helpful answer. "
+            "You MUST base your answer strictly and ONLY on the provided source chunks. "
+            "If the answer cannot be found in the provided source chunks, reply exactly with: "
+            "\"I cannot find the answer to this question in the provided document.\" "
+            "Do NOT use outside knowledge or hallucinate information. "
             "Always cite the source numbers you used (e.g. [Source 1]). "
             "Use Markdown for formatting. Be clear, concise, and helpful."
         )
@@ -199,6 +201,7 @@ class AIService:
     def generate_summary(self, text: str) -> Dict[str, Any]:
         system_prompt = (
             "You are a world-class academic summarizer. "
+            "You MUST strictly base your summary on the provided text. Do not invent information. "
             "You always respond with valid JSON only. No markdown. No explanation outside the JSON."
         )
         user_prompt = (
@@ -207,7 +210,7 @@ class AIService:
             f"- \"detailed\": 1 comprehensive paragraph\n"
             f"- \"bullets\": array of 4-6 key bullet-point strings\n"
             f"- \"key_concepts\": array of objects with \"concept\" and \"explanation\" keys (3-5 items)\n\n"
-            f"Text:\n{text[:6000]}\n\n"
+            f"Text:\n{text[:25000]}\n\n"
             f"Output raw JSON only. Start with {{."
         )
 
@@ -221,6 +224,7 @@ class AIService:
     def generate_flashcards(self, text: str) -> List[Dict[str, str]]:
         system_prompt = (
             "You are an expert educator creating study flashcards. "
+            "You MUST extract questions and answers ONLY from the provided text. Do not hallucinate. "
             "You always respond with valid JSON only. No markdown. No explanation outside the JSON."
         )
         user_prompt = (
@@ -228,7 +232,7 @@ class AIService:
             f"Respond ONLY with a JSON array of objects, each with:\n"
             f"- \"question\": a clear, specific question\n"
             f"- \"answer\": a complete, accurate answer\n\n"
-            f"Text:\n{text[:5000]}\n\n"
+            f"Text:\n{text[:25000]}\n\n"
             f"Output raw JSON array only. Start with [."
         )
 
@@ -245,6 +249,7 @@ class AIService:
     def generate_quiz(self, text: str) -> List[Dict[str, Any]]:
         system_prompt = (
             "You are an expert quiz designer. "
+            "You MUST base the quiz STRICTLY on the facts presented in the provided text. Do not invent details. "
             "You always respond with valid JSON only. No markdown. No explanation outside the JSON."
         )
         user_prompt = (
@@ -256,7 +261,7 @@ class AIService:
             f"- \"options\": array of option strings (4 for mcq, [\"True\",\"False\"] for tf, [] for blank)\n"
             f"- \"correct_answer\": the exact correct answer string\n"
             f"- \"explanation\": why this answer is correct\n\n"
-            f"Text:\n{text[:5000]}\n\n"
+            f"Text:\n{text[:25000]}\n\n"
             f"Output raw JSON array only. Start with [."
         )
 
@@ -273,6 +278,7 @@ class AIService:
     def generate_mindmap(self, text: str) -> Dict[str, Any]:
         system_prompt = (
             "You are an expert at creating hierarchical mind maps. "
+            "You MUST extract the hierarchy strictly from the provided text. Do not hallucinate external concepts. "
             "You always respond with valid JSON only. No markdown. No explanation outside the JSON."
         )
         user_prompt = (
@@ -282,7 +288,7 @@ class AIService:
             f"- \"label\": short node label (1-4 words)\n"
             f"- \"children\": array of child nodes (empty array for leaf nodes)\n\n"
             f"The root node should be the main topic. Create at least 3 main branches.\n\n"
-            f"Text:\n{text[:4000]}\n\n"
+            f"Text:\n{text[:25000]}\n\n"
             f"Output raw JSON only. Start with {{."
         )
 
