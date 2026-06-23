@@ -38,7 +38,8 @@ export default function StudyTools() {
     addStudyHours
   } = useStudyStore();
 
-  const [activeTab, setActiveTab] = useState<'flashcards' | 'quiz' | 'tutor' | 'planner'>('flashcards');
+  const [activeTab, setActiveTab] = useState<'flashcards' | 'quiz' | 'planner'>('flashcards');
+  const [isTutorOpen, setIsTutorOpen] = useState(false);
 
   // Flashcards States
   const [selectedDocId, setSelectedDocId] = useState('');
@@ -56,7 +57,9 @@ export default function StudyTools() {
   // Tutor States
   const [tutorTopic, setTutorTopic] = useState('');
   const [tutorDiff, setTutorDiff] = useState('medium');
-  const [tutorOutput, setTutorOutput] = useState<any | null>(null);
+  type Message = { role: 'user' | 'assistant', content: string };
+  const [tutorMessages, setTutorMessages] = useState<Message[]>([]);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [loadingTutor, setLoadingTutor] = useState(false);
 
   // Planner States
@@ -141,37 +144,52 @@ export default function StudyTools() {
 
   // --- AI Tutor Handlers ---
   const handleTutorExplain = async () => {
-    if (!tutorTopic.trim()) return;
+    if (!tutorTopic.trim() || isStreaming) return;
+    
+    const userMessage = tutorTopic;
+    setTutorMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setTutorTopic('');
     setLoadingTutor(true);
-    setTutorOutput(null);
+
+    let fullAnswer = "";
 
     if (isBackendOnline) {
       try {
         const res = await fetch(`${API_BASE}/tutor/explain`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ concept: tutorTopic, difficulty: tutorDiff })
+          body: JSON.stringify({ concept: userMessage, difficulty: tutorDiff })
         });
         const data = await res.json();
-        setTutorOutput(data);
+        fullAnswer = `### Core Explanation\n${data.explanation}\n\n### Analogy Metaphor\n${data.analogy}\n\n### Applied Case Study\n${data.example}\n\n*${data.summary}*`;
       } catch (err) {
         console.error(err);
-      } finally {
-        setLoadingTutor(false);
+        fullAnswer = "Sorry, I encountered an error synthesizing the explanation.";
       }
     } else {
       // Mock Tutor response
-      setTimeout(() => {
-        setTutorOutput({
-          explanation: `In computer systems and mathematics, ${tutorTopic} is a key framework representing structural patterns. At a ${tutorDiff} difficulty, it involves balancing nodes, optimizing search operations, and managing resources efficiently.`,
-          analogy: `Think of ${tutorTopic} like organizing a grocery store: categorizing shelves into aisles so that customers don't search aimlessly.`,
-          example: `An industry example includes indexing databases, caching queries, or balancing network traffic under peak server load.`,
-          summary: `Summary: ${tutorTopic} improves operational efficiency by structuring loose datasets.`
-        });
-        setLoadingTutor(false);
-        addStudyHours(0.4);
-      }, 1000);
+      await new Promise(resolve => setTimeout(resolve, 800)); // artificial delay
+      fullAnswer = `Absolutely! Let's break down **${userMessage}**.\n\n### Core Concept\nIn computer systems and mathematics, ${userMessage} is a key framework representing structural patterns. At a ${tutorDiff} difficulty level, it involves balancing nodes, optimizing search operations, and managing resources efficiently so that overall system latency is reduced.\n\n### Real-World Analogy\nThink of ${userMessage} like organizing a massive grocery store. Instead of throwing all items into one giant pile, you categorize them into aisles, shelves, and sections so that customers don't search aimlessly. It transforms an O(N) search into an O(1) or O(log N) lookup.\n\n### Practical Example\nAn industry example includes indexing large SQL databases, caching frequent queries in Redis, or balancing network traffic under peak server load. Without ${userMessage}, the system would bottleneck entirely.\n\n*Summary: ${userMessage} improves operational efficiency by structuring loose datasets into highly optimized lookup paths.*`;
     }
+
+    // Stream the answer
+    setIsStreaming(true);
+    setTutorMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+    
+    // Typewriter effect
+    const words = fullAnswer.split(' ');
+    for (let i = 0; i < words.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 20)); // speed of typing
+      setTutorMessages(prev => {
+        const newMsgs = [...prev];
+        newMsgs[newMsgs.length - 1].content += (i === 0 ? '' : ' ') + words[i];
+        return newMsgs;
+      });
+    }
+    
+    setIsStreaming(false);
+    setLoadingTutor(false);
+    addStudyHours(0.4);
   };
 
   // --- Study Planner Handlers ---
@@ -194,32 +212,41 @@ export default function StudyTools() {
       </div>
 
       {/* Tabs Menu */}
-      <div className="flex border-b border-white/8 gap-4 overflow-x-auto pb-1">
-        {[
-          { id: 'flashcards', name: 'Flashcard Decks', icon: Layers },
-          { id: 'quiz', name: 'Practice Quizzes', icon: HelpCircle },
-          { id: 'tutor', name: 'AI Tutor Explainer', icon: Brain },
-          { id: 'planner', name: 'Study Planner', icon: Calendar },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`
-                flex items-center gap-2 px-4 py-3 font-semibold text-sm whitespace-nowrap border-b-2 cursor-pointer transition-all duration-300
-                ${isActive 
-                  ? 'border-indigo-500 text-white' 
-                  : 'border-transparent text-white/50 hover:text-white'
-                }
-              `}
-            >
-              <Icon size={16} />
-              {tab.name}
-            </button>
-          );
-        })}
+      <div className="flex justify-between items-center border-b border-white/8 pb-1 mb-4">
+        <div className="flex gap-4 overflow-x-auto">
+          {[
+            { id: 'flashcards', name: 'Flashcard Decks', icon: Layers },
+            { id: 'quiz', name: 'Practice Quizzes', icon: HelpCircle },
+            { id: 'planner', name: 'Study Planner', icon: Calendar },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`
+                  flex items-center gap-2 px-4 py-3 font-semibold text-sm whitespace-nowrap border-b-2 cursor-pointer transition-all duration-300
+                  ${isActive 
+                    ? 'border-indigo-500 text-white' 
+                    : 'border-transparent text-white/50 hover:text-white'
+                  }
+                `}
+              >
+                <Icon size={16} />
+                {tab.name}
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={() => setIsTutorOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 text-indigo-300 text-sm font-bold rounded-xl transition-all shadow-lg shadow-indigo-900/20 whitespace-nowrap"
+        >
+          <Sparkles size={16} />
+          <span className="hidden sm:inline">AI Tutor</span>
+        </button>
       </div>
 
       {/* Tab Contents */}
@@ -291,7 +318,7 @@ export default function StudyTools() {
                         className="w-full h-full relative preserve-3d transition-transform duration-500"
                       >
                         {/* Front Side */}
-                        <div className="absolute inset-0 w-full h-full rounded-2xl p-6 flex flex-col justify-between glass-card border border-white/10 backface-hidden shadow-2xl">
+                        <div className="absolute inset-0 w-full h-full rounded-2xl p-6 flex flex-col justify-between bg-[#1E1E2E] border border-white/10 backface-hidden shadow-2xl">
                           <div className="flex justify-between items-center text-[10px] text-indigo-400 font-bold uppercase tracking-wider">
                             <span>Concept Recall Question</span>
                             <span className="bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full">Box {activeCards[currentCardIdx]?.box}</span>
@@ -306,7 +333,7 @@ export default function StudyTools() {
 
                         {/* Back Side */}
                         <div 
-                          className="absolute inset-0 w-full h-full rounded-2xl p-6 flex flex-col justify-between glass-card border border-indigo-400/40 bg-indigo-500/5 rotateY-180 backface-hidden shadow-2xl"
+                          className="absolute inset-0 w-full h-full rounded-2xl p-6 flex flex-col justify-between bg-[#232336] border border-indigo-400/40 rotateY-180 backface-hidden shadow-2xl"
                         >
                           <div className="flex justify-between items-center text-[10px] text-cyan-400 font-bold uppercase tracking-wider">
                             <span>Recall Answer Explanation</span>
@@ -538,108 +565,6 @@ export default function StudyTools() {
             </motion.div>
           )}
 
-          {/* AI TUTOR TAB */}
-          {activeTab === 'tutor' && (
-            <motion.div
-              key="tutor-tab"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="max-w-2xl mx-auto space-y-6"
-            >
-              <div className="glass-card p-6 rounded-3xl space-y-4">
-                <h3 className="text-md font-bold text-white flex items-center gap-2">
-                  <Brain size={16} className="text-indigo-400" />
-                  Gemini Explainer Interface
-                </h3>
-                <p className="text-xs text-white/50">
-                  Input any complex concept. The AI Tutor explains the idea, applies analogies, and displays code or calculations.
-                </p>
-
-                <div className="space-y-4 pt-2">
-                  <div>
-                    <label className="block text-[10px] text-white/40 uppercase tracking-wider font-semibold mb-1.5">Concept to Explain</label>
-                    <input 
-                      type="text" 
-                      value={tutorTopic}
-                      onChange={(e) => setTutorTopic(e.target.value)}
-                      placeholder="e.g. Quantum Entanglement, Dijkstra's algorithm, DNA replication"
-                      className="w-full glass-input px-4 py-3 rounded-xl text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] text-white/40 uppercase tracking-wider font-semibold mb-1.5">Cognitive Depth / Difficulty</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { id: 'easy', label: 'Beginner (Analogies)' },
-                        { id: 'medium', label: 'Intermediate' },
-                        { id: 'hard', label: 'Elite (Rigorous)' }
-                      ].map((lvl) => (
-                        <button
-                          key={lvl.id}
-                          onClick={() => setTutorDiff(lvl.id)}
-                          className={`
-                            p-2.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all
-                            ${tutorDiff === lvl.id 
-                              ? 'bg-indigo-600/10 border-indigo-500 text-white' 
-                              : 'bg-white/3 border-white/5 hover:bg-white/6 text-white/60'
-                            }
-                          `}
-                        >
-                          {lvl.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleTutorExplain}
-                    disabled={loadingTutor || !tutorTopic.trim()}
-                    className="w-full bg-gradient-primary hover:scale-[1.01] hover:shadow-lg hover:shadow-indigo-600/20 py-3 rounded-xl text-xs font-semibold text-white transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    {loadingTutor ? 'Synthesizing Explanation...' : 'Explain with AI Tutor'}
-                  </button>
-                </div>
-              </div>
-
-              {/* Explainer Output Card */}
-              {tutorOutput && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="glass-card p-6 rounded-3xl space-y-5 border border-white/8"
-                >
-                  <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                    <span className="text-xs font-extrabold text-indigo-400 uppercase tracking-wider">Tutor Synthesizer Outputs</span>
-                    <span className="text-[10px] text-white/40 border border-white/10 rounded px-1.5 py-0.5 uppercase">{tutorDiff} depth</span>
-                  </div>
-
-                  <div className="space-y-4 text-sm leading-relaxed text-white/70">
-                    <div>
-                      <h4 className="font-bold text-white text-xs uppercase tracking-wider text-white/40 mb-1.5">Core Explanation</h4>
-                      <p className="bg-white/3 border border-white/5 p-4 rounded-xl text-white/80">{tutorOutput.explanation}</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-cyan-500/5 border border-cyan-500/10 p-4 rounded-xl">
-                        <h5 className="font-bold text-cyan-400 text-xs uppercase tracking-wider mb-1">Analogy Metaphor</h5>
-                        <p className="text-xs text-white/70 mt-1">{tutorOutput.analogy}</p>
-                      </div>
-                      <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl">
-                        <h5 className="font-bold text-emerald-400 text-xs uppercase tracking-wider mb-1">Applied Case Study</h5>
-                        <p className="text-xs text-white/70 mt-1">{tutorOutput.example}</p>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-white/5 pt-3 text-xs text-white/40 italic">
-                      {tutorOutput.summary}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
 
           {/* STUDY PLANNER TAB */}
           {activeTab === 'planner' && (
@@ -766,6 +691,113 @@ export default function StudyTools() {
 
         </AnimatePresence>
       </div>
+
+      {/* AI TUTOR SLIDE BAR */}
+      <AnimatePresence>
+        {isTutorOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsTutorOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            />
+            
+            {/* Sidebar */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-screen w-full max-w-md bg-[#0A0A0F] border-l border-white/10 shadow-2xl z-50 flex flex-col"
+            >
+              {/* Header */}
+              <div className="bg-[#13111E] border-b border-white/10 px-6 py-4 flex items-center justify-between z-10 shrink-0">
+                <div className="flex items-center gap-3">
+                  <Brain className="text-indigo-400" size={20} />
+                  <div>
+                    <h3 className="font-bold text-white text-sm">Gemini Tutor</h3>
+                    <p className="text-[10px] text-white/50">Ask me to break down any concept.</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <select 
+                    value={tutorDiff}
+                    onChange={(e) => setTutorDiff(e.target.value)}
+                    className="bg-white/5 border border-white/10 text-white/70 text-[10px] px-2 py-1.5 rounded-lg focus:outline-none cursor-pointer hidden sm:block"
+                  >
+                    <option value="easy">Beginner</option>
+                    <option value="medium">Intermediate</option>
+                    <option value="hard">Elite</option>
+                  </select>
+                  <button 
+                    onClick={() => setIsTutorOpen(false)}
+                    className="p-1.5 hover:bg-white/10 rounded-lg text-white/50 hover:text-white transition-colors border border-transparent hover:border-white/10"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Chat Area */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 flex flex-col">
+                {tutorMessages.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50">
+                    <Brain size={48} className="text-indigo-400 mb-4" />
+                    <h4 className="text-white font-bold mb-2">What do you want to learn?</h4>
+                    <p className="text-xs text-white/60 max-w-sm">Type a concept below, and I'll break it down using analogies and practical examples.</p>
+                  </div>
+                ) : (
+                  tutorMessages.map((msg, idx) => (
+                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[85%] rounded-2xl px-5 py-4 shadow-lg ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-[#1E1E2E] text-white/90 border border-white/5 rounded-tl-sm'}`}>
+                        {msg.role === 'assistant' && (
+                          <div className="flex items-center gap-2 mb-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                            <Sparkles size={12} /> AI Tutor
+                          </div>
+                        )}
+                        <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                          {msg.content}
+                          {isStreaming && idx === tutorMessages.length - 1 && (
+                            <span className="inline-block w-2 h-4 bg-indigo-400 animate-pulse ml-1 align-middle" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Input Area */}
+              <div className="p-4 bg-[#13111E] border-t border-white/10 shrink-0 pb-6">
+                <div className="flex items-center gap-3 bg-[#0A0A0F] border border-white/10 rounded-2xl px-3 py-2.5 focus-within:border-indigo-500 transition-colors shadow-inner">
+                  <input
+                    type="text"
+                    value={tutorTopic}
+                    onChange={(e) => setTutorTopic(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleTutorExplain()}
+                    placeholder="Message AI Tutor..."
+                    disabled={loadingTutor || isStreaming}
+                    className="flex-1 bg-transparent border-none px-2 text-sm text-white focus:outline-none disabled:opacity-50"
+                  />
+                  <button
+                    onClick={handleTutorExplain}
+                    disabled={!tutorTopic.trim() || loadingTutor || isStreaming}
+                    className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/30 disabled:text-white/30 disabled:cursor-not-allowed text-white p-2.5 rounded-xl transition-colors shadow-md"
+                  >
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+                <div className="text-center mt-2 text-[10px] text-white/30">
+                  AI Tutor can make mistakes. Verify important information.
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
     </div>
   );

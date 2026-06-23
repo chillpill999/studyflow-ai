@@ -17,20 +17,25 @@ export default function ImageStudio() {
     
     try {
       if (selectedModel === 'nanobanana') {
-        // Use the dedicated NanoBanana backend proxy which enforces the 3/day rate limit
-        const response = await fetch('/api/generate-nanobanana', {
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${backendUrl}/api/image/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt }),
         });
 
         if (!response.ok) {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(errData.error || `Server Error: ${response.status}`);
+          let errorText = await response.text();
+          try {
+            const errData = JSON.parse(errorText);
+            errorText = errData.detail || errData.error || errorText;
+          } catch (e) {}
+          throw new Error(errorText || `Server Error: ${response.status}`);
         }
 
-        const data = await response.json();
-        setImageUrl(data.url);
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        setImageUrl(objectUrl);
         setLoading(false);
       } else {
         // Fallback: Pollinations AI. 
