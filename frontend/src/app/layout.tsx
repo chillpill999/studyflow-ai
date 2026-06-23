@@ -3,6 +3,7 @@ import { Playfair_Display, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/g
 import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { AuthProvider } from "@/components/AuthProvider";
+import WebMCPProvider from "@/components/WebMCPProvider";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -41,6 +42,7 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-[#0F1117] font-sans text-[#8A8F9E]">
         <AuthProvider>
+          <WebMCPProvider />
           <LayoutWrapper>{children}</LayoutWrapper>
         </AuthProvider>
       </body>
