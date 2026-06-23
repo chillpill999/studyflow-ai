@@ -35,7 +35,7 @@ export default function AITutorBubble() {
 
     if (isBackendOnline) {
       try {
-        const res = await fetch(`${API_BASE}/tutor/explain`, {
+        const res = await fetch(`/api/tutor`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
