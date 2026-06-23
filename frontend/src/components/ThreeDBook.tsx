@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { signIn } from 'next-auth/react';
 
@@ -8,6 +8,14 @@ export default function ThreeDBook() {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile(); // Check immediately on mount
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Mouse parallax tracking for subtle movement
   const mouseX = useMotionValue(0);
@@ -61,11 +69,11 @@ export default function ThreeDBook() {
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
         animate={{
-          x: isOpen ? "50%" : "0%",
-          scale: isOpen ? 1.15 : (isHovered ? 1.05 : 1),
+          x: isOpen ? (isMobile ? "15%" : "50%") : "0%",
+          scale: isOpen ? (isMobile ? 0.9 : 1.15) : (isHovered ? 1.05 : 1),
           rotateX: isOpen ? parallaxX.get() : (isHovered ? 15 : 10),
           rotateY: isOpen ? parallaxY.get() : (isHovered ? -15 : -10),
-          z: isOpen ? 100 : 0
+          z: isOpen ? (isMobile ? 50 : 100) : 0
         }}
         transition={springTransition}
       >
