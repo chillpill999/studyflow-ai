@@ -456,6 +456,16 @@ export default function Dashboard() {
         </div>
 
       </div>
+
+      {/* Footer Credits */}
+      <div className="pt-12 pb-4 text-center">
+        <p className="text-[#8A8F9E] text-[13px] tracking-wide">
+          Made with Love of Hothlali Members ❤️
+        </p>
+        <p className="text-[#4A4F5E] text-[11px] mt-1 font-mono uppercase tracking-widest">
+          developed by Civil Boys
+        </p>
+      </div>
     </motion.div>
   );
 }
