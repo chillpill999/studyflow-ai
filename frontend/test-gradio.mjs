@@ -1,5 +1,4 @@
 import { client } from "@gradio/client";
-import fs from "fs";
 
 async function run() {
   try {

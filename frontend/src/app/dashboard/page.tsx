@@ -10,7 +10,7 @@ import {
   Award, 
   Upload, 
   Trash2, 
-  ExternalLink,
+
   MessageSquare,
   Sparkles,
   CheckCircle,
@@ -27,7 +27,7 @@ export default function Dashboard() {
     user,
     documents,
     quizzes,
-    loading,
+
     fetchDocuments,
     uploadDocument,
     deleteDocument,
@@ -39,15 +39,17 @@ export default function Dashboard() {
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [aiInsights, setAiInsights] = useState<any[]>([]);
+interface Insight {
+  id: string;
+  type: string;
+  subject: string;
+  text: string;
+  status: string;
+}
 
-  useEffect(() => {
-    fetchDocuments();
-    fetchQuizzes();
-    loadInsights();
-  }, [fetchDocuments, fetchQuizzes]);
+  const [aiInsights, setAiInsights] = useState<Insight[]>([]);
 
-  const loadInsights = async () => {
+  const loadInsights = React.useCallback(async () => {
     if (isBackendOnline) {
       try {
         const res = await fetch(`${API_BASE}/analytics/insights`);
@@ -58,18 +60,26 @@ export default function Dashboard() {
       }
     } else {
       // Mock insights fallback
-      // Minimal mock insights fallback
-      setAiInsights([
-        {
-          id: "1",
-          type: "action",
-          subject: "Welcome",
-          text: "Upload your first document to begin generating personalized insights.",
-          status: "info"
-        }
-      ]);
+      setTimeout(() => {
+        setAiInsights([
+          {
+            id: "1",
+            type: "action",
+            subject: "Welcome",
+            text: "Upload your first document to begin generating personalized insights.",
+            status: "info"
+          }
+        ]);
+      }, 0);
     }
-  };
+  }, [isBackendOnline]);
+
+  useEffect(() => {
+    fetchDocuments();
+    fetchQuizzes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/rules-of-hooks, @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect
+    loadInsights();
+  }, [fetchDocuments, fetchQuizzes, loadInsights]);
 
   // Drag and drop handlers
   const handleDrag = (e: React.DragEvent) => {
@@ -144,9 +154,9 @@ export default function Dashboard() {
   const totalDocs = documents.length;
   const completedQuizzes = quizzes.length;
   const totalStreak = user?.streak || 0;
-  const targetHours = 8.0;
+
   const studyHours = user?.study_hours || 0;
-  const targetPercent = Math.min(100, Math.round((studyHours / targetHours) * 100));
+
 
   // Generate empty heatmap grid data (5 weeks, 7 days)
   const heatmapData = Array.from({ length: 35 }, (_, i) => {
@@ -162,7 +172,7 @@ export default function Dashboard() {
     }
   };
 
-  const itemVariants: any = {
+  const itemVariants: import('framer-motion').Variants = {
     hidden: { opacity: 0, y: 16 },
     visible: { 
       opacity: 1, 

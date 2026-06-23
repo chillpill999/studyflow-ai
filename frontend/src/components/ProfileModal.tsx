@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Target, X, Check } from 'lucide-react';
 import { useStudyStore } from '../store/studyStore';
-import { API_BASE } from '../lib/api';
+
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -30,7 +30,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     setIsSaving(true);
     
     // Use existing setOnboarding to update both name and subject
-    await setOnboarding(username.trim(), subject, user.study_hours || 2);
+    await setOnboarding(username.trim(), subject);
     
     setIsSaving(false);
     onClose();

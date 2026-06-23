@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Target, BookOpen, Clock, ArrowRight } from 'lucide-react';
+import { Target, BookOpen, Clock, ArrowRight } from 'lucide-react';
 import { useStudyStore } from '../store/studyStore';
 
 export default function OnboardingModal() {
@@ -33,7 +33,7 @@ export default function OnboardingModal() {
       if (!subject || !username.trim()) return; // Must select subject and enter name
       setStep(2);
     } else {
-      setOnboarding(username.trim(), subject, hours);
+      setOnboarding(username.trim(), subject);
     }
   };
 
@@ -44,7 +44,7 @@ export default function OnboardingModal() {
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] as any }}
+          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
           className="w-full max-w-lg bg-[#0B1120]/90 border border-white/10 rounded-2xl p-6 relative overflow-hidden shadow-2xl"
         >
           {/* Neon Glow Blobs inside Modal */}
@@ -74,7 +74,7 @@ export default function OnboardingModal() {
                   <h2 className="text-xl font-bold text-white">Welcome to StudyFlow</h2>
                 </div>
                 <p className="text-white/60 text-sm leading-relaxed">
-                  Let's personalize your workspace. What should we call you, and what is your primary focus?
+                  Let&apos;s personalize your workspace. What should we call you, and what is your primary focus?
                 </p>
 
                 <div className="pt-2">
@@ -123,7 +123,7 @@ export default function OnboardingModal() {
                   <h2 className="text-xl font-bold text-white">Define Your Daily Target</h2>
                 </div>
                 <p className="text-white/60 text-sm leading-relaxed">
-                  Set a daily target study time. We'll track your streak and display learning velocity widgets.
+                  Set a daily target study time. We&apos;ll track your streak and display learning velocity widgets.
                 </p>
 
                 <div className="space-y-4 pt-4">

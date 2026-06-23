@@ -3,21 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  BookOpen, 
-  Award, 
-  Sparkles, 
   Calendar, 
   HelpCircle, 
-  Plus, 
   Check, 
-  ArrowRight,
-  TrendingUp,
-  Brain,
-  Layers,
-  ChevronRight
+  Layers
 } from 'lucide-react';
-import { useStudyStore, Flashcard, QuizQuestion } from '../../store/studyStore';
-import { API_BASE } from '../../lib/api';
+import { useStudyStore, QuizQuestion } from '../../store/studyStore';
 
 export default function StudyTools() {
   const {
@@ -34,7 +25,6 @@ export default function StudyTools() {
     saveQuizResult,
     generateStudyPlan,
     setActivePlan,
-    isBackendOnline,
     addStudyHours
   } = useStudyStore();
   const [activeTab, setActiveTab] = useState<'flashcards' | 'quiz' | 'planner'>('flashcards');
@@ -164,7 +154,7 @@ export default function StudyTools() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'flashcards' | 'quiz' | 'planner')}
                 className={`
                   flex items-center gap-2 px-4 py-3 font-semibold text-sm whitespace-nowrap border-b-2 cursor-pointer transition-all duration-300
                   ${isActive 
@@ -235,7 +225,7 @@ export default function StudyTools() {
                   <div className="text-center py-20 border border-white/5 rounded-2xl bg-white/3">
                     <Layers className="mx-auto text-white/10 h-10 w-10 mb-2" />
                     <p className="text-white/60 font-semibold text-sm">No flashcards in deck</p>
-                    <p className="text-white/30 text-xs mt-1">Choose a document on the left and click 'Generate' to create cards.</p>
+                    <p className="text-white/30 text-xs mt-1">Choose a document on the left and click &apos;Generate&apos; to create cards.</p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-6">
@@ -246,7 +236,7 @@ export default function StudyTools() {
                     >
                       <motion.div 
                         animate={{ rotateY: isFlipped ? 180 : 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as any }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                         className="w-full h-full relative preserve-3d transition-transform duration-500"
                       >
                         {/* Front Side */}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   MessageSquare, 
   Send, 
@@ -9,9 +9,7 @@ import {
   BookOpen, 
   FileText, 
   Info, 
-  Check, 
-  ChevronRight,
-  TrendingUp,
+
   FileTextIcon
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
@@ -20,7 +18,7 @@ import { API_BASE } from '../../lib/api';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-  sources?: any[];
+  sources?: { id: number; text?: string }[];
 }
 
 export default function DocumentChat() {
@@ -77,7 +75,7 @@ export default function DocumentChat() {
         
         // Character stream simulation
         streamResponse(data.response, data.sources);
-      } catch (err) {
+      } catch {
         streamResponse("Failed to connect to the backend server. Please verify FastAPI is running on port 8000.");
       }
     } else {
@@ -89,13 +87,13 @@ export default function DocumentChat() {
           "The document emphasizes that visually mapping nodes (Mind Mapping) increases structural synthesis, linking concepts across distinct chapters."
         ];
         const randomAnswer = mockResponses[Math.floor(Math.random() * mockResponses.length)];
-        const mockSources = activeDocContent?.chunks?.slice(0, 2) || [];
+        const mockSources = (activeDocContent?.chunks as Array<{ id: number, text: string }>)?.slice(0, 2) || [];
         streamResponse(randomAnswer, mockSources);
       }, 1000);
     }
   };
 
-  const streamResponse = (fullText: string, sources?: any[]) => {
+  const streamResponse = (fullText: string, sources?: { id: number; text?: string }[]) => {
     setIsAiTyping(false);
     
     let currentText = '';
@@ -127,7 +125,12 @@ export default function DocumentChat() {
     setMessages(newMessages);
     setIsAiTyping(true);
 
-    const formatSummaryToMarkdown = (data: any) => {
+    const formatSummaryToMarkdown = (data: {
+      short?: string;
+      detailed?: string;
+      bullets?: string[];
+      key_concepts?: { concept: string; explanation: string }[];
+    }) => {
       let md = `**Executive Summary**\n${data.short}\n\n`;
       md += `**Detailed Synopsis**\n${data.detailed}\n\n`;
       md += `**Key Highlights**\n`;
@@ -135,7 +138,7 @@ export default function DocumentChat() {
         md += `- ${b}\n`;
       });
       md += `\n**Core Terminology**\n`;
-      data.key_concepts?.forEach((c: any) => {
+      data.key_concepts?.forEach((c) => {
         md += `- **${c.concept}:** ${c.explanation}\n`;
       });
       return md;
@@ -148,7 +151,7 @@ export default function DocumentChat() {
         });
         const data = await res.json();
         streamResponse(formatSummaryToMarkdown(data));
-      } catch (err) {
+      } catch {
         streamResponse("Failed to generate summary. Please verify FastAPI is running.");
       }
     } else {
@@ -183,10 +186,10 @@ export default function DocumentChat() {
   };
 
   return (
-    <div className="h-[calc(100vh-80px)] flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto overflow-hidden">
+    <div className="h-auto lg:h-[calc(100vh-80px)] flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto lg:overflow-hidden">
       
       {/* LEFT PANEL: Document Viewer & Selector */}
-      <div className="w-full lg:w-5/12 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-5 flex flex-col justify-between overflow-hidden">
+      <div className="w-full lg:w-5/12 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-5 flex flex-col justify-between overflow-hidden min-h-[400px] lg:min-h-0">
         
         {/* Document Header & Picker */}
         <div className="space-y-4">
@@ -227,10 +230,10 @@ export default function DocumentChat() {
               <div className="space-y-4 text-sm leading-relaxed text-white/70">
                 <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <FileTextIcon size={14} className="text-cyan-400" />
-                  <span className="font-bold text-xs text-white/90">{activeDocContent.filename}</span>
+                  <span className="font-bold text-xs text-white/90">{activeDocContent.filename as string}</span>
                 </div>
                 {activeDocContent.chunks ? (
-                  activeDocContent.chunks.map((chunk: any) => (
+                  (activeDocContent.chunks as Array<{ id: number, text: string }>).map((chunk) => (
                     <motion.div 
                       key={chunk.id} 
                       animate={{ 
@@ -246,7 +249,7 @@ export default function DocumentChat() {
                     </motion.div>
                   ))
                 ) : (
-                  <div>{activeDocContent.text_content}</div>
+                  <div>{activeDocContent.text_content as string}</div>
                 )}
               </div>
             ) : (
@@ -273,7 +276,7 @@ export default function DocumentChat() {
       </div>
 
       {/* RIGHT PANEL: Chat Workspace Console */}
-      <div className="w-full lg:w-7/12 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-5 flex flex-col justify-between overflow-hidden">
+      <div className="w-full lg:w-7/12 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-5 flex flex-col justify-between overflow-hidden min-h-[500px] lg:min-h-0">
         
         {/* Chat Header */}
         <div className="border-b border-white/5 pb-3">
@@ -318,7 +321,7 @@ export default function DocumentChat() {
                       <div className="mt-3.5 pt-3 border-t border-white/5 space-y-1.5">
                         <span className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Source Citations:</span>
                         <div className="flex flex-wrap gap-1.5">
-                          {msg.sources.map((src: any) => (
+                          {msg.sources.map((src) => (
                             <button
                               key={src.id}
                               onClick={() => handleCitationClick(src.id)}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { 
   FileText, 
   Plus, 
@@ -12,7 +12,6 @@ import {
   Eye, 
   Edit3, 
   Check, 
-  ChevronRight,
   BookOpen
 } from 'lucide-react';
 import { useStudyStore, NoteInfo } from '../../store/studyStore';
@@ -23,7 +22,6 @@ export default function NotesSystem() {
     fetchNotes,
     saveNote,
     deleteNote,
-    isBackendOnline,
     addStudyHours
   } = useStudyStore();
 
@@ -42,13 +40,6 @@ export default function NotesSystem() {
     fetchNotes();
   }, [fetchNotes]);
 
-  // Load first note into editor on load
-  useEffect(() => {
-    if (notes.length > 0 && !activeNote) {
-      handleSelectNote(notes[0]);
-    }
-  }, [notes, activeNote]);
-
   const handleSelectNote = (note: NoteInfo) => {
     setActiveNote(note);
     setNoteTitle(note.title);
@@ -57,6 +48,14 @@ export default function NotesSystem() {
     setEditorMode('edit');
     setSaveStatus('idle');
   };
+
+  // Load first note into editor on load
+  useEffect(() => {
+    if (notes.length > 0 && !activeNote) {
+      const timeoutId = setTimeout(() => handleSelectNote(notes[0]), 0);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [notes, activeNote]);
 
   const handleCreateNewNote = () => {
     const tempNote: NoteInfo = {
@@ -137,10 +136,10 @@ export default function NotesSystem() {
   });
 
   return (
-    <div className="h-[calc(100vh-85px)] flex flex-col md:flex-row gap-6 max-w-7xl mx-auto overflow-hidden">
+    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col md:flex-row gap-6 max-w-7xl mx-auto md:overflow-hidden">
       
       {/* LEFT SIDEBAR: Notes Directory list */}
-      <div className="w-full md:w-80 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-4 flex flex-col justify-between overflow-hidden">
+      <div className="w-full md:w-80 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-4 flex flex-col justify-between overflow-hidden min-h-[350px] md:min-h-0">
         
         <div className="space-y-4 flex-1 flex flex-col min-h-0">
           
@@ -233,7 +232,7 @@ export default function NotesSystem() {
       </div>
 
       {/* RIGHT EDITOR PANEL */}
-      <div className="flex-1 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-5 flex flex-col justify-between overflow-hidden">
+      <div className="flex-1 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-5 flex flex-col justify-between overflow-hidden min-h-[500px] md:min-h-0">
         {activeNote ? (
           <div className="h-full flex flex-col justify-between min-h-0">
             

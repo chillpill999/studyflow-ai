@@ -78,7 +78,7 @@ interface StudyFlowState {
   user: UserProfile | null;
   documents: DocumentInfo[];
   activeDocId: string | null;
-  activeDocContent: any | null;
+  activeDocContent: Record<string, unknown> | null;
   notes: NoteInfo[];
   tasks: TaskInfo[];
   flashcards: Flashcard[];
@@ -92,13 +92,13 @@ interface StudyFlowState {
   // Actions
   checkBackendOnline: () => Promise<boolean>;
   initUser: (userId?: string, username?: string, email?: string, image?: string) => Promise<void>;
-  setOnboarding: (username: string, subject: string, hours: number) => Promise<void>;
+  setOnboarding: (username: string, subject: string) => Promise<void>;
   addStudyHours: (hours: number) => Promise<void>;
   
   // Doc actions
   fetchDocuments: () => Promise<void>;
   uploadDocument: (file: File) => Promise<string | null>;
-  fetchDocumentDetails: (docId: string) => Promise<any>;
+  fetchDocumentDetails: (docId: string) => Promise<unknown>;
   deleteDocument: (docId: string) => Promise<void>;
   setActiveDocId: (docId: string | null) => void;
 
@@ -165,7 +165,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
     if (online) {
       try {
         // Try getting the user
-        let res = await fetch(`${API_BASE}/user/${userId}`);
+        const res = await fetch(`${API_BASE}/user/${userId}`);
         let data = null;
 
         if (res.ok) {
@@ -199,7 +199,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
           },
           loading: false
         });
-      } catch (err) {
+      } catch {
         set({ error: 'Failed to load user', loading: false });
       }
     } else {
@@ -220,7 +220,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
     }
   },
 
-  setOnboarding: async (username: string, subject: string, hours: number) => {
+  setOnboarding: async (username: string, subject: string) => {
     const user = get().user;
     if (!user) return;
     const updatedUser = { ...user, username: username, preference_subject: subject, onboarding_completed: true };
@@ -306,7 +306,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
         await get().fetchDocuments();
         set({ loading: false });
         return data.id;
-      } catch (err) {
+      } catch {
         set({ error: 'Upload failed', loading: false });
         return null;
       }
@@ -427,7 +427,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
     if (get().isBackendOnline) {
       const res = await fetch(`${API_BASE}/tasks`);
       const data = await res.json();
-      set({ tasks: data.map((t: any) => ({ ...t, is_completed: t.is_completed === 1 })) });
+      set({ tasks: data.map((t: { id: string, title: string, date: string, is_completed: number | boolean }) => ({ ...t, is_completed: t.is_completed === 1 || t.is_completed === true })) });
     } else {
       // Seed default tasks only if empty
       if (get().tasks.length === 0) {
@@ -673,7 +673,7 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
           activePlan: data,
           loading: false
         }));
-      } catch (err) {
+      } catch {
         set({ loading: false });
       }
     } else {

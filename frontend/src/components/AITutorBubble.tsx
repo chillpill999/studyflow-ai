@@ -139,7 +139,7 @@ export default function AITutorBubble() {
                   <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50">
                     <Brain size={40} className="text-indigo-400 mb-3" />
                     <h4 className="text-white font-bold mb-1 text-sm">What do you want to learn?</h4>
-                    <p className="text-xs text-white/60 max-w-[200px]">Type a concept below, and I'll break it down using analogies.</p>
+                    <p className="text-xs text-white/60 max-w-[200px]">Type a concept below, and I&apos;ll break it down using analogies.</p>
                   </div>
                 ) : (
                   tutorMessages.map((msg, idx) => (

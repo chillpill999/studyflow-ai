@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BrainCircuit, BookOpen, Sparkles, RefreshCw, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { BrainCircuit, Sparkles, RefreshCw, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
 import { API_BASE } from '../../lib/api';
 
@@ -144,8 +144,8 @@ export default function MindMap() {
   const buildRenderCoordinates = () => {
     if (!treeData) return { nodes: [], links: [] };
 
-    const nodes: any[] = [];
-    const links: any[] = [];
+    const nodes: Array<{ id: string, label: string, x: number, y: number, level: number, isRoot: boolean, hasChildren: boolean }> = [];
+    const links: Array<{ id: string, x1: number, y1: number, x2: number, y2: number, level: number }> = [];
 
     // Root coordinate
     const centerX = 300;
@@ -232,7 +232,7 @@ export default function MindMap() {
   const { nodes: renderNodes, links: renderLinks } = buildRenderCoordinates();
 
   return (
-    <div className="h-[calc(100vh-85px)] flex flex-col gap-6 max-w-7xl mx-auto overflow-hidden">
+    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col gap-6 max-w-7xl mx-auto md:overflow-hidden pb-4 md:pb-0">
       
       {/* Top Workspace settings */}
       <div className="bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 z-20">
@@ -250,7 +250,7 @@ export default function MindMap() {
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <select 
             value={selectedSourceType} 
-            onChange={(e) => { setSelectedSourceType(e.target.value as any); setSelectedSourceId(''); }}
+            onChange={(e) => { setSelectedSourceType(e.target.value as 'document' | 'note'); setSelectedSourceId(''); }}
             className="bg-[#030712] border border-white/10 rounded-lg px-2.5 py-2 text-xs text-white/80 focus:outline-none"
           >
             <option value="document">Documents</option>
@@ -282,7 +282,7 @@ export default function MindMap() {
       </div>
 
       {/* Main Canvas Workspace */}
-      <div className="flex-1 bg-[#030712] border border-white/8 rounded-2xl relative overflow-hidden select-none z-10">
+      <div className="flex-1 bg-[#030712] border border-white/8 rounded-2xl relative overflow-hidden select-none z-10 min-h-[500px] md:min-h-0">
         
         {/* Canvas Background Grid patterns */}
         <div 

@@ -29,7 +29,7 @@ export default function ImageStudio() {
           try {
             const errData = JSON.parse(errorText);
             errorText = errData.detail || errData.error || errorText;
-          } catch (e) {}
+          } catch {}
           throw new Error(errorText || `Server Error: ${response.status}`);
         }
 
@@ -54,9 +54,9 @@ export default function ImageStudio() {
         };
         img.src = url;
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Image generation failed:", error);
-      alert(`Generation Failed: ${error.message}`);
+      alert(`Generation Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setLoading(false);
     }
   };
@@ -92,7 +92,7 @@ export default function ImageStudio() {
               <label className="block text-sm font-medium text-[#8A8F9E] mb-2">Select Model</label>
               <select
                 value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value as any)}
+                onChange={(e) => setSelectedModel(e.target.value as 'nanobanana' | 'basic')}
                 className="w-full glass-input p-3 rounded-xl focus:ring-2 focus:ring-[#C9956A] outline-none text-[#F0EEF6] bg-[#1E1E2E]/50"
               >
                 <option value="nanobanana">NanoBanana Pro (3/day)</option>
@@ -123,9 +123,9 @@ export default function ImageStudio() {
           <div className="glass-card p-6">
             <h3 className="text-sm font-semibold text-[#8A8F9E] uppercase tracking-wider mb-3">Pro Tips</h3>
             <ul className="space-y-3 text-sm text-[#F0EEF6]/80">
-              <li>✨ Mention a specific style like "watercolor", "3d render", or "textbook diagram".</li>
-              <li>🎨 Specify a background color like "white background" to make it easier to embed in notes.</li>
-              <li>🔍 Be descriptive about the subject (e.g., "cross-section", "top-down view").</li>
+              <li>✨ Mention a specific style like &quot;watercolor&quot;, &quot;3d render&quot;, or &quot;textbook diagram&quot;.</li>
+              <li>🎨 Specify a background color like &quot;white background&quot; to make it easier to embed in notes.</li>
+              <li>🔍 Be descriptive about the subject (e.g., &quot;cross-section&quot;, &quot;top-down view&quot;).</li>
             </ul>
           </div>
         </div>
@@ -147,6 +147,7 @@ export default function ImageStudio() {
               </div>
             ) : imageUrl ? (
               <div className="relative w-full h-full flex flex-col items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
                   src={imageUrl} 
                   alt={prompt} 

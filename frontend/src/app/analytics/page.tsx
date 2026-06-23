@@ -3,16 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  LineChart, 
   CheckSquare, 
   Trash2, 
   Plus, 
-  Sparkles, 
   Zap, 
   Award, 
-  Clock, 
-  BookOpen, 
-  Calendar,
   Check
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
@@ -20,18 +15,15 @@ import { useStudyStore } from '../../store/studyStore';
 export default function AnalyticsWorkspace() {
   const {
     tasks,
-    quizzes,
     user,
     fetchTasks,
     addTask,
     toggleTask,
     deleteTask,
-    fetchQuizzes,
-    isBackendOnline
+    fetchQuizzes
   } = useStudyStore();
 
   const [taskTitle, setTaskTitle] = useState('');
-  const [activeDate, setActiveDate] = useState(new Date().toISOString().split('T')[0]);
   const [hoveredChartBar, setHoveredChartBar] = useState<number | null>(null);
 
   useEffect(() => {
@@ -42,13 +34,13 @@ export default function AnalyticsWorkspace() {
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!taskTitle.trim()) return;
-    await addTask(taskTitle, activeDate);
+    const today = new Date().toISOString().split('T')[0];
+    await addTask(taskTitle, today);
     setTaskTitle('');
   };
 
   // Stats Calculations
-  const studyHours = user?.study_hours || 0;
-  const streak = user?.streak || 0;
+
   const completedTasks = tasks.filter(t => t.is_completed).length;
   const totalTasks = tasks.length;
   
@@ -251,7 +243,7 @@ export default function AnalyticsWorkspace() {
                   <div className="text-center py-10 border border-white/5 rounded-2xl bg-white/3">
                     <CheckSquare className="mx-auto text-white/10 h-8 w-8 mb-2" />
                     <p className="text-white/40 text-xs font-semibold">No daily goals yet</p>
-                    <p className="text-[10px] text-white/25 mt-1">List goals like 'Revise Physics' or 'Practice MCQ'.</p>
+                    <p className="text-[10px] text-white/25 mt-1">List goals like &apos;Revise Physics&apos; or &apos;Practice MCQ&apos;.</p>
                   </div>
                 ) : (
                   <AnimatePresence>

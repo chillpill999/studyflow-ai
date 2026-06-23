@@ -15,7 +15,7 @@ const handler = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         // Attach the Google ID (sub) to the session if needed
-        (session.user as any).id = token.sub;
+        (session.user as Record<string, unknown>).id = token.sub;
       }
       return session;
     },

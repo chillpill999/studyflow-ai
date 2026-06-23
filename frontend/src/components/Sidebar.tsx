@@ -67,7 +67,7 @@ export default function Sidebar({ isMobileOpen = false, setIsMobileOpen }: Sideb
 
       <motion.div 
         animate={{ width: isCollapsed ? 76 : 240 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as any }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className={`
           fixed inset-y-0 left-0 z-50 h-screen md:sticky md:top-0
           bg-[#0F1117]/90 backdrop-blur-xl border-r border-white/5 

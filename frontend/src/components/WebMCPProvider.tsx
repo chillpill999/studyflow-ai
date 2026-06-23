@@ -5,9 +5,9 @@ import { useEffect } from 'react';
 export default function WebMCPProvider() {
   useEffect(() => {
     // Check if the WebMCP browser extension/API is available
-    // @ts-ignore
+    // @ts-expect-error - WebMCP extension API
     if (typeof window !== 'undefined' && window.navigator && window.navigator.modelContext) {
-      // @ts-ignore
+      // @ts-expect-error - WebMCP extension API
       window.navigator.modelContext.provideContext({
         tools: [
           {
@@ -21,7 +21,7 @@ export default function WebMCPProvider() {
               },
               required: ["front", "back"]
             },
-            execute: async (params: any) => {
+            execute: async (params: { front: string, back: string }) => {
               console.log("WebMCP Tool Execution: create_flashcard", params);
               // In a real implementation, this would trigger the app's flashcard creation logic
               return { success: true, message: `Flashcard created: ${params.front}` };
