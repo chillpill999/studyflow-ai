@@ -41,10 +41,13 @@ export default function AITutorBubble() {
           })
         });
         const data = await res.json();
-        fullAnswer = data.response;
+        if (!res.ok) {
+          throw new Error(data.detail || "Backend error");
+        }
+        fullAnswer = data.response || data.explanation || "Sorry, I received an empty response. Please try again.";
       } catch (err) {
         console.error(err);
-        fullAnswer = "Sorry, I encountered an error synthesizing the explanation.";
+        fullAnswer = "Sorry, I encountered an error communicating with the server.";
       }
     } else {
       // Mock Tutor response
@@ -115,7 +118,7 @@ export default function AITutorBubble() {
                     <Brain className="text-indigo-400" size={16} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-sm">Gemini Tutor</h3>
+                    <h3 className="font-bold text-white text-sm">AI Sikshak</h3>
                     <p className="text-[10px] text-white/50">Always here to explain.</p>
                   </div>
                 </div>
