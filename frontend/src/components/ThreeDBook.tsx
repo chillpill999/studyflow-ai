@@ -64,13 +64,13 @@ export default function ThreeDBook() {
         Open: 800px wide x 500px tall. 
       */}
       <motion.div 
-        className="relative w-[320px] sm:w-[400px] h-[450px] sm:h-[500px] [transform-style:preserve-3d] cursor-pointer"
+        className="relative w-[280px] sm:w-[400px] h-[400px] sm:h-[500px] [transform-style:preserve-3d] cursor-pointer"
         onClick={() => !isOpen && setIsOpen(true)}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
         animate={{
-          x: isOpen ? (isMobile ? "15%" : "50%") : "0%",
-          scale: isOpen ? (isMobile ? 0.9 : 1.15) : (isHovered ? 1.05 : 1),
+          x: isOpen ? (isMobile ? "0%" : "50%") : "0%",
+          scale: isOpen ? (isMobile ? 0.95 : 1.15) : (isHovered ? 1.05 : 1),
           rotateX: isOpen ? parallaxX.get() : (isHovered ? 15 : 10),
           rotateY: isOpen ? parallaxY.get() : (isHovered ? -15 : -10),
           z: isOpen ? (isMobile ? 50 : 100) : 0
