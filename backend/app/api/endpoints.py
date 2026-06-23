@@ -268,7 +268,10 @@ def tutor_explain(req: TutorRequest):
     if req.doc_id:
         doc = db.get_document(req.doc_id)
         if doc:
-            context = doc["text_content"][:15000]
+            if req.doc_id not in rag_service.documents:
+                rag_service.index_document(req.doc_id, doc["chunks"])
+            retrieved_chunks = rag_service.query(req.doc_id, req.concept, top_k=3)
+            context = "\n\n".join([c["text"] for c in retrieved_chunks])
 
     explanation = ai_service.explain_concept(req.concept, req.difficulty, context, req.chat_history)
     return {"response": explanation}
