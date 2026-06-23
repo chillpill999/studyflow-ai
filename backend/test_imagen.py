@@ -1,7 +1,9 @@
 import httpx
 import json
 
-API_KEY = "AIzaSyAMfJrXFNxOvyoXEMyxkRl5asZgoFINqiE"
+import os
+
+API_KEY = os.environ.get("GEMINI_API_KEY", "")
 URL = f"https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key={API_KEY}"
 
 def generate_image(prompt):
