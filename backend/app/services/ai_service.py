@@ -328,49 +328,38 @@ class AIService:
             print(f"[AI] Study plan parse failed: {e}")
             return self._mock_study_plan(topic, days)
 
-    def explain_concept(self, concept: str, difficulty: str = "medium", context: str = "") -> Dict[str, str]:
+    def explain_concept(self, concept: str, difficulty: str = "medium", context: str = "", chat_history: List[Dict[str, str]] = None) -> str:
+        if chat_history is None:
+            chat_history = []
+            
         system_prompt = (
             "You are an elite academic AI tutor. "
-            "You must be extremely concise, stay strictly on topic, and NEVER hallucinate or diverge into unrelated subjects. "
-            "You always respond with valid JSON only. No markdown. No explanation outside the JSON."
+            "Your goal is to help the student understand concepts deeply through conversational dialogue. "
+            "You must be concise, helpful, and clear. NEVER hallucinate information. "
+            "If the user asks a question about the document, rely strictly on the provided Document Context. "
+            "Use markdown formatting to structure your response. Act like ChatGPT, Claude, or Gemini."
         )
-        context_str = f"Document Context (use this to ground your answer if relevant):\n{context}\n\n" if context else ""
+        
+        history_str = ""
+        for msg in chat_history[-6:]:
+            role = "User" if msg["role"] == "user" else "Assistant"
+            history_str += f"{role}: {msg['content']}\n"
+            
+        context_str = f"Document Context (use this to ground your answers if relevant):\n{context}\n\n" if context else ""
+        
         user_prompt = (
             f"{context_str}"
-            f"Explain the core academic concept of \"{concept}\" at a {difficulty} difficulty level.\n"
-            f"Do not include any off-topic information. Be direct and precise.\n"
-            f"Respond ONLY with a JSON object with these keys:\n"
-            f"- \"explanation\": Clear, focused explanation strictly about the concept (3-4 sentences)\n"
-            f"- \"example\": A concrete, highly relevant real-world example\n"
-            f"- \"analogy\": A simple, direct analogy\n"
-            f"- \"summary\": A 1-sentence quick-review summary\n\n"
-            f"Output raw JSON only. Start with {{."
+            f"Conversation history:\n{history_str}\n"
+            f"The student's latest message/concept is: \"{concept}\"\n"
+            f"Their preferred explanation difficulty level is: {difficulty}.\n"
+            f"Provide a conversational, helpful, and highly accurate response."
         )
 
-        raw = self._generate_json(user_prompt, system_prompt)
         try:
-            result = json.loads(raw)
-            if isinstance(result, dict):
-                return result
-            raise ValueError("Not a dict")
+            return self._generate(user_prompt, system_prompt, temperature=0.5, max_tokens=1024)
         except Exception as e:
-            print(f"[AI] Concept explain parse failed: {e}")
-            return {
-                "explanation": (
-                    f"{concept} is a fundamental concept that underpins many principles in its field. "
-                    f"At a {difficulty} level, it involves understanding its core mechanisms, "
-                    f"how it interacts with related systems, and the principles governing its behavior."
-                ),
-                "example": (
-                    f"A practical example of {concept} can be found in standard textbook problems "
-                    f"and industry applications where its properties are leveraged for real-world solutions."
-                ),
-                "analogy": (
-                    f"Think of {concept} like a recipe in cooking — it defines specific inputs, "
-                    f"a precise process, and a predictable output every time."
-                ),
-                "summary": f"{concept} is a key building block that connects theory and practice in its domain.",
-            }
+            print(f"[AI] Concept explain failed: {e}")
+            return f"I'm sorry, I couldn't generate an explanation right now. (Error: {e})"
 
     # ------------------------------------------------------------------
     # Internal helpers

@@ -55,6 +55,7 @@ class TutorRequest(BaseModel):
     concept: str
     difficulty: Optional[str] = "medium"
     doc_id: Optional[str] = None
+    chat_history: Optional[List[Dict[str, str]]] = []
 
 class QuizSaveRequest(BaseModel):
     doc_id: str
@@ -269,8 +270,8 @@ def tutor_explain(req: TutorRequest):
         if doc:
             context = doc["text_content"][:15000]
 
-    explanation = ai_service.explain_concept(req.concept, req.difficulty, context)
-    return explanation
+    explanation = ai_service.explain_concept(req.concept, req.difficulty, context, req.chat_history)
+    return {"response": explanation}
 
 
 # 8. STUDY PLANNER

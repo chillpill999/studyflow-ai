@@ -33,10 +33,15 @@ export default function AITutorBubble() {
         const res = await fetch(`${API_BASE}/tutor/explain`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ concept: userMessage, difficulty: tutorDiff, doc_id: activeDocId })
+          body: JSON.stringify({ 
+            concept: userMessage, 
+            difficulty: tutorDiff, 
+            doc_id: activeDocId,
+            chat_history: [...tutorMessages, { role: 'user', content: userMessage }]
+          })
         });
         const data = await res.json();
-        fullAnswer = `### Core Explanation\n${data.explanation}\n\n### Analogy Metaphor\n${data.analogy}\n\n### Applied Case Study\n${data.example}\n\n*${data.summary}*`;
+        fullAnswer = data.response;
       } catch (err) {
         console.error(err);
         fullAnswer = "Sorry, I encountered an error synthesizing the explanation.";
@@ -44,7 +49,7 @@ export default function AITutorBubble() {
     } else {
       // Mock Tutor response
       await new Promise(resolve => setTimeout(resolve, 800)); // artificial delay
-      fullAnswer = `Absolutely! Let's break down **${userMessage}**.\n\n### Core Concept\n${userMessage} is a fundamental concept that underpins many principles in its field. At a ${tutorDiff} difficulty level, it involves understanding its core mechanisms and the principles governing its behavior.\n\n### Real-World Analogy\nThink of ${userMessage} like a recipe in cooking — it defines specific inputs, a precise process, and a predictable output every time.\n\n### Practical Example\nA practical example of ${userMessage} can be found in standard textbook problems and industry applications where its properties are leveraged for real-world solutions.\n\n*Summary: ${userMessage} is a key building block that connects theory and practice in its domain.*`;
+      fullAnswer = `Absolutely! Let's break down **${userMessage}**.\n\n${userMessage} is a fundamental concept. Think of it like a recipe in cooking — it defines specific inputs, a precise process, and a predictable output every time.`;
     }
 
     setIsStreaming(true);
