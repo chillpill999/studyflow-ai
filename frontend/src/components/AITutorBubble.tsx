@@ -5,6 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Brain, ArrowRight, X } from 'lucide-react';
 import { useStudyStore } from '../store/studyStore';
 import { API_BASE } from '../lib/api';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 type Message = { role: 'user' | 'assistant', content: string };
 
@@ -158,11 +163,23 @@ export default function AITutorBubble() {
                             <Sparkles size={10} /> AI Tutor
                           </div>
                         )}
-                        <div className="text-xs leading-relaxed whitespace-pre-wrap">
-                          {msg.content}
-                          {isStreaming && idx === tutorMessages.length - 1 && (
-                            <span className="inline-block w-1.5 h-3.5 bg-indigo-400 animate-pulse ml-1 align-middle" />
-                          )}
+                        <div className="text-xs leading-relaxed overflow-hidden markdown-body">
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm, remarkMath]} 
+                            rehypePlugins={[rehypeKatex]}
+                            components={{
+                              p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                              pre: ({node, ...props}) => <pre className="bg-black/50 p-2 rounded-lg my-2 overflow-x-auto text-[10px]" {...props} />,
+                              code: ({node, inline, ...props}: any) => inline ? <code className="bg-black/30 px-1 py-0.5 rounded text-indigo-200" {...props} /> : <code {...props} />,
+                              ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-2 space-y-1" {...props} />,
+                              ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-2 space-y-1" {...props} />,
+                              h1: ({node, ...props}) => <h1 className="text-sm font-bold text-indigo-300 mt-3 mb-1" {...props} />,
+                              h2: ({node, ...props}) => <h2 className="text-sm font-bold text-indigo-300 mt-3 mb-1" {...props} />,
+                              h3: ({node, ...props}) => <h3 className="text-xs font-bold text-indigo-300 mt-2 mb-1" {...props} />,
+                            }}
+                          >
+                            {msg.content + (isStreaming && idx === tutorMessages.length - 1 ? ' ▋' : '')}
+                          </ReactMarkdown>
                         </div>
                       </div>
                     </div>
