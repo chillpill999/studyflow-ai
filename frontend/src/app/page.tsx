@@ -88,9 +88,9 @@ export default function LandingPage() {
               <div className="w-12 h-12 rounded-xl bg-[#C9956A]/10 flex items-center justify-center mb-6 border border-[#C9956A]/20">
                 <FileText className="w-6 h-6 text-[#C9956A]" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Document RAG Chat</h3>
+              <h3 className="text-xl font-semibold mb-3">Chat with PDF AI</h3>
               <p className="text-[#8A8F9E] leading-relaxed">
-                Upload PDFs & lecture slides to our free study AI. Chat with our Gemini model for sourced answers mapped perfectly to your curriculum.
+                Upload PDFs & lecture slides to our free study AI. Chat with our Gemini model for sourced answers mapped perfectly to your curriculum. The ultimate AI homework helper.
               </p>
             </div>
 
@@ -98,7 +98,7 @@ export default function LandingPage() {
               <div className="w-12 h-12 rounded-xl bg-[#C9956A]/10 flex items-center justify-center mb-6 border border-[#C9956A]/20">
                 <Layers className="w-6 h-6 text-[#C9956A]" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Flashcard Studio</h3>
+              <h3 className="text-xl font-semibold mb-3">AI Flashcard Generator</h3>
               <p className="text-[#8A8F9E] leading-relaxed">
                 Auto-generate spaced-repetition flashcards from any text or case study AI notes in seconds using the best study AI engine.
               </p>
@@ -108,9 +108,9 @@ export default function LandingPage() {
               <div className="w-12 h-12 rounded-xl bg-[#C9956A]/10 flex items-center justify-center mb-6 border border-[#C9956A]/20">
                 <Network className="w-6 h-6 text-[#C9956A]" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Visual Mind Maps</h3>
+              <h3 className="text-xl font-semibold mb-3">Visual AI Mind Maps</h3>
               <p className="text-[#8A8F9E] leading-relaxed">
-                Turn complex topics into interactive node maps with one click. The ultimate study ai tool for understanding the big picture instantly.
+                Turn complex topics into interactive node maps with one click. The ultimate student AI tool for understanding the big picture instantly.
               </p>
             </div>
 

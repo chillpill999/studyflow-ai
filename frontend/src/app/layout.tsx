@@ -22,7 +22,11 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "StudyFlow AI - The Best Study AI Tool",
   description: "StudyFlow is the best free study AI platform. Upload documents, chat with PDFs, generate flashcards, take notes, and plan your studies with our advanced study AI tool.",
-  keywords: ["study ai", "study ai tool", "study ai free", "best study ai", "free study ai", "ai tutor", "ai study assistant"],
+  keywords: [
+    "study ai", "study ai tool", "study ai free", "best study ai", "free study ai", 
+    "ai tutor", "ai study assistant", "ai homework helper", "chat with pdf ai", 
+    "ai flashcard generator", "ai study planner", "ai quiz maker", "student ai tool"
+  ],
 };
 
 export default function RootLayout({
