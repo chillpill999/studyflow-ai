@@ -1,3 +1,11 @@
+---
+title: Studyflow Ai
+emoji: 📚
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
 <!-- Logo Here -->
 
 <h1 align="center">🎓 StudyFlow AI</h1>
