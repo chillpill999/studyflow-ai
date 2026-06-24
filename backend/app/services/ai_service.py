@@ -210,7 +210,7 @@ class AIService:
             f"- \"detailed\": 1 comprehensive paragraph\n"
             f"- \"bullets\": array of 4-6 key bullet-point strings\n"
             f"- \"key_concepts\": array of objects with \"concept\" and \"explanation\" keys (3-5 items)\n\n"
-            f"Text:\n{text[:25000]}\n\n"
+            f"Text:\n{text[:1000000]}\n\n"
             f"Output raw JSON only. Start with {{."
         )
 
@@ -232,7 +232,7 @@ class AIService:
             f"Respond ONLY with a JSON array of objects, each with:\n"
             f"- \"question\": a clear, specific question\n"
             f"- \"answer\": a complete, accurate answer\n\n"
-            f"Text:\n{text[:25000]}\n\n"
+            f"Text:\n{text[:1000000]}\n\n"
             f"Output raw JSON array only. Start with [."
         )
 
@@ -261,7 +261,7 @@ class AIService:
             f"- \"options\": array of option strings (4 for mcq, [\"True\",\"False\"] for tf, [] for blank)\n"
             f"- \"correct_answer\": the exact correct answer string\n"
             f"- \"explanation\": why this answer is correct\n\n"
-            f"Text:\n{text[:25000]}\n\n"
+            f"Text:\n{text[:1000000]}\n\n"
             f"Output raw JSON array only. Start with [."
         )
 
@@ -288,7 +288,7 @@ class AIService:
             f"- \"label\": short node label (1-4 words)\n"
             f"- \"children\": array of child nodes (empty array for leaf nodes)\n\n"
             f"The root node should be the main topic. Create at least 3 main branches.\n\n"
-            f"Text:\n{text[:25000]}\n\n"
+            f"Text:\n{text[:1000000]}\n\n"
             f"Output raw JSON only. Start with {{."
         )
 
