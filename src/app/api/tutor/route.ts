@@ -1,99 +1,68 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
+  // 1. Strict Environment Variable Validation
+  const requiredVars = ['GEMINI_API_KEY', 'GROQ_API_KEY', 'OPENROUTER_API_KEY'];
+  for (const v of requiredVars) {
+    if (!process.env[v]) {
+      console.error(`[CRITICAL] Missing Environment Variable: ${v}`);
+      return NextResponse.json(
+        { error: `Server configuration missing: Please check Vercel environment variables.` }, 
+        { status: 500 }
+      );
+    }
+  }
+
   try {
-    const { concept, difficulty, chat_history } = await req.json();
-    
-    const system_prompt = `You are an elite academic AI tutor. 
-Your goal is to help the student understand concepts deeply through conversational dialogue. 
-You must provide extremely detailed, comprehensive answers. Do NOT hold back on length or detail. 
-If the topic involves physics, mathematics, engineering, or any technical field, you MUST provide full, step-by-step mathematical derivations, formulas, and deep theoretical explanations. 
-NEVER hallucinate information. Use markdown formatting to structure your response, including LaTeX for equations. Act like ChatGPT, Claude, or Gemini in "Expert" mode.`;
+    const body = await req.json();
+    const { documentId, question, chat_history } = body;
 
-    let history_str = "";
-    if (chat_history && Array.isArray(chat_history)) {
-        for (const msg of chat_history.slice(-6)) {
-            const role = msg.role === "user" ? "User" : "Assistant";
-            history_str += `${role}: ${msg.content}\n`;
-        }
-    }
+    // 2. Retrieval: Fetch Groq JSON summary from DB
+    // TODO: const document = await db.documents.findUnique({ where: { id: documentId } });
+    // This is a placeholder summary. In production, this would be the actual DB result.
+    const documentSummary = JSON.stringify({
+      title: "Extracted Document Summary",
+      key_concepts: ["Concept A", "Concept B"],
+      summary: "This document covers important concepts related to the user's study material."
+    }); 
 
-    const user_prompt = `Conversation history:\n${history_str}\nThe student's latest message/concept is: "${concept}"\nTheir preferred explanation difficulty level is: ${difficulty}.\nProvide a conversational, helpful, and highly accurate response.`;
+    // 3. Strict Anti-Hallucination System Prompt
+    const systemPrompt = `You are an expert AI Tutor for StudyFlow. You have been provided a structured summary of the user's study material. Your ONLY job is to answer the user's questions based strictly on this provided summary. Do not use outside knowledge. If the user asks a question that cannot be answered using the summary, you must reply verbatim: 'I cannot answer that based on the uploaded document. Please check the material or ask about a different topic.' Do not guess.
 
-    const glmKey = process.env.GLM_API_KEY;
-    const geminiKey = process.env.GEMINI_API_KEY;
-    const groqKey = process.env.GROQ_API_KEY;
+Document Summary:
+${documentSummary}`;
 
-    if (glmKey) {
-      const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+    // 4. OpenRouter API: Nemotron-3-Ultra
+    try {
+      const openRouterRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${glmKey}`,
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'glm-4',
+          model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
           messages: [
-            { role: 'system', content: system_prompt },
-            { role: 'user', content: user_prompt }
+            { role: 'system', content: systemPrompt },
+            ...(Array.isArray(chat_history) ? chat_history : []),
+            { role: 'user', content: question || body.concept || "Explain the core concepts." } // Fallback to body.concept for backward compatibility if needed
           ],
-          temperature: 0.5,
-          max_tokens: 4096
+          temperature: 0.1,
+          max_tokens: 2048
         })
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || "GLM API error");
-      return NextResponse.json({ response: data.choices[0].message.content });
+      
+      const aiData = await openRouterRes.json();
+      if (!openRouterRes.ok) throw new Error(aiData.error?.message || "OpenRouter Error");
+      
+      return NextResponse.json({ response: aiData.choices[0].message.content });
+    } catch (aiErr: any) {
+      console.error("OpenRouter AI Error:", aiErr);
+      return NextResponse.json({ error: "AI processing failed. Please try again." }, { status: 502 });
     }
-
-    if (geminiKey) {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: {
-             parts: [{ text: system_prompt }]
-          },
-          contents: [{ parts: [{ text: user_prompt }] }],
-          generationConfig: {
-            temperature: 0.5,
-            maxOutputTokens: 4096,
-          }
-        })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || "Gemini API error");
-      return NextResponse.json({ response: data.candidates[0].content.parts[0].text });
-    } 
-    
-    if (groqKey) {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${groqKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: system_prompt },
-            { role: 'user', content: user_prompt }
-          ],
-          temperature: 0.5,
-          max_tokens: 4096
-        })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message || "Groq API error");
-      return NextResponse.json({ response: data.choices[0].message.content });
-    }
-
-    return NextResponse.json({ 
-      response: "Hello there! I notice that you haven't configured the `GEMINI_API_KEY` or `GROQ_API_KEY` in Vercel Environment Variables yet. Therefore, I am running in **Mock Fallback Mode**.\n\n### The Forgetting Curve\n\nWhen we learn new information, our memory of it decreases exponentially over time unless we review it. This is known as the **Ebbinghaus Forgetting Curve**.\n\n$$\nR = e^{-\\frac{t}{S}}\n$$\n\nWhere:\n- $R$ is memory retention\n- $S$ is the relative strength of memory\n- $t$ is time\n\nTo combat this, we use **Spaced Repetition** and **Active Recall** to flatten the curve and retain knowledge permanently! Try adding your API key to get personalized tutoring!"
-    });
     
   } catch (err: any) {
-    console.error(err);
-    return NextResponse.json({ detail: err.message }, { status: 500 });
+    console.error("General Tutor Error:", err);
+    return NextResponse.json({ error: err.message || "Internal Server Error" }, { status: 500 });
   }
 }
