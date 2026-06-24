@@ -1,14 +1,91 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenAI } from '@google/genai';
 
 export const runtime = 'nodejs';
 
+function chunkText(text: string, size = 2000, overlap = 200): string[] {
+  const chunks: string[] = [];
+  let i = 0;
+  while (i < text.length) {
+    const chunk = text.slice(i, i + size);
+    chunks.push(chunk);
+    i += size - overlap;
+  }
+  return chunks;
+}
+
+async function getSummaryFromGemini(text: string, apiKey: string): Promise<{ title: string; key_concepts: string[]; summary: string }> {
+  const ai = new GoogleGenAI({ apiKey });
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: `Summarize the following text. Extract its core information. 
+Output ONLY minified JSON with exactly these keys: "title" (string), "key_concepts" (array of strings), "summary" (string). Do not include any markdown formatting, backticks, or extra text.
+
+Text to summarize:
+${text}`,
+    config: {
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'OBJECT',
+        properties: {
+          title: { type: 'STRING' },
+          key_concepts: {
+            type: 'ARRAY',
+            items: { type: 'STRING' }
+          },
+          summary: { type: 'STRING' }
+        },
+        required: ['title', 'key_concepts', 'summary']
+      },
+      temperature: 0.3
+    }
+  });
+
+  const content = response.text();
+  if (!content) {
+    throw new Error('Gemini returned empty content');
+  }
+  return JSON.parse(content);
+}
+
+async function getSummaryFromGroq(text: string, groqKey: string): Promise<{ title: string; key_concepts: string[]; summary: string }> {
+  const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${groqKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a summarization engine. Read the following text and extract its core information. Output ONLY minified JSON with exactly these keys: "title" (string), "key_concepts" (array of strings), "summary" (string). Do not include any markdown formatting, backticks, or extra text.'
+        },
+        { role: 'user', content: text }
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.3
+    })
+  });
+
+  const groqData = await groqRes.json();
+  if (!groqRes.ok) {
+    throw new Error(groqData.error?.message || 'Groq Error');
+  }
+
+  const content = groqData.choices[0].message.content;
+  return JSON.parse(content);
+}
+
 export async function POST(req: Request) {
-  // Only GROQ_API_KEY is strictly required — others are optional enhancements
   const groqKey = process.env.GROQ_API_KEY;
-  if (!groqKey) {
-    console.error('[CRITICAL] Missing GROQ_API_KEY');
+  const geminiKey = process.env.GEMINI_API_KEY;
+
+  if (!groqKey && !geminiKey) {
+    console.error('[CRITICAL] Missing both GROQ_API_KEY and GEMINI_API_KEY');
     return NextResponse.json(
-      { error: 'Server configuration missing: GROQ_API_KEY not set in Vercel environment variables.' },
+      { error: 'Server configuration missing: No AI API key configured for summarization.' },
       { status: 500 }
     );
   }
@@ -21,16 +98,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Convert File to Buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const mimeType = file.type || 'application/pdf';
 
-    // 1. Extract raw text from the uploaded document
     let rawText = '';
     try {
       if (mimeType.startsWith('image/')) {
-        // For images: use OpenRouter vision if available, otherwise describe via Groq
         const base64Data = buffer.toString('base64');
         const openRouterKey = process.env.OPENROUTER_API_KEY;
 
@@ -63,7 +137,6 @@ export async function POST(req: Request) {
           }
           rawText = visionData.choices?.[0]?.message?.content || '';
         } else {
-          // Fallback: tell user we can't process images without vision API
           rawText = `[Image file: ${file.name}] Image text extraction requires OPENROUTER_API_KEY to be configured. Please upload a PDF or text file instead.`;
         }
       } else if (mimeType === 'application/pdf') {
@@ -72,7 +145,6 @@ export async function POST(req: Request) {
         const { text } = await extractText(pdf, { mergePages: true });
         rawText = text;
       } else {
-        // Assume text-based file (txt, docx content as text, etc.)
         rawText = buffer.toString('utf-8');
       }
 
@@ -87,45 +159,79 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Groq API: Summarize & Structure into JSON
-    let summaryJson = '';
-    try {
-      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${groqKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a summarization engine. Read the following text and extract its core information. Output ONLY minified JSON with exactly these keys: "title" (string), "key_concepts" (array of strings), "summary" (string). Do not include any markdown formatting, backticks, or extra text.'
-            },
-            { role: 'user', content: rawText.slice(0, 12000) } // Limit to avoid token overflow
-          ],
-          response_format: { type: 'json_object' },
-          temperature: 0.3
-        })
-      });
-
-      const groqData = await groqRes.json();
-      if (!groqRes.ok) throw new Error(groqData.error?.message || 'Groq Error');
-
-      summaryJson = groqData.choices[0].message.content;
-    } catch (groqErr: any) {
-      console.error('Groq Summarization Error:', groqErr);
-      return NextResponse.json({ error: 'Failed to summarize document using Groq.' }, { status: 502 });
-    }
-
-    // 3. Parse the JSON summary
     let parsedSummary;
     try {
-      parsedSummary = JSON.parse(summaryJson);
-    } catch {
-      console.error('JSON Parse Error for Groq output:', summaryJson);
-      return NextResponse.json({ error: 'Failed to parse summarization output.' }, { status: 500 });
+      if (geminiKey) {
+        console.log(`[INFO] Summarizing document of length ${rawText.length} characters using Gemini.`);
+        parsedSummary = await getSummaryFromGemini(rawText, geminiKey);
+      } else if (groqKey) {
+        const maxSingleLength = 30000;
+        if (rawText.length <= maxSingleLength) {
+          parsedSummary = await getSummaryFromGroq(rawText, groqKey);
+        } else {
+          const chunkSize = 25000;
+          const chunks: string[] = [];
+          for (let i = 0; i < rawText.length; i += chunkSize) {
+            chunks.push(rawText.slice(i, i + chunkSize));
+          }
+
+          console.log(`[INFO] Document size is ${rawText.length} characters. Processing sequentially in ${chunks.length} chunks via Groq.`);
+
+          const chunkSummaries = [];
+          for (let idx = 0; idx < chunks.length; idx++) {
+            try {
+              const summary = await getSummaryFromGroq(chunks[idx], groqKey);
+              chunkSummaries.push(summary);
+              await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (err) {
+              console.error(`Error summarizing chunk ${idx}:`, err);
+              chunkSummaries.push({
+                title: `Section ${idx + 1}`,
+                key_concepts: [],
+                summary: `[Unable to summarize this section due to API rate limit]`
+              });
+            }
+          }
+
+          const combinedPrompt = `You have been provided with summaries and key concepts from ${chunks.length} parts of a single large document. 
+Please merge these summaries and key concepts into a single, cohesive, high-quality summary of the entire document. 
+Also compile the most important key concepts and choose a fitting overall title.
+
+Output ONLY minified JSON with exactly these keys: "title" (string), "key_concepts" (array of strings), "summary" (string). Do not include any markdown formatting, backticks, or extra text.
+
+Here are the summaries of the parts:
+${chunkSummaries.map((s, idx) => `--- Part ${idx + 1}: ${s.title} ---
+Key Concepts: ${s.key_concepts ? s.key_concepts.join(', ') : ''}
+Summary: ${s.summary}`).join('\n\n')}`;
+
+          const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${groqKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: 'llama-3.3-70b-versatile',
+              messages: [
+                {
+                  role: 'system',
+                  content: 'You are a summarization engine. Output ONLY minified JSON with exactly these keys: "title" (string), "key_concepts" (array of strings), "summary" (string). Do not include any markdown formatting, backticks, or extra text.'
+                },
+                { role: 'user', content: combinedPrompt }
+              ],
+              response_format: { type: 'json_object' },
+              temperature: 0.3
+            })
+          });
+
+          const groqData = await groqRes.json();
+          if (!groqRes.ok) throw new Error(groqData.error?.message || 'Groq Error combining summaries');
+          parsedSummary = JSON.parse(groqData.choices[0].message.content);
+        }
+      }
+    } catch (summarizeErr: any) {
+      console.error('Summarization Error:', summarizeErr);
+      return NextResponse.json({ error: 'Failed to summarize document: ' + (summarizeErr.message || '') }, { status: 502 });
     }
 
     const documentIdPlaceholder = 'doc_' + Date.now();
@@ -133,7 +239,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       documentId: documentIdPlaceholder,
-      summary: parsedSummary
+      summary: parsedSummary,
+      text_content: rawText,
+      chunks: chunkText(rawText)
     });
   } catch (err: any) {
     console.error('Process Route General Error:', err);

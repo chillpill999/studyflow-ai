@@ -40,6 +40,13 @@ export default function DocumentChat() {
     fetchDocuments();
   }, [fetchDocuments]);
 
+  // Re-hydrate active document content from IndexedDB on page mount or refresh
+  useEffect(() => {
+    if (activeDocId && !activeDocContent) {
+      setActiveDocId(activeDocId);
+    }
+  }, [activeDocId, activeDocContent, setActiveDocId]);
+
   // Scroll to bottom on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

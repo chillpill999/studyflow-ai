@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { documentDB } from '../lib/db';
 
 export interface UserProfile {
   id: string;
@@ -104,7 +105,7 @@ interface StudyFlowState {
   uploadDocument: (file: File) => Promise<string | null>;
   fetchDocumentDetails: (docId: string) => Promise<unknown>;
   deleteDocument: (docId: string) => Promise<void>;
-  setActiveDocId: (docId: string | null) => void;
+  setActiveDocId: (docId: string | null) => void | Promise<void>;
 
   // Notes actions
   fetchNotes: () => Promise<void>;
@@ -205,9 +206,18 @@ export const useStudyStore = create<StudyFlowState>()(
             created_at: new Date().toISOString()
           };
           
+          // Save the full content and chunks to client-side IndexedDB to prevent LocalStorage limits
+          await documentDB?.saveDocument(data.documentId, data.text_content, data.chunks, data.summary, file.name);
+          
           set(state => ({
             documents: [newDoc, ...state.documents],
-            activeDocContent: { id: data.documentId, summary: data.summary },
+            activeDocContent: { 
+              id: data.documentId, 
+              summary: data.summary,
+              text_content: data.text_content,
+              chunks: data.chunks ? data.chunks.map((text: string, idx: number) => ({ id: idx, text })) : [],
+              filename: file.name
+            },
             loading: false
           }));
           return data.documentId;
@@ -219,20 +229,56 @@ export const useStudyStore = create<StudyFlowState>()(
       },
 
       fetchDocumentDetails: async (docId: string) => {
-        // Just return the currently active doc summary if it matches
-        return get().activeDocContent?.id === docId ? get().activeDocContent : null;
+        // Retrieve details from IndexedDB or fallback to active doc content
+        if (get().activeDocContent?.id === docId) {
+          return get().activeDocContent;
+        }
+        const doc = await documentDB?.getDocument(docId);
+        if (doc) {
+          return {
+            id: doc.id,
+            summary: doc.summary,
+            text_content: doc.textContent,
+            chunks: doc.chunks ? doc.chunks.map((text: string, idx: number) => ({ id: idx, text })) : [],
+            filename: doc.filename
+          };
+        }
+        return null;
       },
 
       deleteDocument: async (docId: string) => {
+        await documentDB?.deleteDocument(docId);
         set(state => ({
           documents: state.documents.filter(d => d.id !== docId),
           flashcards: state.flashcards.filter(f => f.doc_id !== docId),
-          quizzes: state.quizzes.filter(q => q.doc_id !== docId)
+          quizzes: state.quizzes.filter(q => q.doc_id !== docId),
+          activeDocContent: state.activeDocContent?.id === docId ? null : state.activeDocContent,
+          activeDocId: state.activeDocId === docId ? null : state.activeDocId
         }));
       },
 
-      setActiveDocId: (docId: string | null) => {
+      setActiveDocId: async (docId: string | null) => {
         set({ activeDocId: docId });
+        if (docId) {
+          set({ loading: true });
+          const doc = await documentDB?.getDocument(docId);
+          if (doc) {
+            set({
+              activeDocContent: {
+                id: doc.id,
+                summary: doc.summary,
+                text_content: doc.textContent,
+                chunks: doc.chunks ? doc.chunks.map((text: string, idx: number) => ({ id: idx, text })) : [],
+                filename: doc.filename
+              }
+            });
+          } else {
+            set({ activeDocContent: null });
+          }
+          set({ loading: false });
+        } else {
+          set({ activeDocContent: null });
+        }
       },
 
       fetchNotes: async () => {},
