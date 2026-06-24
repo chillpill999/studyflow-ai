@@ -20,8 +20,31 @@ NEVER hallucinate information. Use markdown formatting to structure your respons
 
     const user_prompt = `Conversation history:\n${history_str}\nThe student's latest message/concept is: "${concept}"\nTheir preferred explanation difficulty level is: ${difficulty}.\nProvide a conversational, helpful, and highly accurate response.`;
 
+    const glmKey = process.env.GLM_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
     const groqKey = process.env.GROQ_API_KEY;
+
+    if (glmKey) {
+      const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${glmKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'glm-4',
+          messages: [
+            { role: 'system', content: system_prompt },
+            { role: 'user', content: user_prompt }
+          ],
+          temperature: 0.5,
+          max_tokens: 4096
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || "GLM API error");
+      return NextResponse.json({ response: data.choices[0].message.content });
+    }
 
     if (geminiKey) {
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
