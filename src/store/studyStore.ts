@@ -617,7 +617,6 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
           explanation: "Spaced repetition spaces out reviews to review content right before you are about to forget it."
         }
       ];
-    }
   },
 
   saveQuizResult: async (docId: string, quiz: QuizQuestion[], score: number, total: number) => {
