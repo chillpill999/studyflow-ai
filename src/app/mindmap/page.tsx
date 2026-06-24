@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BrainCircuit, Sparkles, RefreshCw, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
-import { API_BASE } from '../../lib/api';
 
 interface MindNode {
   id: string;
@@ -18,7 +17,6 @@ export default function MindMap() {
     notes,
     fetchDocuments,
     fetchNotes,
-    isBackendOnline
   } = useStudyStore();
 
   const [selectedSourceType, setSelectedSourceType] = useState<'document' | 'note'>('document');
@@ -82,22 +80,23 @@ export default function MindMap() {
       setLoading(false);
     };
 
-    if (isBackendOnline) {
-      try {
-        const endpoint = selectedSourceType === 'document' 
-          ? `${API_BASE}/document/${selectedSourceId}/mindmap`
-          : `${API_BASE}/notes/${selectedSourceId}/mindmap`;
-          
-        const res = await fetch(endpoint, { method: 'POST' });
-        if (!res.ok) throw new Error("API Failed");
-        const data = await res.json();
-        setTreeData(data);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setTimeout(generateMockMindMap, 1000);
-      }
-    } else {
+    try {
+      const requestBody = {
+        summary: selectedSourceId
+      };
+
+      const res = await fetch(`/api/generate/mindmap`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!res.ok) throw new Error('API failed');
+      const data = await res.json();
+      setTreeData(data);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
       setTimeout(generateMockMindMap, 1000);
     }
   };

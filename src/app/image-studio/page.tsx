@@ -17,8 +17,7 @@ export default function ImageStudio() {
     
     try {
       if (selectedModel === 'nanobanana') {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-        const response = await fetch(`${backendUrl}/api/image/generate`, {
+        const response = await fetch('/api/generate/image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt }),
@@ -28,7 +27,7 @@ export default function ImageStudio() {
           let errorText = await response.text();
           try {
             const errData = JSON.parse(errorText);
-            errorText = errData.detail || errData.error || errorText;
+            errorText = errData.error || errorText;
           } catch {}
           throw new Error(errorText || `Server Error: ${response.status}`);
         }

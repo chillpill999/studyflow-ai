@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Brain, ArrowRight, X } from 'lucide-react';
 import { useStudyStore } from '../store/studyStore';
-import { API_BASE } from '../lib/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -14,7 +13,7 @@ import 'katex/dist/katex.min.css';
 type Message = { role: 'user' | 'assistant', content: string };
 
 export default function AITutorBubble() {
-  const { isBackendOnline, addStudyHours, activeDocId } = useStudyStore();
+  const { addStudyHours, activeDocId } = useStudyStore();
   const [isOpen, setIsOpen] = useState(false);
   
   const [tutorTopic, setTutorTopic] = useState('');
@@ -41,17 +40,17 @@ export default function AITutorBubble() {
           concept: userMessage, 
           difficulty: tutorDiff, 
           doc_id: activeDocId,
-          chat_history: [...tutorMessages, { role: 'user', content: userMessage }]
+          chat_history: tutorMessages
         })
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.detail || "Backend error");
+        throw new Error(data.error || "Backend error");
       }
       fullAnswer = data.response || data.explanation || "Sorry, I received an empty response. Please try again.";
     } catch (err) {
       console.error(err);
-      fullAnswer = "Sorry, I encountered an error communicating with the server. Please make sure your API key is configured in Vercel.";
+      fullAnswer = "Sorry, I encountered an error communicating with the server. Please make sure your API key is configured properly.";
     }
 
     setIsStreaming(true);
@@ -77,15 +76,23 @@ export default function AITutorBubble() {
       {/* Floating Action Button */}
       {!isOpen && (
         <motion.button
+          drag
+          dragMomentum={false}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           exit={{ scale: 0 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 h-14 w-14 bg-indigo-600 hover:bg-indigo-500 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.4)] flex items-center justify-center z-50 transition-colors"
+          className="fixed bottom-6 right-6 h-16 w-16 rounded-full flex items-center justify-center z-50 cursor-grab active:cursor-grabbing"
+          style={{
+            background: 'radial-gradient(circle at 30% 30%, #818cf8, #4f46e5)',
+            boxShadow: 'inset -4px -4px 8px rgba(0,0,0,0.3), inset 4px 4px 8px rgba(255,255,255,0.4), 0 10px 20px rgba(79,70,229,0.5)',
+            border: '1px solid rgba(255,255,255,0.2)'
+          }}
         >
-          <Sparkles className="text-white" size={24} />
+          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/20 to-white/40 pointer-events-none" />
+          <Sparkles className="text-white drop-shadow-md z-10" size={24} />
         </motion.button>
       )}
 

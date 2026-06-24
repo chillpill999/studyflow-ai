@@ -13,7 +13,6 @@ import {
   FileTextIcon
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
-import { API_BASE } from '../../lib/api';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -28,7 +27,6 @@ export default function DocumentChat() {
     activeDocContent,
     setActiveDocId,
     fetchDocuments,
-    isBackendOnline
   } = useStudyStore();
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -59,37 +57,24 @@ export default function DocumentChat() {
     setMessages(newMessages);
     setIsAiTyping(true);
 
-    if (isBackendOnline) {
-      try {
-        const history = newMessages.map(m => ({ role: m.role, content: m.content }));
-        
-        const res = await fetch(`${API_BASE}/document/${activeDocId}/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: userText,
-            chat_history: history
-          })
-        });
-        const data = await res.json();
-        
-        // Character stream simulation
-        streamResponse(data.response, data.sources);
-      } catch {
-        streamResponse("Failed to connect to the backend server. Please verify FastAPI is running on port 8000.");
-      }
-    } else {
-      // Mock chat retrieval response
-      setTimeout(() => {
-        const mockResponses = [
-          "Based on the uploaded document, the primary theme revolves around cognitive memory structures. The document details how active recall forces semantic consolidation, while spaced repetition schedules reviews right before the decay threshold is hit.",
-          "According to the text, memory efficiency drops by 60% within 48 hours unless active revision is performed. We recommend testing yourself with the Flashcard tool or generating a Practice Quiz.",
-          "The document emphasizes that visually mapping nodes (Mind Mapping) increases structural synthesis, linking concepts across distinct chapters."
-        ];
-        const randomAnswer = mockResponses[Math.floor(Math.random() * mockResponses.length)];
-        const mockSources = (activeDocContent?.chunks as Array<{ id: number, text: string }>)?.slice(0, 2) || [];
-        streamResponse(randomAnswer, mockSources);
-      }, 1000);
+    try {
+      const history = newMessages.map(m => ({ role: m.role, content: m.content }));
+      
+      const res = await fetch(`/api/tutor`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: userText,
+          chat_history: history,
+          doc_id: activeDocId,
+          summary: activeDocContent?.summary || "No document loaded"
+        })
+      });
+      const data = await res.json();
+      
+      streamResponse(data.response || "No response received");
+    } catch {
+      streamResponse("Failed to connect to the backend server. Please verify your Vercel API keys are set.");
     }
   };
 
@@ -100,80 +85,46 @@ export default function DocumentChat() {
     const interval = setInterval(() => {
       if (currentText.length < fullText.length) {
         currentText += fullText.charAt(currentText.length);
+        
         setMessages(prev => {
-          const list = [...prev];
-          const lastIdx = list.length - 1;
-          if (list[lastIdx] && list[lastIdx].role === 'assistant') {
-            list[lastIdx] = { role: 'assistant', content: currentText, sources };
+          const newM = [...prev];
+          const lastMsg = newM[newM.length - 1];
+          if (lastMsg?.role === 'assistant') {
+            lastMsg.content = currentText;
+            lastMsg.sources = sources;
           } else {
-            list.push({ role: 'assistant', content: currentText, sources });
+            newM.push({ role: 'assistant', content: currentText, sources });
           }
-          return list;
+          return newM;
         });
       } else {
         clearInterval(interval);
       }
-    }, 15);
+    }, 15); // Adjust typing speed here
   };
 
-  const handleGenerateSummary = async () => {
+  const generateSummary = async () => {
     if (!activeDocId) return;
-    
-    // Inject user message
-    const userText = "Please generate a comprehensive summary of this document.";
-    const newMessages: Message[] = [...messages, { role: 'user', content: userText }];
-    setMessages(newMessages);
     setIsAiTyping(true);
+    setMessages([{ role: 'assistant', content: '' }]);
 
-    const formatSummaryToMarkdown = (data: {
-      short?: string;
-      detailed?: string;
-      bullets?: string[];
-      key_concepts?: { concept: string; explanation: string }[];
-    }) => {
-      let md = `**Executive Summary**\n${data.short}\n\n`;
-      md += `**Detailed Synopsis**\n${data.detailed}\n\n`;
-      md += `**Key Highlights**\n`;
-      data.bullets?.forEach((b: string) => {
-        md += `- ${b}\n`;
-      });
-      md += `\n**Core Terminology**\n`;
-      data.key_concepts?.forEach((c) => {
-        md += `- **${c.concept}:** ${c.explanation}\n`;
-      });
+    const formatSummaryToMarkdown = (data: any) => {
+      if (typeof data === 'string') return data;
+      let md = `## ${data.title || 'Document Summary'}\n\n`;
+      md += `${data.summary || 'Summary unavailable.'}\n\n`;
+      if (data.key_concepts) {
+        md += `\n**Core Terminology**\n`;
+        data.key_concepts.forEach((c: any) => {
+          md += `- **${c.concept || c}:** ${c.explanation || ''}\n`;
+        });
+      }
       return md;
     };
 
-    if (isBackendOnline) {
-      try {
-        const res = await fetch(`${API_BASE}/document/${activeDocId}/summarize`, {
-          method: 'POST'
-        });
-        const data = await res.json();
-        streamResponse(formatSummaryToMarkdown(data));
-      } catch {
-        streamResponse("Failed to generate summary. Please verify FastAPI is running.");
-      }
+    if (activeDocContent?.summary) {
+      streamResponse(formatSummaryToMarkdown(activeDocContent.summary));
     } else {
-      // Mock summary
-      setTimeout(() => {
-        const mockData = {
-          short: "This document is a comprehensive guide to active memory consolidation, Leitner systems, and visual mind mapping structures.",
-          detailed: "The study materials analyze cognitive load theory and memory decay curves. It advocates for active testing over passive highlighting. Synthesizing visual maps connects discrete subfields, while spaced repetition schedules reviews at expanding gaps to reinforce neurological pathways.",
-          bullets: [
-            "Active recall stimulates memory consolidation 3x more than highlighting.",
-            "Spaced repetition flattens the forgetting curve over time.",
-            "Visual maps support cross-linking multiple conceptual domains.",
-            "Practice quizzes validate learning thresholds before final assessments."
-          ],
-          key_concepts: [
-            { concept: "Active Recall", explanation: "Simulating mental retrieval of items to consolidate long-term synaptic connections." },
-            { concept: "Leitner Box System", explanation: "A flashcard tracking layout that schedules card reviews based on box weights (1 to 5)." },
-            { concept: "Forgetting Curve", explanation: "The exponential rate at which new information fades from memory unless active retrieval is done." }
-          ]
-        };
-        streamResponse(formatSummaryToMarkdown(mockData));
-      }, 1200);
+      streamResponse("Failed to generate summary. No document content available.");
     }
   };
 
@@ -200,7 +151,7 @@ export default function DocumentChat() {
             </h3>
             {activeDocId && (
               <button 
-                onClick={handleGenerateSummary}
+                onClick={generateSummary}
                 className="bg-indigo-600/20 hover:bg-indigo-600/35 border border-indigo-500/30 text-indigo-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all"
               >
                 <Sparkles size={12} className="animate-pulse" />
