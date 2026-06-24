@@ -65,25 +65,6 @@ NEVER hallucinate information. Use markdown formatting to structure your respons
       return NextResponse.json({ response: data.choices[0].message.content });
     }
 
-    // Fallback to Pollinations AI (free model)
-    const pollResponse = await fetch('https://text.pollinations.ai/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'openai',
-        messages: [
-          { role: 'system', content: system_prompt },
-          { role: 'user', content: user_prompt }
-        ],
-        jsonMode: false
-      })
-    });
-    
-    if (pollResponse.ok) {
-      const text = await pollResponse.text();
-      return NextResponse.json({ response: text });
-    }
-
     return NextResponse.json({ 
       response: "Hello there! I notice that you haven't configured the `GEMINI_API_KEY` or `GROQ_API_KEY` in Vercel Environment Variables yet. Therefore, I am running in **Mock Fallback Mode**.\n\n### The Forgetting Curve\n\nWhen we learn new information, our memory of it decreases exponentially over time unless we review it. This is known as the **Ebbinghaus Forgetting Curve**.\n\n$$\nR = e^{-\\frac{t}{S}}\n$$\n\nWhere:\n- $R$ is memory retention\n- $S$ is the relative strength of memory\n- $t$ is time\n\nTo combat this, we use **Spaced Repetition** and **Active Recall** to flatten the curve and retain knowledge permanently! Try adding your API key to get personalized tutoring!"
     });

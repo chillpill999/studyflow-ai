@@ -93,22 +93,7 @@ class AIService:
         return response.text
 
     # ------------------------------------------------------------------
-    # Internal: Call Pollinations AI as a free fallback
-    # ------------------------------------------------------------------
-    def _call_pollinations(self, messages: List[Dict[str, str]]) -> str:
-        url = "https://text.pollinations.ai/"
-        payload = {
-            "messages": messages,
-            "model": "openai",
-            "jsonMode": False
-        }
-        with httpx.Client(timeout=60.0) as client:
-            r = client.post(url, json=payload)
-            r.raise_for_status()
-            return r.text
-
-    # ------------------------------------------------------------------
-    # Internal: Master generate — tries Groq first, then Gemini, then Pollinations, then mock
+    # Internal: Master generate — tries Groq first, then Gemini, then mock
     # ------------------------------------------------------------------
     def _generate(
         self,
@@ -137,15 +122,9 @@ class AIService:
                     system_instruction=system_prompt,
                 )
             except Exception as e:
-                print(f"[AI] Gemini failed: {e}. Trying Pollinations...")
+                print(f"[AI] Gemini failed: {e}. Using mock data...")
 
-        # 3. Try Pollinations (free, no key required)
-        try:
-            return self._call_pollinations(messages)
-        except Exception as e:
-            print(f"[AI] Pollinations failed: {e}. Using mock data...")
-
-        # 4. Mock fallback
+        # 3. Mock fallback
         return self._get_mock_fallback(user_prompt)
 
     # ------------------------------------------------------------------
