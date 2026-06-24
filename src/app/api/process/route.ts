@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 export async function POST(req: Request) {
   // Only GROQ_API_KEY is strictly required — others are optional enhancements
   const groqKey = process.env.GROQ_API_KEY;
@@ -65,10 +67,10 @@ export async function POST(req: Request) {
           rawText = `[Image file: ${file.name}] Image text extraction requires OPENROUTER_API_KEY to be configured. Please upload a PDF or text file instead.`;
         }
       } else if (mimeType === 'application/pdf') {
-        // pdf-parse exports a default function
-        const pdfParse = (await import('pdf-parse')).default;
-        const pdfData = await pdfParse(buffer);
-        rawText = pdfData.text;
+        const { extractText, getDocumentProxy } = await import('unpdf');
+        const pdf = await getDocumentProxy(new Uint8Array(buffer));
+        const { text } = await extractText(pdf, { mergePages: true });
+        rawText = text;
       } else {
         // Assume text-based file (txt, docx content as text, etc.)
         rawText = buffer.toString('utf-8');
