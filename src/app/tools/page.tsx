@@ -6,7 +6,10 @@ import {
   Calendar, 
   HelpCircle, 
   Check, 
-  Layers
+  Layers,
+  Sparkles,
+  RefreshCw,
+  X
 } from 'lucide-react';
 import { useStudyStore, QuizQuestion } from '../../store/studyStore';
 
@@ -232,41 +235,60 @@ export default function StudyTools() {
                     {/* Card container */}
                     <div 
                       onClick={() => setIsFlipped(!isFlipped)}
-                      className="w-full max-w-2xl min-h-[350px] cursor-pointer perspective-1000"
+                      className="w-full max-w-2xl min-h-[380px] cursor-pointer perspective-1000 group"
                     >
                       <motion.div 
                         animate={{ rotateY: isFlipped ? 180 : 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
                         className="w-full h-full relative preserve-3d transition-transform duration-500"
                       >
                         {/* Front Side */}
-                        <div className="absolute inset-0 w-full h-full rounded-2xl p-6 flex flex-col justify-between bg-[#1E1E2E] border border-white/10 backface-hidden shadow-2xl">
-                          <div className="flex justify-between items-center text-[10px] text-indigo-400 font-bold uppercase tracking-wider">
-                            <span>Concept Recall Question</span>
-                            <span className="bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full">Box {activeCards[currentCardIdx]?.box}</span>
+                        <div className="absolute inset-0 w-full h-full rounded-2xl p-8 flex flex-col justify-between glass-card backface-hidden border-t border-white/20 overflow-hidden">
+                          {/* Premium glow effect */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-[var(--accent-primary)]/10 blur-[50px] pointer-events-none rounded-full" />
+                          
+                          <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest relative z-10">
+                            <span className="text-[var(--accent-secondary)] flex items-center gap-2">
+                              <Layers size={14} /> Concept Question
+                            </span>
+                            <span className="bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/30 text-[var(--accent-secondary)] px-3 py-1 rounded-full backdrop-blur-md">
+                              Box {activeCards[currentCardIdx]?.box}
+                            </span>
                           </div>
-                          <div className="flex-1 flex items-center justify-center overflow-y-auto my-4 px-4">
-                            <p className="text-center text-lg font-bold text-white whitespace-pre-wrap">
+                          
+                          <div className="flex-1 flex items-center justify-center overflow-y-auto my-6 px-4 relative z-10">
+                            <p className="text-center text-2xl font-semibold text-white/95 whitespace-pre-wrap leading-snug drop-shadow-md">
                               {activeCards[currentCardIdx]?.question}
                             </p>
                           </div>
-                          <div className="text-center text-xs text-white/30 font-medium tracking-wide">
-                            Click to flip and view explanation
+                          
+                          <div className="text-center text-xs text-white/40 font-medium tracking-wide uppercase flex items-center justify-center gap-2 relative z-10 group-hover:text-[var(--accent-secondary)] transition-colors">
+                            <RefreshCw size={14} className="group-hover:animate-spin-slow" /> Click to reveal answer
                           </div>
                         </div>
 
                         {/* Back Side */}
                         <div 
-                          className="absolute inset-0 w-full h-full rounded-2xl p-6 flex flex-col justify-between bg-[#232336] border border-indigo-400/40 rotateY-180 backface-hidden shadow-2xl"
+                          className="absolute inset-0 w-full h-full rounded-2xl p-8 flex flex-col justify-between glass-card backface-hidden rotateY-180 border-t border-[var(--accent-primary)]/40 overflow-hidden"
+                          style={{ background: 'rgba(20, 20, 30, 0.95)' }}
                         >
-                          <div className="flex justify-between items-center text-[10px] text-cyan-400 font-bold uppercase tracking-wider">
-                            <span>Recall Answer Explanation</span>
-                            <span>Spaced Repetition Review</span>
+                          {/* Premium glow effect */}
+                          <div className="absolute bottom-0 right-0 w-1/2 h-40 bg-[var(--accent-primary)]/15 blur-[60px] pointer-events-none rounded-full" />
+                          
+                          <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest relative z-10">
+                            <span className="text-[var(--accent-primary)] flex items-center gap-2">
+                              <Sparkles size={14} /> Answer & Explanation
+                            </span>
+                            <span className="text-white/40">
+                              Spaced Repetition
+                            </span>
                           </div>
-                          <div className="flex-1 overflow-y-auto my-4 px-4 text-left text-[15px] leading-relaxed text-white/90 whitespace-pre-wrap">
+                          
+                          <div className="flex-1 overflow-y-auto my-6 px-2 text-left text-base leading-relaxed text-white/85 whitespace-pre-wrap font-medium relative z-10 custom-scrollbar">
                             {activeCards[currentCardIdx]?.answer}
                           </div>
-                          <div className="text-center text-xs text-white/30 font-medium tracking-wide">
+                          
+                          <div className="text-center text-xs text-white/30 font-medium tracking-wide uppercase relative z-10">
                             Click anywhere to flip back
                           </div>
                         </div>
@@ -274,31 +296,32 @@ export default function StudyTools() {
                     </div>
 
                     {/* Progress indicator */}
-                    <div className="flex items-center gap-4 text-xs text-white/40 font-bold">
-                      <span>Card {currentCardIdx + 1} of {activeCards.length}</span>
-                      <div className="h-1 w-24 bg-white/5 rounded-full overflow-hidden">
-                        <div className="bg-indigo-500 h-full" style={{ width: `${((currentCardIdx + 1) / activeCards.length) * 100}%` }} />
+                    <div className="flex items-center gap-4 text-xs text-white/40 font-bold uppercase tracking-widest mt-4">
+                      <span>Card {currentCardIdx + 1} <span className="text-white/20 mx-1">/</span> {activeCards.length}</span>
+                      <div className="h-1.5 w-32 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                        <div className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] h-full transition-all duration-500 ease-out" style={{ width: `${((currentCardIdx + 1) / activeCards.length) * 100}%` }} />
                       </div>
                     </div>
 
                     {/* Spaced Repetition Box assessment rating */}
                     {isFlipped && (
                       <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex gap-4 max-w-sm w-full"
+                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="flex gap-4 max-w-sm w-full mt-2"
                       >
                         <button
                           onClick={() => handleCardReview('hard')}
-                          className="flex-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 hover:border-rose-500/50 text-rose-300 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-center"
+                          className="flex-1 py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 hover:border-red-500/50 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(239,68,68,0.15)] flex items-center justify-center gap-2"
                         >
-                          Forgot (Reset Box)
+                          <X size={16} /> Hard (Review Soon)
                         </button>
                         <button
                           onClick={() => handleCardReview('easy')}
-                          className="flex-1 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 text-emerald-300 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-center"
+                          className="flex-1 py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all border border-green-500/30 bg-green-500/10 text-green-300 hover:bg-green-500/20 hover:border-green-500/50 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(34,197,94,0.15)] flex items-center justify-center gap-2"
                         >
-                          Got It! (Box Up)
+                          <Check size={16} /> Easy (Know It)
                         </button>
                       </motion.div>
                     )}
