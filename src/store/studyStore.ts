@@ -502,18 +502,27 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
 
   generateFlashcards: async (docId: string) => {
     set({ loading: true });
-    if (get().isBackendOnline) {
-      const res = await fetch(`${API_BASE}/document/${docId}/flashcards`, { method: 'POST' });
-      const cards = await res.json();
-      set(state => ({ flashcards: [...cards, ...state.flashcards], loading: false }));
-    } else {
-      // Generate mocks
+    
+    const generateMocks = () => {
       const mockCards = [
         { id: `fc-${Date.now()}-1`, doc_id: docId, question: "Question 1: What is the main theory?", answer: "The main theory defines the primary cognitive learning methods.", box: 1 },
         { id: `fc-${Date.now()}-2`, doc_id: docId, question: "Question 2: What is Active Recall?", answer: "Active recall is testing memory instead of passive studying.", box: 1 },
         { id: `fc-${Date.now()}-3`, doc_id: docId, question: "Question 3: How does Spaced Repetition help?", answer: "It decreases review frequency over time to flatten forgetting curve.", box: 1 }
       ];
       set(state => ({ flashcards: [...mockCards, ...state.flashcards], loading: false }));
+    };
+
+    if (get().isBackendOnline) {
+      try {
+        const res = await fetch(`${API_BASE}/document/${docId}/flashcards`, { method: 'POST' });
+        if (!res.ok) throw new Error("API failed");
+        const cards = await res.json();
+        set(state => ({ flashcards: [...cards, ...state.flashcards], loading: false }));
+      } catch (e) {
+        generateMocks();
+      }
+    } else {
+      generateMocks();
     }
   },
 
@@ -574,16 +583,17 @@ export const useStudyStore = create<StudyFlowState>((set, get) => ({
     if (get().isBackendOnline) {
       try {
         const res = await fetch(`${API_BASE}/document/${docId}/quiz`, { method: 'POST' });
+        if (!res.ok) throw new Error("API failed");
         const data = await res.json();
         set({ loading: false });
         return data;
       } catch (err) {
         set({ loading: false });
-        throw err;
+        // Fallback to mock Quiz below
       }
-    } else {
-      // Mock Quiz
-      set({ loading: false });
+    }
+    // Mock Quiz (fallback)
+    set({ loading: false });
       return [
         {
           type: 'mcq',

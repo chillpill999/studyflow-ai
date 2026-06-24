@@ -44,6 +44,44 @@ export default function MindMap() {
     setLoading(true);
     setTreeData(null);
 
+    const generateMockMindMap = () => {
+      const sourceName = selectedSourceType === 'document'
+        ? documents.find(d => d.id === selectedSourceId)?.filename || 'Document Source'
+        : notes.find(n => n.id === selectedSourceId)?.title || 'Notes Source';
+
+      setTreeData({
+        id: 'root',
+        label: sourceName.split('.')[0],
+        children: [
+          {
+            id: 'c1',
+            label: 'Active Memory',
+            children: [
+              { id: 'c1_1', label: 'Retrieval Practice', children: [] },
+              { id: 'c1_2', label: 'Synaptic Plasticity', children: [] }
+            ]
+          },
+          {
+            id: 'c2',
+            label: 'Scheduling Methods',
+            children: [
+              { id: 'c2_1', label: 'Expanding Gaps', children: [] },
+              { id: 'c2_2', label: 'Leitner Boxes', children: [] }
+            ]
+          },
+          {
+            id: 'c3',
+            label: 'Visual Synthesis',
+            children: [
+              { id: 'c3_1', label: 'Hierarchy Linking', children: [] },
+              { id: 'c3_2', label: 'Chunking Material', children: [] }
+            ]
+          }
+        ]
+      });
+      setLoading(false);
+    };
+
     if (isBackendOnline) {
       try {
         const endpoint = selectedSourceType === 'document' 
@@ -51,52 +89,16 @@ export default function MindMap() {
           : `${API_BASE}/notes/${selectedSourceId}/mindmap`;
           
         const res = await fetch(endpoint, { method: 'POST' });
+        if (!res.ok) throw new Error("API Failed");
         const data = await res.json();
         setTreeData(data);
+        setLoading(false);
       } catch (err) {
         console.error(err);
-      } finally {
-        setLoading(false);
+        setTimeout(generateMockMindMap, 1000);
       }
     } else {
-      // Mock mindmap fallbacks
-      setTimeout(() => {
-        const sourceName = selectedSourceType === 'document'
-          ? documents.find(d => d.id === selectedSourceId)?.filename || 'Document Source'
-          : notes.find(n => n.id === selectedSourceId)?.title || 'Notes Source';
-
-        setTreeData({
-          id: 'root',
-          label: sourceName.split('.')[0],
-          children: [
-            {
-              id: 'c1',
-              label: 'Active Memory',
-              children: [
-                { id: 'c1_1', label: 'Retrieval Practice', children: [] },
-                { id: 'c1_2', label: 'Synaptic Plasticity', children: [] }
-              ]
-            },
-            {
-              id: 'c2',
-              label: 'Scheduling Methods',
-              children: [
-                { id: 'c2_1', label: 'Expanding Gaps', children: [] },
-                { id: 'c2_2', label: 'Leitner Boxes', children: [] }
-              ]
-            },
-            {
-              id: 'c3',
-              label: 'Visual Synthesis',
-              children: [
-                { id: 'c3_1', label: 'Hierarchy Linking', children: [] },
-                { id: 'c3_2', label: 'Chunking Material', children: [] }
-              ]
-            }
-          ]
-        });
-        setLoading(false);
-      }, 1000);
+      setTimeout(generateMockMindMap, 1000);
     }
   };
 
