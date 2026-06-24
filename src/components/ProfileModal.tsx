@@ -20,7 +20,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [isSaving, setIsSaving] = useState(false);
 
   const subjects = [
-    'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'Business & Econ', 'General'
+    'cs', 'eee', 'ce', 'me', 'fpp', '........'
   ];
 
   if (!isOpen || !user) return null;

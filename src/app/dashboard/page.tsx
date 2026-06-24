@@ -17,7 +17,6 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
-import { API_BASE } from '../../lib/api';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -32,8 +31,7 @@ export default function Dashboard() {
     uploadDocument,
     deleteDocument,
     setActiveDocId,
-    fetchQuizzes,
-    isBackendOnline
+    fetchQuizzes
   } = useStudyStore();
 
   const [dragActive, setDragActive] = useState(false);
@@ -50,29 +48,17 @@ interface Insight {
   const [aiInsights, setAiInsights] = useState<Insight[]>([]);
 
   const loadInsights = React.useCallback(async () => {
-    if (isBackendOnline) {
-      try {
-        const res = await fetch(`${API_BASE}/analytics/insights`);
-        const data = await res.json();
-        setAiInsights(data.insights || []);
-      } catch (err) {
-        console.error(err);
+    // Mock insights fallback
+    setAiInsights([
+      {
+        id: "1",
+        type: "action",
+        subject: "Welcome",
+        text: "Upload your first document to begin generating personalized insights.",
+        status: "info"
       }
-    } else {
-      // Mock insights fallback
-      setTimeout(() => {
-        setAiInsights([
-          {
-            id: "1",
-            type: "action",
-            subject: "Welcome",
-            text: "Upload your first document to begin generating personalized insights.",
-            status: "info"
-          }
-        ]);
-      }, 0);
-    }
-  }, [isBackendOnline]);
+    ]);
+  }, []);
 
   useEffect(() => {
     fetchDocuments();

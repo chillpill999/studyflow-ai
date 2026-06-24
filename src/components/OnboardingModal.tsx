@@ -20,12 +20,12 @@ export default function OnboardingModal() {
   }
 
   const subjects = [
-    { name: 'Computer Science', icon: '💻' },
-    { name: 'Mathematics', icon: '📐' },
-    { name: 'Physics', icon: '⚛️' },
-    { name: 'Chemistry', icon: '🧪' },
-    { name: 'Biology', icon: '🧬' },
-    { name: 'Business & Econ', icon: '📈' },
+    { name: 'cs', icon: '💻' },
+    { name: 'eee', icon: '⚡' },
+    { name: 'ce', icon: '🏗️' },
+    { name: 'me', icon: '⚙️' },
+    { name: 'fpp', icon: '📝' },
+    { name: '........', icon: '✨' },
   ];
 
   const handleNext = () => {
