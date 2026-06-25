@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import { documentDB } from '../lib/db';
 
 export interface UserProfile {
@@ -78,6 +78,9 @@ export interface StudyPlan {
 export interface ActiveDocContent {
   id: string;
   summary: any;
+  text_content: string;
+  chunks: { id: number; text: string }[];
+  filename: string;
 }
 
 interface StudyFlowState {
@@ -153,7 +156,6 @@ export const useStudyStore = create<StudyFlowState>()(
 
       initUser: async (userId = 'user_demo_123', username = 'Scholar', email = 'scholar@studyflow.ai', image?: string) => {
         set({ loading: true });
-        // Local only user init
         if (!get().user) {
           set({
             user: {
@@ -184,64 +186,32 @@ export const useStudyStore = create<StudyFlowState>()(
       },
 
       fetchDocuments: async () => {
-        // Handled by persist middleware, no external fetch needed
-      },
-
-      uploadDocument: async (file: File, extractedText?: string) => {
-        set({ loading: true });
+        // Sync document list from FastAPI backend (Supabase) if available
         try {
-          let res: Response;
-
-          if (extractedText) {
-            // PDF was parsed client-side — send lightweight JSON (no file binary)
-            res = await fetch('/api/process', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text: extractedText, filename: file.name })
-            });
-          } else {
-            // Non-PDF files — send as FormData
-            const formData = new FormData();
-            formData.append('file', file);
-            res = await fetch('/api/process', {
-              method: 'POST',
-              body: formData
-            });
+          const origin = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+          const res = await fetch(`${origin}/api/documents`);
+          if (res.ok) {
+            const backendDocs = await res.json();
+            const documents: DocumentInfo[] = backendDocs.map((doc: any) => ({
+              id: doc.id,
+              filename: doc.filename,
+              file_type: doc.file_type || 'pdf',
+              created_at: doc.created_at || new Date().toISOString()
+            }));
+            set({ documents });
           }
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Upload failed");
-          
-          const newDoc: DocumentInfo = {
-            id: data.documentId,
-            filename: file.name,
-            file_type: file.name.split('.').pop() || 'pdf',
-            created_at: new Date().toISOString()
-          };
-          
-          // Save the full content and chunks to client-side IndexedDB to prevent LocalStorage limits
-          await documentDB?.saveDocument(data.documentId, data.text_content, data.chunks, data.summary, file.name);
-          
-          set(state => ({
-            documents: [newDoc, ...state.documents],
-            activeDocContent: { 
-              id: data.documentId, 
-              summary: data.summary,
-              text_content: data.text_content,
-              chunks: data.chunks ? data.chunks.map((text: string, idx: number) => ({ id: idx, text })) : [],
-              filename: file.name
-            },
-            loading: false
-          }));
-          return data.documentId;
-        } catch (e: any) {
-          console.error(e);
-          set({ error: e.message, loading: false });
-          return null;
+        } catch (e) {
+          console.error("Failed to sync documents list from backend:", e);
+          // Keep local documents state as fallback
         }
       },
 
+      uploadDocument: async (file: File, extractedText?: string) => {
+        // Obsolete local upload path replaced by src/lib/api.ts uploadDocument
+        return null;
+      },
+
       fetchDocumentDetails: async (docId: string) => {
-        // Retrieve details from IndexedDB or fallback to active doc content
         if (get().activeDocContent?.id === docId) {
           return get().activeDocContent;
         }
@@ -259,7 +229,18 @@ export const useStudyStore = create<StudyFlowState>()(
       },
 
       deleteDocument: async (docId: string) => {
+        // 1. Delete from remote FastAPI backend (Supabase)
+        try {
+          const origin = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+          await fetch(`${origin}/api/documents/${docId}`, { method: 'DELETE' });
+        } catch (e) {
+          console.error("Failed to delete document from backend:", e);
+        }
+
+        // 2. Delete from local IndexedDB
         await documentDB?.deleteDocument(docId);
+
+        // 3. Update state
         set(state => ({
           documents: state.documents.filter(d => d.id !== docId),
           flashcards: state.flashcards.filter(f => f.doc_id !== docId),
@@ -273,21 +254,62 @@ export const useStudyStore = create<StudyFlowState>()(
         set({ activeDocId: docId });
         if (docId) {
           set({ loading: true });
-          const doc = await documentDB?.getDocument(docId);
-          if (doc) {
-            set({
-              activeDocContent: {
-                id: doc.id,
-                summary: doc.summary,
-                text_content: doc.textContent,
-                chunks: doc.chunks ? doc.chunks.map((text: string, idx: number) => ({ id: idx, text })) : [],
-                filename: doc.filename
-              }
-            });
-          } else {
-            set({ activeDocContent: null });
+          try {
+            // Check if document is cached in local IndexedDB
+            let doc = await documentDB?.getDocument(docId);
+
+            if (!doc) {
+              // If not cached, fetch details from backend
+              const origin = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+              const res = await fetch(`${origin}/api/documents/${docId}`);
+              if (!res.ok) throw new Error("Failed to fetch document details from backend");
+              
+              const backendDoc = await res.json();
+
+              // Trigger AI summarization and chunking on the serverless Vercel function
+              const processRes = await fetch('/api/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  text: backendDoc.text_content || "",
+                  filename: backendDoc.filename || "document.pdf"
+                })
+              });
+
+              if (!processRes.ok) throw new Error("Failed to summarize document content");
+              const processData = await processRes.json();
+
+              // Cache document content, chunks, and summary locally in IndexedDB
+              await documentDB?.saveDocument(
+                docId,
+                processData.text_content,
+                processData.chunks,
+                processData.summary,
+                backendDoc.filename
+              );
+
+              doc = await documentDB?.getDocument(docId);
+            }
+
+            if (doc) {
+              set({
+                activeDocContent: {
+                  id: doc.id,
+                  summary: doc.summary,
+                  text_content: doc.textContent,
+                  chunks: doc.chunks ? doc.chunks.map((text: string, idx: number) => ({ id: idx, text })) : [],
+                  filename: doc.filename
+                }
+              });
+            } else {
+              set({ activeDocContent: null });
+            }
+          } catch (e: any) {
+            console.error("Failed to activate document:", e);
+            set({ error: e.message, activeDocContent: null });
+          } finally {
+            set({ loading: false });
           }
-          set({ loading: false });
         } else {
           set({ activeDocContent: null });
         }

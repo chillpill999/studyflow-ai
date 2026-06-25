@@ -1,4 +1,14 @@
-FROM python:3.10
+FROM python:3.11-slim
+
+# Install system dependencies for PyMuPDF (fitz)
+RUN apt-get update && apt-get install -y \
+    libmupdf-dev \
+    mupdf \
+    gcc \
+    g++ \
+    libfreetype6-dev \
+    libharfbuzz-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Hugging Face Spaces requires a non-root user
 RUN useradd -m -u 1000 user
@@ -7,14 +17,12 @@ WORKDIR /app
 
 # Copy the requirements file from the backend folder
 COPY backend/requirements.txt .
-
-# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire backend folder into the container
 COPY backend/ .
 
-# Ensure the non-root user has ownership so SQLite can write to the database
+# Ensure the non-root user has ownership
 RUN chown -R user:user /app
 
 # Switch to the non-root user

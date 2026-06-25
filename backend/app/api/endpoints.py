@@ -10,12 +10,25 @@ from app.core.db import db
 from app.services.document_service import DocumentService
 from app.services.rag_service import rag_service
 from app.services.ai_service import ai_service
+from supabase import create_client
 
 router = APIRouter()
 
-# Temporary upload folder
+# Temporary upload folder (legacy/fallback)
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Supabase Storage & Database Setup
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+supabase = None
+if SUPABASE_URL and SUPABASE_KEY:
+    try:
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    except Exception as e:
+        print(f"Supabase client initialization failed: {e}")
+
+BUCKET_NAME = "documents"
 
 # --- Schemas ---
 class UserUpsert(BaseModel):
@@ -95,54 +108,143 @@ def update_stats(stats: UserStatsUpdate):
     return db.update_user_stats(stats.id, stats.study_hours_add, stats.streak_increment)
 
 
-# 2. DOCUMENT UPLOAD & PARSING
-@router.post("/document/upload")
-async def upload_document(
-    file: UploadFile = File(...),
-    doc_id: Optional[str] = Form(None)
-):
-    if not doc_id:
-        doc_id = str(uuid.uuid4())
+# 2. DOCUMENT UPLOAD & PARSING (Supabase & PyMuPDF Integrated)
+@router.post("/documents/upload")
+async def upload_document(file: UploadFile = File(...)):
+    if not supabase:
+        raise HTTPException(500, "Supabase connection is not configured on the backend server")
         
-    filename = file.filename
-    ext = filename.split(".")[-1].lower() if "." in filename else ""
-    
-    # Save file temporarily
-    temp_path = os.path.join(UPLOAD_DIR, f"{doc_id}.{ext}")
     try:
-        with open(temp_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        # Validate file type
+        if not file.filename.endswith(".pdf"):
+            raise HTTPException(400, "Only PDF files are supported")
+        
+        # Read file content
+        content = await file.read()
+        
+        # Validate file size (20MB max)
+        if len(content) > 20 * 1024 * 1024:
+            raise HTTPException(413, "File size exceeds 20MB limit")
+        
+        # Generate unique filename to avoid collisions
+        unique_name = f"{uuid.uuid4()}_{file.filename}"
+        
+        # Upload to Supabase Storage
+        supabase.storage.from_(BUCKET_NAME).upload(
+            path=unique_name,
+            file=content,
+            file_options={"content-type": "application/pdf"}
+        )
+        
+        # Get public URL
+        public_url = supabase.storage.from_(BUCKET_NAME).get_public_url(unique_name)
+        
+        # Save metadata to Supabase DB
+        doc = supabase.table("documents").insert({
+            "filename": file.filename,
+            "storage_path": unique_name,
+            "public_url": public_url,
+            "file_size": len(content),
+            "status": "processing"
+        }).execute()
+        
+        if not doc.data:
+            raise Exception("Failed to insert document metadata into Supabase table")
             
-        # Extract Text
-        text_content = DocumentService.extract_text(temp_path, ext)
-        # Chunk Text
-        chunks = DocumentService.chunk_text(text_content)
+        document_id = doc.data[0]["id"]
         
-        # Save metadata to DB
-        db.add_document(doc_id, filename, ext, text_content, chunks)
+        # Process PDF text extraction in /tmp (safe on HF Spaces)
+        tmp_path = f"/tmp/{unique_name}"
+        os.makedirs(os.path.dirname(tmp_path), exist_ok=True)
+        with open(tmp_path, "wb") as f:
+            f.write(content)
         
-        # Index in RAG service
-        rag_service.index_document(doc_id, chunks)
+        # Extract text with PyMuPDF
+        import fitz
+        pdf_doc = fitz.open(tmp_path)
+        full_text = ""
+        for page in pdf_doc:
+            full_text += page.get_text()
+        pdf_doc.close()
+        
+        # Clean up /tmp after extraction
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        
+        # Update document status
+        supabase.table("documents").update({
+            "status": "ready",
+            "extracted_text": full_text[:50000]  # cap at 50k chars
+        }).eq("id", document_id).execute()
+        
+        # Seed local SQLite DB for backward compatibility
+        try:
+            chunks = DocumentService.chunk_text(full_text)
+            rag_service.index_document(document_id, chunks)
+            db.add_document(document_id, file.filename, "pdf", full_text, chunks)
+        except Exception as local_db_err:
+            print(f"Non-critical error saving to local SQLite/RAG index: {local_db_err}")
         
         return {
-            "id": doc_id,
-            "filename": filename,
-            "file_type": ext,
-            "chunks_count": len(chunks)
+            "success": True,
+            "data": {
+                "document_id": document_id,
+                "filename": file.filename,
+                "public_url": public_url
+            }
         }
+        
+    except HTTPException:
+        raise
     except Exception as e:
-        # Clean up temp file
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
-        raise HTTPException(status_code=400, detail=f"Upload processing failed: {str(e)}")
+        raise HTTPException(500, f"Upload failed: {str(e)}")
 
 
 @router.get("/documents")
 def list_documents():
+    if supabase:
+        try:
+            res = supabase.table("documents").select("id, filename, file_size, status, created_at").order("created_at", desc=True).execute()
+            return [
+                {
+                    "id": doc["id"],
+                    "filename": doc["filename"],
+                    "file_type": doc["filename"].split(".")[-1].lower() if "." in doc["filename"] else "pdf",
+                    "created_at": doc.get("created_at") or ""
+                }
+                for doc in res.data
+            ]
+        except Exception as e:
+            print(f"Supabase list_documents failed: {e}. Falling back to SQLite.")
+            
     return db.get_all_documents()
+
 
 @router.get("/documents/{doc_id}")
 def get_document(doc_id: str):
+    if supabase:
+        try:
+            res = supabase.table("documents").select("*").eq("id", doc_id).execute()
+            if res.data:
+                doc_data = res.data[0]
+                text_content = doc_data.get("extracted_text") or ""
+                chunks = DocumentService.chunk_text(text_content)
+                
+                # Index in RAG service in case server restarted
+                if doc_id not in rag_service.documents:
+                    rag_service.index_document(doc_id, chunks)
+                
+                return {
+                    "id": doc_data["id"],
+                    "filename": doc_data["filename"],
+                    "file_type": "pdf",
+                    "text_content": text_content,
+                    "chunks": chunks,
+                    "created_at": doc_data.get("created_at") or ""
+                }
+        except Exception as e:
+            print(f"Supabase get_document failed: {e}. Falling back to SQLite.")
+            
     doc = db.get_document(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
@@ -151,54 +253,37 @@ def get_document(doc_id: str):
         rag_service.index_document(doc_id, doc["chunks"])
     return doc
 
+
 @router.delete("/documents/{doc_id}")
 def delete_document(doc_id: str):
-    # Retrieve doc to delete temp file
-    doc = db.get_document(doc_id)
-    if doc:
-        ext = doc["file_type"]
-        temp_path = os.path.join(UPLOAD_DIR, f"{doc_id}.{ext}")
-        if os.path.exists(temp_path):
-            try:
-                os.remove(temp_path)
-            except Exception:
-                pass
-    db.delete_document(doc_id)
-    return {"status": "success", "message": "Document deleted"}
-
-
-# 3. AI DOCUMENT CHAT (RAG)
-@router.post("/document/{doc_id}/chat")
-def chat_document(doc_id: str, chat_req: ChatRequest):
-    # Ensure document chunks are loaded in vector index
-    doc = db.get_document(doc_id)
-    if not doc:
-        raise HTTPException(status_code=404, detail="Document not found")
+    if supabase:
+        try:
+            # Delete file from Storage
+            res = supabase.table("documents").select("storage_path").eq("id", doc_id).execute()
+            if res.data and res.data[0].get("storage_path"):
+                storage_path = res.data[0]["storage_path"]
+                try:
+                    supabase.storage.from_(BUCKET_NAME).remove([storage_path])
+                except Exception as storage_err:
+                    print(f"Failed to remove PDF file from Supabase storage: {storage_err}")
+            
+            # Delete row from DB
+            supabase.table("documents").delete().eq("id", doc_id).execute()
+        except Exception as e:
+            print(f"Supabase delete_document failed: {e}")
+            
+    try:
+        db.delete_document(doc_id)
+    except Exception:
+        pass
         
-    if doc_id not in rag_service.documents:
-        rag_service.index_document(doc_id, doc["chunks"])
-
-    # Query RAG Service to fetch top 3 related context chunks
-    retrieved_chunks = rag_service.query(doc_id, chat_req.query, top_k=3)
-    chunk_texts = [c["text"] for c in retrieved_chunks]
-    
-    # Get answer from AI Service
-    answer = ai_service.chat_with_document(
-        context_chunks=chunk_texts,
-        query=chat_req.query,
-        chat_history=chat_req.chat_history
-    )
-    
-    return {
-        "response": answer,
-        "sources": retrieved_chunks
-    }
+    return {"status": "success", "message": "Document deleted"}
 
 
 # 4. SUMMARY GENERATION
 @router.post("/document/{doc_id}/summarize")
 def summarize_document(doc_id: str):
-    doc = db.get_document(doc_id)
+    doc = get_document(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
     
@@ -209,7 +294,7 @@ def summarize_document(doc_id: str):
 # 5. FLASHCARD GENERATOR
 @router.post("/document/{doc_id}/flashcards")
 def generate_flashcards(doc_id: str):
-    doc = db.get_document(doc_id)
+    doc = get_document(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
         
@@ -243,7 +328,7 @@ def update_flashcard(card_id: str, req: FlashcardUpdateRequest):
 # 6. QUIZ GENERATOR
 @router.post("/document/{doc_id}/quiz")
 def generate_quiz(doc_id: str):
-    doc = db.get_document(doc_id)
+    doc = get_document(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
         
@@ -325,7 +410,7 @@ def delete_task(task_id: str):
 # 11. MIND MAP GENERATION
 @router.post("/document/{doc_id}/mindmap")
 def generate_mindmap_document(doc_id: str):
-    doc = db.get_document(doc_id)
+    doc = get_document(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
         
@@ -347,8 +432,7 @@ def generate_mindmap_note(note_id: str):
 # 12. ANALYTICS & AI INSIGHTS
 @router.get("/analytics/insights")
 def get_analytics_insights():
-    # Dynamic calculations or metrics based on database content
-    docs = db.get_all_documents()
+    docs = list_documents()
     tasks = db.get_tasks()
     quizzes = db.get_quizzes()
     
@@ -356,7 +440,6 @@ def get_analytics_insights():
     completed_tasks = sum(1 for t in tasks if t["is_completed"])
     total_tasks = len(tasks)
     
-    # Generate customizable AI widgets response
     insights = [
         {
             "id": "1",

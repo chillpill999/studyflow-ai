@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
@@ -8,35 +8,15 @@ import {
   Clock, 
   FileText, 
   Award, 
-  Upload, 
   Trash2, 
-
   MessageSquare,
   Sparkles,
   CheckCircle,
   AlertTriangle
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
+import FileUploader from '../../components/FileUploader';
 
-export default function Dashboard() {
-  const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const {
-    user,
-    documents,
-    quizzes,
-
-    fetchDocuments,
-    uploadDocument,
-    deleteDocument,
-    setActiveDocId,
-    fetchQuizzes
-  } = useStudyStore();
-
-  const [dragActive, setDragActive] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
 interface Insight {
   id: string;
   type: string;
@@ -44,6 +24,19 @@ interface Insight {
   text: string;
   status: string;
 }
+
+export default function Dashboard() {
+  const router = useRouter();
+  
+  const {
+    user,
+    documents,
+    quizzes,
+    fetchDocuments,
+    deleteDocument,
+    setActiveDocId,
+    fetchQuizzes
+  } = useStudyStore();
 
   const [aiInsights, setAiInsights] = useState<Insight[]>([]);
 
@@ -63,103 +56,8 @@ interface Insight {
   useEffect(() => {
     fetchDocuments();
     fetchQuizzes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/rules-of-hooks, @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect
     loadInsights();
   }, [fetchDocuments, fetchQuizzes, loadInsights]);
-
-  // Drag and drop handlers
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      await handleFileUpload(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      await handleFileUpload(e.target.files[0]);
-    }
-  };
-
-  const handleFileUpload = async (file: File) => {
-    // Validate extension
-    const ext = file.name.split('.').pop()?.toLowerCase();
-    const valid = ['pdf', 'docx', 'pptx', 'txt'].includes(ext || '');
-    if (!valid) {
-      alert("Invalid file format. StudyFlow supports PDF, DOCX, PPTX, and TXT files.");
-      return;
-    }
-
-    setIsUploading(true);
-    setUploadProgress(20);
-
-    // Simulate progress
-    const interval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 80) {
-          clearInterval(interval);
-          return 80;
-        }
-        return prev + 15;
-      });
-    }, 150);
-
-    let extractedText: string | undefined;
-
-    // For PDFs: parse text client-side to avoid Vercel's 4.5 MB body limit
-    if (ext === 'pdf') {
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const { extractText, getDocumentProxy } = await import('unpdf');
-        const pdf = await getDocumentProxy(new Uint8Array(arrayBuffer));
-        const { text } = await extractText(pdf, { mergePages: true });
-
-        if (!text.trim()) {
-          clearInterval(interval);
-          setIsUploading(false);
-          setUploadProgress(0);
-          alert("This PDF doesn't contain selectable text (it may be a scanned image). Please use a PDF with actual text content.");
-          return;
-        }
-
-        extractedText = text;
-        console.log(`[StudyFlow] PDF parsed client-side: ${text.length} chars extracted from "${file.name}"`);
-      } catch (pdfErr) {
-        console.error('Client-side PDF parsing failed:', pdfErr);
-        clearInterval(interval);
-        setIsUploading(false);
-        setUploadProgress(0);
-        alert("Failed to read this PDF. The file may be corrupted or password-protected.");
-        return;
-      }
-    }
-
-    const docId = await uploadDocument(file, extractedText);
-    
-    clearInterval(interval);
-    setUploadProgress(100);
-    setTimeout(() => {
-      setIsUploading(false);
-      setUploadProgress(0);
-      if (docId) {
-        setActiveDocId(docId);
-        router.push('/chat');
-      }
-    }, 500);
-  };
 
   const triggerChatWithDoc = (docId: string) => {
     setActiveDocId(docId);
@@ -170,9 +68,7 @@ interface Insight {
   const totalDocs = documents.length;
   const completedQuizzes = quizzes.length;
   const totalStreak = user?.streak || 0;
-
   const studyHours = user?.study_hours || 0;
-
 
   // Generate empty heatmap grid data (5 weeks, 7 days)
   const heatmapData = Array.from({ length: 35 }, (_, i) => {
@@ -294,55 +190,28 @@ interface Insight {
           
           {/* Uploader Widget */}
           <motion.div variants={itemVariants} className="glass-card p-6 relative">
-            <input 
-              ref={fileInputRef}
-              type="file" 
-              className="hidden" 
-              accept=".pdf,.docx,.pptx,.txt"
-              onChange={handleFileChange}
-            />
+            <FileUploader 
+              onSuccess={async (docId, filename) => {
+                // Construct metadata for Zustand
+                const newDoc = {
+                  id: docId,
+                  filename: filename,
+                  file_type: "pdf",
+                  created_at: new Date().toISOString()
+                };
 
-            <div 
-              onDragEnter={handleDrag}
-              onDragOver={handleDrag}
-              onDragLeave={handleDrag}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`
-                border-[1.5px] rounded-xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer transition-all duration-300
-                ${dragActive 
-                  ? 'border-[#C9956A] border-solid bg-[rgba(201,149,106,0.08)]' 
-                  : 'border-dashed border-[rgba(201,149,106,0.3)] bg-transparent hover:border-solid hover:border-[#C9956A] hover:bg-[rgba(201,149,106,0.04)]'
-                }
-              `}
-            >
-              {isUploading ? (
-                <div className="w-full max-w-xs text-center space-y-3">
-                  <div className="h-8 w-8 border-4 border-[#C9956A]/20 border-t-[#C9956A] rounded-full animate-spin mx-auto" />
-                  <p className="text-[14px] font-medium text-[#F5F0EB]">Parsing Document Text...</p>
-                  <div className="w-full bg-[#1D2235] h-1.5 rounded-full overflow-hidden">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: `${uploadProgress}%` }}
-                      className="bg-[#C9956A] h-full"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="h-14 w-14 rounded-full flex items-center justify-center text-[#C9956A] shadow-[0_0_20px_rgba(201,149,106,0.2)] bg-[#1D2235]">
-                    <Upload size={24} />
-                  </div>
-                  <div className="text-center space-y-1">
-                    <p className="text-[15px] font-medium text-[#8A8F9E]">Drag & drop or click to browse</p>
-                    <p className="text-[13px] text-[#4A4F5E]">Supports PDF, DOCX, PPTX, TXT</p>
-                  </div>
-                  <button className="shimmer-button mt-2 bg-gradient-primary text-[#0F1117] font-medium text-[14px] px-6 py-2.5 rounded-lg shadow-[0_4px_15px_rgba(201,149,106,0.3)] hover:shadow-[0_6px_20px_rgba(201,149,106,0.4)] transition-all cursor-pointer">
-                    Upload Document
-                  </button>
-                </>
-              )}
-            </div>
+                // Add to Zustand document list
+                useStudyStore.setState((state) => ({
+                  documents: [newDoc, ...state.documents]
+                }));
+
+                // Set active doc ID
+                setActiveDocId(docId);
+
+                // Redirect to chat
+                router.push('/chat');
+              }}
+            />
           </motion.div>
 
           {/* Uploaded Documents List */}
@@ -355,12 +224,6 @@ interface Insight {
                   <FileText className="text-[#C9956A] h-5 w-5 animate-float-1" />
                 </div>
                 <p className="text-[#8A8F9E] font-medium text-[14px]">No documents yet</p>
-                <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="mt-3 px-4 py-1.5 border border-[#C9956A] rounded-lg text-[13px] font-medium text-[#C9956A] hover:bg-[rgba(201,149,106,0.05)] transition-colors cursor-pointer"
-                >
-                  Upload First Document
-                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3">
