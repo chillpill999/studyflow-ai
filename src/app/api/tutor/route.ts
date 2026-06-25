@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenAI } from '@google/genai';
 
 export async function POST(req: Request) {
-  // Only GROQ_API_KEY is strictly required
   const groqKey = process.env.GROQ_API_KEY;
   const openRouterKey = process.env.OPENROUTER_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY;
 
-  if (!groqKey && !openRouterKey) {
-    console.error('[CRITICAL] Missing both GROQ_API_KEY and OPENROUTER_API_KEY');
+  if (!groqKey && !openRouterKey && !geminiKey) {
+    console.error('[CRITICAL] Missing all AI keys (GEMINI_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY)');
     return NextResponse.json(
       { error: 'Server configuration missing: No AI API key configured.' },
       { status: 500 }
@@ -15,19 +16,21 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { documentId, doc_id, summary, concept, question, difficulty, chat_history } = body;
+    const { documentId, doc_id, summary, text_content, concept, question, difficulty, chat_history } = body;
 
     // The user's query
     const userQuery = question || concept || 'Explain the core concepts.';
 
     let systemPrompt = `You are an expert AI Tutor for StudyFlow. Your goal is to help the student understand concepts deeply through conversational dialogue. Provide detailed, comprehensive answers. If the topic involves physics, mathematics, engineering, or any technical field, provide full step-by-step derivations.`;
 
-    // If a summary is provided, use strict anti-hallucination prompt
-    const actualDocId = documentId || doc_id;
-    let documentSummary = summary;
+    // If full text context is provided, use it for exact answers
+    if (text_content) {
+      systemPrompt = `You are an expert AI Tutor for StudyFlow. You have been provided the full text content of the user's study material. Your ONLY job is to answer the user's questions based strictly on this provided content. Do not use outside knowledge. If the user asks a question that cannot be answered using the content, you must reply verbatim: 'I cannot answer that based on the uploaded document. Please check the material or ask about a different topic.' Do not guess.
 
-    if (documentSummary) {
-      const summaryStr = typeof documentSummary === 'object' ? JSON.stringify(documentSummary) : documentSummary;
+Document Content:
+${text_content}`;
+    } else if (summary) {
+      const summaryStr = typeof summary === 'object' ? JSON.stringify(summary) : summary;
       systemPrompt = `You are an expert AI Tutor for StudyFlow. You have been provided a structured summary of the user's study material. Your ONLY job is to answer the user's questions based strictly on this provided summary. Do not use outside knowledge. If the user asks a question that cannot be answered using the summary, you must reply verbatim: 'I cannot answer that based on the uploaded document. Please check the material or ask about a different topic.' Do not guess.
 
 Document Summary:
@@ -45,7 +48,46 @@ ${summaryStr}`;
       { role: 'user', content: userQuery }
     ];
 
-    // Primary: Use Groq (fast, reliable, key already configured)
+    // Primary: Use Gemini if available (since it has a 1M token context window and high free limits)
+    if (geminiKey) {
+      try {
+        const ai = new GoogleGenAI({ apiKey: geminiKey });
+        
+        // Filter and format message history for Gemini API
+        const contents = (Array.isArray(chat_history) ? chat_history : [])
+          .filter(m => m.role === 'user' || m.role === 'assistant')
+          .map(m => ({
+            role: m.role === 'assistant' ? 'model' as const : 'user' as const,
+            parts: [{ text: m.content || '' }]
+          }));
+
+        // Append current user query if it's not already at the end of chat_history
+        const lastMsg = chat_history?.[chat_history.length - 1];
+        if (!lastMsg || lastMsg.content !== userQuery || lastMsg.role !== 'user') {
+          contents.push({ role: 'user' as const, parts: [{ text: userQuery }] });
+        }
+
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents,
+          config: {
+            systemInstruction: systemPrompt,
+            temperature: 0.3,
+            maxOutputTokens: 2048
+          }
+        });
+
+        const reply = response.text;
+        if (reply) {
+          return NextResponse.json({ response: reply });
+        }
+      } catch (geminiErr: any) {
+        console.error('Gemini AI Tutor Error:', geminiErr);
+        // Fall back to Groq/OpenRouter
+      }
+    }
+
+    // Secondary: Use Groq
     if (groqKey) {
       try {
         const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {

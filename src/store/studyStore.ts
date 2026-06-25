@@ -102,7 +102,7 @@ interface StudyFlowState {
   
   // Doc actions
   fetchDocuments: () => Promise<void>;
-  uploadDocument: (file: File) => Promise<string | null>;
+  uploadDocument: (file: File, extractedText?: string) => Promise<string | null>;
   fetchDocumentDetails: (docId: string) => Promise<unknown>;
   deleteDocument: (docId: string) => Promise<void>;
   setActiveDocId: (docId: string | null) => void | Promise<void>;
@@ -187,15 +187,27 @@ export const useStudyStore = create<StudyFlowState>()(
         // Handled by persist middleware, no external fetch needed
       },
 
-      uploadDocument: async (file: File) => {
+      uploadDocument: async (file: File, extractedText?: string) => {
         set({ loading: true });
         try {
-          const formData = new FormData();
-          formData.append('file', file);
-          const res = await fetch('/api/process', {
-            method: 'POST',
-            body: formData
-          });
+          let res: Response;
+
+          if (extractedText) {
+            // PDF was parsed client-side — send lightweight JSON (no file binary)
+            res = await fetch('/api/process', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text: extractedText, filename: file.name })
+            });
+          } else {
+            // Non-PDF files — send as FormData
+            const formData = new FormData();
+            formData.append('file', file);
+            res = await fetch('/api/process', {
+              method: 'POST',
+              body: formData
+            });
+          }
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Upload failed");
           

@@ -117,7 +117,37 @@ interface Insight {
       });
     }, 150);
 
-    const docId = await uploadDocument(file);
+    let extractedText: string | undefined;
+
+    // For PDFs: parse text client-side to avoid Vercel's 4.5 MB body limit
+    if (ext === 'pdf') {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const { extractText, getDocumentProxy } = await import('unpdf');
+        const pdf = await getDocumentProxy(new Uint8Array(arrayBuffer));
+        const { text } = await extractText(pdf, { mergePages: true });
+
+        if (!text.trim()) {
+          clearInterval(interval);
+          setIsUploading(false);
+          setUploadProgress(0);
+          alert("This PDF doesn't contain selectable text (it may be a scanned image). Please use a PDF with actual text content.");
+          return;
+        }
+
+        extractedText = text;
+        console.log(`[StudyFlow] PDF parsed client-side: ${text.length} chars extracted from "${file.name}"`);
+      } catch (pdfErr) {
+        console.error('Client-side PDF parsing failed:', pdfErr);
+        clearInterval(interval);
+        setIsUploading(false);
+        setUploadProgress(0);
+        alert("Failed to read this PDF. The file may be corrupted or password-protected.");
+        return;
+      }
+    }
+
+    const docId = await uploadDocument(file, extractedText);
     
     clearInterval(interval);
     setUploadProgress(100);

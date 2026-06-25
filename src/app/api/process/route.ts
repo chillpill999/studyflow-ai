@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 
 export const runtime = 'nodejs';
+export const maxDuration = 60; // Prevent Vercel timeout on large doc summarization
 
 function chunkText(text: string, size = 2000, overlap = 200): string[] {
   const chunks: string[] = [];
@@ -41,7 +42,7 @@ ${text}`,
     }
   });
 
-  const content = response.text();
+  const content = response.text;
   if (!content) {
     throw new Error('Gemini returned empty content');
   }
@@ -91,78 +92,102 @@ export async function POST(req: Request) {
   }
 
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
-    }
-
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const mimeType = file.type || 'application/pdf';
-
     let rawText = '';
-    try {
-      if (mimeType.startsWith('image/')) {
-        const base64Data = buffer.toString('base64');
-        const openRouterKey = process.env.OPENROUTER_API_KEY;
+    let filename = 'document';
 
-        if (openRouterKey) {
-          const openRouterRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${openRouterKey}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              model: 'google/gemini-2.0-flash-001',
-              messages: [
-                {
-                  role: 'user',
-                  content: [
-                    { type: 'text', text: 'Extract and return all the text content from this image exactly as it is. Do not add any extra commentary or formatting, just the raw text.' },
-                    { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } }
-                  ]
-                }
-              ],
-              temperature: 0.1,
-              max_tokens: 4000
-            })
-          });
+    // Determine if the client sent pre-extracted text (JSON) or a raw file (FormData)
+    const contentType = req.headers.get('content-type') || '';
 
-          const visionData = await openRouterRes.json();
-          if (!openRouterRes.ok) {
-            throw new Error(visionData.error?.message || 'Vision OCR API error');
-          }
-          rawText = visionData.choices?.[0]?.message?.content || '';
-        } else {
-          rawText = `[Image file: ${file.name}] Image text extraction requires OPENROUTER_API_KEY to be configured. Please upload a PDF or text file instead.`;
-        }
-      } else if (mimeType === 'application/pdf') {
-        const { extractText, getDocumentProxy } = await import('unpdf');
-        const pdf = await getDocumentProxy(new Uint8Array(buffer));
-        const { text } = await extractText(pdf, { mergePages: true });
-        rawText = text;
-      } else {
-        rawText = buffer.toString('utf-8');
-      }
+    if (contentType.includes('application/json')) {
+      // --- CLIENT-SIDE PARSED PATH (PDFs) ---
+      // The browser already extracted text using unpdf; no file binary to parse.
+      const body = await req.json();
+      rawText = body.text || '';
+      filename = body.filename || 'document.pdf';
 
       if (!rawText.trim()) {
-        throw new Error('Extracted text is empty.');
+        return NextResponse.json(
+          { error: 'The document appears to be empty or contains only images. Please ensure your PDF has selectable text.' },
+          { status: 400 }
+        );
       }
-    } catch (extractErr: any) {
-      console.error('Extraction Error:', extractErr);
-      return NextResponse.json(
-        { error: 'Failed to extract text from document. Please ensure the file is readable.' },
-        { status: 400 }
-      );
+    } else {
+      // --- LEGACY FORMDATA PATH (images, txt, docx, pptx, and fallback) ---
+      const formData = await req.formData();
+      const file = formData.get('file') as File | null;
+
+      if (!file) {
+        return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+      }
+
+      filename = file.name;
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const mimeType = file.type || 'application/octet-stream';
+
+      try {
+        if (mimeType.startsWith('image/')) {
+          const base64Data = buffer.toString('base64');
+          const openRouterKey = process.env.OPENROUTER_API_KEY;
+
+          if (openRouterKey) {
+            const openRouterRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${openRouterKey}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                model: 'google/gemini-2.0-flash-001',
+                messages: [
+                  {
+                    role: 'user',
+                    content: [
+                      { type: 'text', text: 'Extract and return all the text content from this image exactly as it is. Do not add any extra commentary or formatting, just the raw text.' },
+                      { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+                    ]
+                  }
+                ],
+                temperature: 0.1,
+                max_tokens: 4000
+              })
+            });
+
+            const visionData = await openRouterRes.json();
+            if (!openRouterRes.ok) {
+              throw new Error(visionData.error?.message || 'Vision OCR API error');
+            }
+            rawText = visionData.choices?.[0]?.message?.content || '';
+          } else {
+            rawText = `[Image file: ${file.name}] Image text extraction requires OPENROUTER_API_KEY to be configured. Please upload a PDF or text file instead.`;
+          }
+        } else if (mimeType === 'application/pdf') {
+          // Server-side PDF fallback (for files under 4.5 MB that somehow bypass client parsing)
+          const { extractText, getDocumentProxy } = await import('unpdf');
+          const pdf = await getDocumentProxy(new Uint8Array(buffer));
+          const { text } = await extractText(pdf, { mergePages: true });
+          rawText = text;
+        } else {
+          rawText = buffer.toString('utf-8');
+        }
+
+        if (!rawText.trim()) {
+          throw new Error('Extracted text is empty.');
+        }
+      } catch (extractErr: any) {
+        console.error('Extraction Error:', extractErr);
+        return NextResponse.json(
+          { error: 'Failed to extract text from document. Please ensure the file is readable.' },
+          { status: 400 }
+        );
+      }
     }
 
+    // --- SUMMARIZATION (shared by both paths) ---
     let parsedSummary;
     try {
       if (geminiKey) {
-        console.log(`[INFO] Summarizing document of length ${rawText.length} characters using Gemini.`);
+        console.log(`[INFO] Summarizing document "${filename}" (${rawText.length} chars) using Gemini.`);
         parsedSummary = await getSummaryFromGemini(rawText, geminiKey);
       } else if (groqKey) {
         const maxSingleLength = 30000;
@@ -248,3 +273,4 @@ Summary: ${s.summary}`).join('\n\n')}`;
     return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
   }
 }
+
