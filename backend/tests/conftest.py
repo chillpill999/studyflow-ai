@@ -159,3 +159,37 @@ def make_table_mock(data=None, single_data=None):
         result.data = [single_data]
 
     return mock
+
+
+@pytest.fixture
+def test_chunks():
+    """Test document chunks fixture."""
+    return [
+        {
+            "id": f"chunk-{i}",
+            "document_id": "test-doc-id-123",
+            "page_number": i + 1,
+            "content": f"This is test content for chunk {i}. It contains some keywords for testing.",
+            "chunk_index": i,
+            "metadata": {"header": f"Section {i+1}"},
+        }
+        for i in range(5)
+    ]
+
+
+@pytest.fixture
+def test_document():
+    """Test document fixture."""
+    return {
+        "id": "test-doc-id-123",
+        "user_id": "test-user-id-123",
+        "file_name": "test_document.pdf",
+        "file_path": "documents/test-user-id-123/test_document.pdf",
+        "file_size": 1024,
+        "mime_type": "application/pdf",
+        "total_pages": 10,
+        "metadata": {"title": "Test Document", "author": "Test Author"},
+    }
+
+
+

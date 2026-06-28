@@ -148,3 +148,55 @@ def test_hybrid_rag_bm25(mock_supabase):
 
     assert len(results) == 1
     assert "Calculus" in results[0]["content"]
+
+
+@patch("app.services.hybrid_rag.supabase_client")
+@patch("app.services.hybrid_rag.AIAgents.get_embedding")
+def test_get_vector_retrieval_no_client(mock_embedding, mock_supabase):
+    """Test vector retrieval returns empty when no client."""
+    mock_embedding.return_value = [0.0] * 768
+    with patch("app.services.hybrid_rag.supabase_client", None):
+        results = HybridRAG.get_vector_retrieval("query", "doc-id")
+        assert results == []
+
+
+@patch("app.services.hybrid_rag.supabase_client")
+@patch("app.services.hybrid_rag.AIAgents.get_embedding")
+def test_hybrid_rag_vector_success(mock_embedding, mock_supabase):
+    mock_embedding.return_value = [0.1] * 768
+
+    mock_rpc = MagicMock()
+    mock_execute = MagicMock()
+    mock_supabase.rpc.return_value = mock_rpc
+    mock_rpc.execute.return_value = mock_execute
+    mock_execute.data = [
+        {"id": "chunk-2", "content": "Vector match content", "page_number": 2, "chunk_index": 1}
+    ]
+
+    results = HybridRAG.get_vector_retrieval("query text", "doc-1", top_k=1)
+    assert len(results) == 1
+    assert results[0]["id"] == "chunk-2"
+    mock_supabase.rpc.assert_called_once_with(
+        "match_document_chunks",
+        {
+            "query_embedding": [0.1] * 768,
+            "match_threshold": 0.3,
+            "match_count": 1,
+            "filter_document_id": "doc-1",
+        }
+    )
+
+
+@patch("app.services.hybrid_rag.HybridRAG.get_bm25_retrieval")
+@patch("app.services.hybrid_rag.HybridRAG.get_vector_retrieval")
+def test_hybrid_retrieve_calls_both(mock_vector, mock_bm25, test_chunks):
+    """Test hybrid_retrieve calls both retrieval methods."""
+    mock_bm25.return_value = test_chunks[:3]
+    mock_vector.return_value = test_chunks[2:]
+
+    results = HybridRAG.hybrid_retrieve("test query", "doc-id", top_k=3)
+
+    mock_bm25.assert_called_once_with("test query", "doc-id", top_k=15)
+    mock_vector.assert_called_once_with("test query", "doc-id", top_k=15)
+    assert len(results) <= 3
+
