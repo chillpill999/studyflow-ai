@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { GlassCard } from '@/components/GlassCard';
+import { vi } from 'vitest';
 
 describe('GlassCard', () => {
   it('renders children correctly', () => {
@@ -9,20 +10,20 @@ describe('GlassCard', () => {
 
   it('applies custom className', () => {
     render(<GlassCard className="custom-class">Content</GlassCard>);
-    const card = screen.getByText('Content').closest('div');
+    const card = screen.getByText('Content').closest('div')?.parentElement;
     expect(card).toHaveClass('custom-class');
   });
 
   it('applies hoverable styles when hoverable prop is true', () => {
     render(<GlassCard hoverable>Content</GlassCard>);
-    const card = screen.getByText('Content').closest('div');
+    const card = screen.getByText('Content').closest('div')?.parentElement;
     expect(card).toHaveClass('hover:bg-white/50');
   });
 
   it('applies cursor pointer when onClick is provided', () => {
     const handleClick = vi.fn();
     render(<GlassCard onClick={handleClick}>Clickable</GlassCard>);
-    const card = screen.getByText('Clickable').closest('div');
+    const card = screen.getByText('Clickable').closest('div')?.parentElement;
     expect(card).toHaveClass('cursor-pointer');
   });
 
@@ -35,7 +36,7 @@ describe('GlassCard', () => {
 
   it('renders shine overlay', () => {
     render(<GlassCard>Content</GlassCard>);
-    const card = screen.getByText('Content').closest('div');
+    const card = screen.getByText('Content').closest('div')?.parentElement;
     const shineOverlay = card?.querySelector('.bg-gradient-to-b.from-white\\/10.to-transparent');
     expect(shineOverlay).toBeInTheDocument();
   });
