@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, serif;
+  --font-mono: var(--font-mono), monospace;
+}
+
+@keyframes logo-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes logo-glow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(185, 152, 210, 0.15);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(185, 152, 210, 0.35), 0 0 15px rgba(185, 152, 210, 0.15);
+  }
+}
+
+@utility animate-logo-float {
+  animation: logo-float 5s ease-in-out infinite, logo-glow 5s ease-in-out infinite;
+}
+
+body {
+  background: linear-gradient(
+    135deg,
+    #FDFCFB 0%,
+    #F7F1F8 30%,
+    #E8D7EA 65%,
+    #D8BFD8 100%
+  ) !important;
+  color: #1a0826;
+  min-height: 100vh;
+}

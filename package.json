@@ -1,0 +1,35 @@
+{
+  "name": "the-study-flow-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise monorepo for The Study Flow - AI Academic Productivity Platform",
+  "scripts": {
+    "bootstrap": "npm run install:frontend && npm run install:backend",
+    "install:frontend": "npm --prefix frontend install",
+    "install:backend": "python -m venv backend/.venv && powershell -Command \"& backend/.venv/Scripts/Activate.ps1; pip install -r backend/requirements.txt\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "powershell -Command \"& backend/.venv/Scripts/Activate.ps1; uvicorn backend.app.main:app --reload --port 8000\"",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "lint:backend": "powershell -Command \"& backend/.venv/Scripts/Activate.ps1; ruff check backend/app\"",
+    "format:frontend": "npm --prefix frontend run format",
+    "format:backend": "powershell -Command \"& backend/.venv/Scripts/Activate.ps1; black backend/app\"",
+    "test:frontend": "npm --prefix frontend run test",
+    "test:backend": "powershell -Command \"& backend/.venv/Scripts/Activate.ps1; pytest backend/tests\"",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5"
+  },
+  "lint-staged": {
+    "frontend/**/*.{js,jsx,ts,tsx,css,json}": [
+      "prettier --write",
+      "npm --prefix frontend run lint --fix"
+    ],
+    "backend/**/*.py": [
+      "black",
+      "ruff check --fix"
+    ]
+  }
+}

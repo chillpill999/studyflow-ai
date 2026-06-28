@@ -1,0 +1,60 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  backend-checks:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install ruff black pytest
+        if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+
+    - name: Format Check with Black
+      run: black --check backend
+
+    - name: Lint Check with Ruff
+      run: ruff check backend
+
+    - name: Run Backend Tests
+      run: |
+        # Skip actual database queries during build using mock configurations
+        export TESTING=True
+        pytest backend/tests --asyncio-mode=auto
+
+  frontend-checks:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package.json
+
+    - name: Install Frontend Dependencies
+      run: npm --prefix frontend ci
+
+    - name: Run Frontend Linters
+      run: npm --prefix frontend run lint
+
+    - name: Build Frontend Application
+      run: npm --prefix frontend run build
