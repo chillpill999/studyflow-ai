@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useProgress } from '@react-three/drei';
 import { Loader2 } from 'lucide-react';
 import { Logo } from '../Logo';
@@ -12,34 +13,38 @@ interface AssetPreloaderProps {
 export const AssetPreloader: React.FC<AssetPreloaderProps> = ({ onComplete }) => {
   const { active, progress, errors } = useProgress();
   const [complete, setComplete] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // If Drei's loader reports not active or completed, transition to complete
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (!active && progress === 100) {
       const timer = setTimeout(() => {
         setComplete(true);
         onComplete();
-      }, 600); // Smooth transition timing
+      }, 800); // Smooth transition timing
       return () => clearTimeout(timer);
     }
   }, [active, progress, onComplete]);
 
-  if (complete) return null;
+  if (complete || !mounted) return null;
 
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#FDFCFB] via-[#F7F1F8] to-[#D8BFD8] z-50 transition-opacity duration-500">
-      <div className="flex flex-col items-center gap-6 max-w-sm text-center px-4">
+  const content = (
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/10 backdrop-blur-2xl z-[9999] transition-opacity duration-700">
+      <div className="flex flex-col items-center gap-6 max-w-sm text-center px-8 py-8 rounded-3xl border border-white/30 bg-white/20 shadow-2xl backdrop-blur-md">
         {/* Animated Floating Logo */}
-        <Logo size={70} className="shadow-lg shadow-purple-950/10 border-white/40" />
+        <Logo size={80} className="shadow-2xl shadow-purple-950/20 border-white/30 animate-logo-float" />
 
-        <div className="space-y-2.5 w-full">
-          <div className="flex justify-between text-xs font-semibold font-sans text-purple-950/60 uppercase tracking-widest px-1">
+        <div className="space-y-3 w-full">
+          <div className="flex justify-between text-[10px] font-bold font-sans text-purple-950/70 uppercase tracking-widest px-1">
             <span>Precompiling 3D Materials...</span>
             <span>{Math.round(progress)}%</span>
           </div>
 
           {/* Frosted loading slider bar */}
-          <div className="w-full h-1.5 bg-purple-950/5 rounded-full overflow-hidden border border-white/20 relative backdrop-blur-sm">
+          <div className="w-64 h-1.5 bg-purple-950/5 rounded-full overflow-hidden border border-white/20 relative backdrop-blur-sm">
             <div
               className="h-full bg-gradient-to-r from-[#B998D2] to-purple-800 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
@@ -48,19 +53,22 @@ export const AssetPreloader: React.FC<AssetPreloaderProps> = ({ onComplete }) =>
         </div>
 
         {errors.length > 0 && (
-          <div className="text-[10px] text-red-600 font-sans font-semibold">
-            Warning: Some shaders failed to warm up. Falling back.
+          <div className="text-[10px] text-rose-600 font-sans font-semibold">
+            Warming up fallback buffers...
           </div>
         )}
 
         <div className="flex items-center gap-2">
-          <Loader2 size={13} className="animate-spin text-[#B998D2]" />
-          <span className="text-[10px] font-sans font-bold text-purple-950/40 uppercase tracking-wider">
-            Optimizing GPU buffers
+          <Loader2 size={12} className="animate-spin text-[#B998D2]" />
+          <span className="text-[9px] font-sans font-semibold text-purple-950/50 uppercase tracking-wider">
+            Optimizing GPU Pipeline
           </span>
         </div>
       </div>
     </div>
   );
+
+  return createPortal(content, document.body);
 };
+
 export default AssetPreloader;
