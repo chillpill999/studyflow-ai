@@ -26,7 +26,7 @@ export interface ChatMessage {
   chat_id: string;
   sender: 'user' | 'assistant';
   content: string;
-  citations?: Array<{ chunk_id: string; page_number: number }>;
+  citations?: Array<{ chunk_id: string; page_number: number; file_name?: string; snippet?: string }>;
   created_at: string;
 }
 
@@ -88,6 +88,15 @@ interface AuthState {
   logout: () => Promise<void>;
 }
 
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  read: boolean;
+  created_at: string;
+}
+
 interface AppState extends AuthState {
   documents: StudyDocument[];
   activeDocument: StudyDocument | null;
@@ -109,6 +118,21 @@ interface AppState extends AuthState {
   setNotes: (notes: StudyNote[]) => void;
   performanceProfile: 'high' | 'medium' | 'low' | 'reducedMotion';
   setPerformanceProfile: (profile: 'high' | 'medium' | 'low' | 'reducedMotion') => void;
+  
+  // Theme System
+  theme: 'pearl' | 'dark' | 'light';
+  setTheme: (theme: 'pearl' | 'dark' | 'light') => void;
+
+  // Command Palette
+  commandPaletteOpen: boolean;
+  setCommandPaletteOpen: (open: boolean) => void;
+
+  // Notifications Center
+  notifications: AppNotification[];
+  addNotification: (notification: Omit<AppNotification, 'id' | 'created_at' | 'read'>) => void;
+  clearNotification: (id: string) => void;
+  clearAllNotifications: () => void;
+  markAllAsRead: () => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -162,5 +186,42 @@ export const useStore = create<AppState>((set) => ({
   // Three.js Performance Settings
   performanceProfile: 'high',
   setPerformanceProfile: (performanceProfile) => set({ performanceProfile }),
+
+  // Theme System
+  theme: (typeof window !== 'undefined' && localStorage.getItem('theme') as any) || 'pearl',
+  setTheme: (theme) => {
+    set({ theme });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', theme);
+      const root = document.documentElement;
+      root.classList.remove('theme-pearl', 'theme-dark', 'theme-light');
+      root.classList.add(`theme-${theme}`);
+    }
+  },
+
+  // Command Palette
+  commandPaletteOpen: false,
+  setCommandPaletteOpen: (commandPaletteOpen) => set({ commandPaletteOpen }),
+
+  // Notifications Center
+  notifications: [],
+  addNotification: (n) => set((state) => ({
+    notifications: [
+      {
+        ...n,
+        id: Math.random().toString(36).substring(2, 9),
+        created_at: new Date().toISOString(),
+        read: false,
+      },
+      ...state.notifications,
+    ].slice(0, 50),
+  })),
+  clearNotification: (id) => set((state) => ({
+    notifications: state.notifications.filter((n) => n.id !== id),
+  })),
+  clearAllNotifications: () => set({ notifications: [] }),
+  markAllAsRead: () => set((state) => ({
+    notifications: state.notifications.map((n) => ({ ...n, read: true })),
+  })),
 }));
 

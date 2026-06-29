@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useStore, StudyTask } from 'src/store/useStore';
 import { GlassCard } from 'src/components/GlassCard';
 import { apiClient } from 'src/lib/axios';
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 export default function PlannerPage() {
-  const { documents, tasks, setTasks, activeDocument } = useStore();
+  const { documents, tasks, setTasks, activeDocument, addNotification } = useStore();
   const [selectedDocId, setSelectedDocId] = useState<string>('');
   
   // Planner configurations
@@ -54,7 +54,11 @@ export default function PlannerPage() {
 
   const handleGeneratePlan = async () => {
     if (!selectedDocId || !examDate) {
-      alert('Please select a document and specify your exam date.');
+      addNotification({
+        title: 'Validation Error',
+        message: 'Please select a document and specify your exam date.',
+        type: 'warning'
+      });
       return;
     }
     setLoading(true);
@@ -65,10 +69,18 @@ export default function PlannerPage() {
         available_hours: studyHours
       });
       setTasks(res.data);
-      alert(`Success! Generated ${res.data.length} task milestones for your study plan.`);
-    } catch (err) {
+      addNotification({
+        title: 'Planner created',
+        message: `Successfully generated ${res.data.length} study task milestones.`,
+        type: 'success'
+      });
+    } catch (err: any) {
       console.error('Plan generation error', err);
-      alert('Failed to generate AI study plan. Check backend service configs.');
+      addNotification({
+        title: 'Planner generation failed',
+        message: err.response?.data?.detail || err.message || 'Failed to generate study plan.',
+        type: 'error'
+      });
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -10,10 +10,18 @@ from app.services.auth import supabase_client
 
 router = APIRouter(prefix="/flashcards", tags=["flashcards"])
 
+LEITNER_INTERVALS: dict[int, timedelta] = {
+    1: timedelta(days=1),
+    2: timedelta(days=3),
+    3: timedelta(days=7),
+    4: timedelta(days=14),
+    5: timedelta(days=30),
+}
+
 
 class FlashcardGeneratePayload(BaseModel):
     document_id: str
-    count: Optional[int] = 8
+    count: int | None = 8
 
 
 class FlashcardReviewPayload(BaseModel):
@@ -27,18 +35,32 @@ class FlashcardUpdatePayload(BaseModel):
 
 class FlashcardImportPayload(BaseModel):
     document_id: str
-    cards: List[Dict[str, str]]
+    cards: list[dict[str, str]]
 
 
-@router.post("/generate", response_model=List[Dict[str, Any]])
+@router.post("/generate", response_model=list[dict[str, Any]])
 async def generate_flashcards(
     payload: FlashcardGeneratePayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Generates flashcard QA pairs from document chunks and saves them in the database.
     """
     try:
+        # 0. Verify document ownership
+        doc_check = (
+            supabase_client.table("documents")
+            .select("id")
+            .eq("id", payload.document_id)
+            .eq("user_id", current_user["id"])
+            .execute()
+        )
+        if not doc_check.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Document not found.",
+            )
+
         # 1. Fetch document chunks to use as context
         chunks_response = (
             supabase_client.table("document_chunks")
@@ -69,7 +91,7 @@ async def generate_flashcards(
                     "front": card.get("front", "Empty Question"),
                     "back": card.get("back", "Empty Answer"),
                     "leitner_box": 1,
-                    "next_review_at": datetime.now(timezone.utc).isoformat(),
+                    "next_review_at": datetime.now(UTC).isoformat(),
                 }
             )
 
@@ -81,14 +103,14 @@ async def generate_flashcards(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Flashcard generation failed: {str(e)}",
-        )
+        ) from e
 
 
-@router.get("", response_model=List[Dict[str, Any]])
+@router.get("", response_model=list[dict[str, Any]])
 async def list_flashcards(
-    document_id: Optional[str] = None,
-    review_needed: Optional[bool] = None,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    document_id: str | None = None,
+    review_needed: bool | None = None,
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Retrieves user's flashcards. Can filter by document and whether reviews are overdue.
@@ -100,7 +122,7 @@ async def list_flashcards(
             query = query.eq("document_id", document_id)
 
         if review_needed:
-            now = datetime.now(timezone.utc).isoformat()
+            now = datetime.now(UTC).isoformat()
             query = query.lte("next_review_at", now)
 
         response = query.execute()
@@ -109,14 +131,14 @@ async def list_flashcards(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to load flashcards: {str(e)}",
-        )
+        ) from e
 
 
-@router.patch("/{card_id}/review", response_model=Dict[str, Any])
+@router.patch("/{card_id}/review", response_model=dict[str, Any])
 async def review_flashcard(
     card_id: str,
     payload: FlashcardReviewPayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Updates Leitner box review schedules.
@@ -146,14 +168,7 @@ async def review_flashcard(
             box = 1
 
         # 3. Schedule next review
-        intervals = {
-            1: timedelta(days=1),
-            2: timedelta(days=3),
-            3: timedelta(days=7),
-            4: timedelta(days=14),
-            5: timedelta(days=30),
-        }
-        next_review = datetime.now(timezone.utc) + intervals.get(box, timedelta(days=1))
+        next_review = datetime.now(UTC) + LEITNER_INTERVALS.get(box, timedelta(days=1))
 
         # 4. Save update
         update_response = (
@@ -182,14 +197,14 @@ async def review_flashcard(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to update flashcard review: {str(e)}",
-        )
+        ) from e
 
 
-@router.patch("/{card_id}", response_model=Dict[str, Any])
+@router.patch("/{card_id}", response_model=dict[str, Any])
 async def update_flashcard(
     card_id: str,
     payload: FlashcardUpdatePayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Manually edit flashcard content.
@@ -212,13 +227,13 @@ async def update_flashcard(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to update flashcard: {str(e)}",
-        )
+        ) from e
 
 
 @router.delete("/{card_id}")
 async def delete_flashcard(
     card_id: str,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Deletes a flashcard.
@@ -230,13 +245,13 @@ async def delete_flashcard(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete flashcard: {str(e)}",
-        )
+        ) from e
 
 
-@router.post("/import", response_model=List[Dict[str, Any]])
+@router.post("/import", response_model=list[dict[str, Any]])
 async def import_flashcards(
     payload: FlashcardImportPayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Bulk imports user-defined or externally-sourced flashcard decks.
@@ -252,7 +267,7 @@ async def import_flashcards(
                     "front": card.get("front", ""),
                     "back": card.get("back", ""),
                     "leitner_box": 1,
-                    "next_review_at": datetime.now(timezone.utc).isoformat(),
+                    "next_review_at": datetime.now(UTC).isoformat(),
                 }
             )
 
@@ -262,4 +277,4 @@ async def import_flashcards(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to import deck: {str(e)}",
-        )
+        ) from e

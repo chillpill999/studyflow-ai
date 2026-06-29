@@ -1,25 +1,15 @@
 import re
-from typing import Any, Dict, List
+from typing import Any
 
 
 class Chunker:
-    @staticmethod
-    def split_into_sentences(text: str) -> List[str]:
-        """
-        Splits a text paragraph into sentences using regex boundary checks.
-        """
-        # Split on periods/exclamations/question marks followed by whitespace and capital letters
-        sentence_end = re.compile(r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s")
-        sentences = sentence_end.split(text)
-        return [s.strip() for s in sentences if s.strip()]
-
     @classmethod
     def create_chunks(
         cls,
-        pages: List[Dict[str, Any]],
+        pages: list[dict[str, Any]],
         chunk_size_words: int = 250,
         overlap_words: int = 40,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Layout-aware, heading-aware, and sliding window chunker.
         Creates overlapping semantic blocks of text to preserve query relevance.

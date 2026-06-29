@@ -1,6 +1,6 @@
 """Tests for the documents router — upload, list, delete."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from tests.conftest import make_table_mock
 

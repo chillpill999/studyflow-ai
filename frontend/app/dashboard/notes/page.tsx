@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useStore, StudyNote } from 'src/store/useStore';
 import { GlassCard } from 'src/components/GlassCard';
 import { apiClient } from 'src/lib/axios';
@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export default function NotesPage() {
-  const { documents, notes, setNotes, activeDocument } = useStore();
+  const { documents, notes, setNotes, activeDocument, addNotification } = useStore();
   const [selectedDocId, setSelectedDocId] = useState<string>('');
   const [selectedNote, setSelectedNote] = useState<StudyNote | null>(null);
   
@@ -73,9 +73,18 @@ export default function NotesPage() {
       const generatedNote: StudyNote = res.data;
       setNotes([generatedNote, ...notes]);
       handleSelectNote(generatedNote);
-    } catch (err) {
+      addNotification({
+        title: 'Notes ready',
+        message: `AI study notes generated successfully: "${generatedNote.title}"`,
+        type: 'success'
+      });
+    } catch (err: any) {
       console.error('Notes generation error', err);
-      alert('Failed to generate AI notes. Please verify your Gemini API Key configurations.');
+      addNotification({
+        title: 'Notes generation failed',
+        message: err.response?.data?.detail || err.message || 'Failed to generate AI notes.',
+        type: 'error'
+      });
     } finally {
       setLoading(false);
     }

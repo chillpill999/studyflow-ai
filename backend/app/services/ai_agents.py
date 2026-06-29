@@ -1,5 +1,6 @@
 import json
-from typing import Any, Dict, Generator, List
+from collections.abc import Generator
+from typing import Any
 
 import google.generativeai as genai
 
@@ -12,7 +13,7 @@ if settings.GEMINI_API_KEY:
 
 class AIAgents:
     @staticmethod
-    def get_embedding(text: str) -> List[float]:
+    def get_embedding(text: str) -> list[float]:
         """
         Generates 768-dimensional text embeddings using text-embedding-004.
         """
@@ -30,7 +31,7 @@ class AIAgents:
             raise e
 
     @staticmethod
-    def get_embeddings_batch(texts: List[str]) -> List[List[float]]:
+    def get_embeddings_batch(texts: list[str]) -> list[list[float]]:
         """
         Generates batch text embeddings for document chunks.
         """
@@ -50,8 +51,8 @@ class AIAgents:
     def chat_agent(
         cls,
         query: str,
-        context_chunks: List[Dict[str, Any]],
-        history: List[Dict[str, str]],
+        context_chunks: list[dict[str, Any]],
+        history: list[dict[str, str]],
     ) -> Generator[str, None, None]:
         """
         [Secondary Model - Gemini 2.5 Flash]
@@ -104,7 +105,7 @@ class AIAgents:
     @classmethod
     def quiz_agent(
         cls, text_context: str, num_questions: int = 5
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         [Secondary Model - Gemini 2.5 Flash]
         Specialized Quiz Agent formulating assessments in strict JSON schema format.
@@ -143,7 +144,7 @@ class AIAgents:
     @classmethod
     def flashcard_agent(
         cls, text_context: str, num_cards: int = 8
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, str]]:
         """
         [Secondary Model - Gemini 2.5 Flash]
         Specialized Flashcard Agent extracting key terms and definitions.
@@ -173,7 +174,7 @@ class AIAgents:
             ]
 
     @classmethod
-    def planner_agent(cls, syllabus_text: str) -> List[Dict[str, Any]]:
+    def planner_agent(cls, syllabus_text: str) -> list[dict[str, Any]]:
         """
         [Primary Model - Gemini 2.5 Pro]
         Specialized Planner Agent extracting milestones and task schedules from syllabus.
@@ -207,7 +208,7 @@ class AIAgents:
             ]
 
     @classmethod
-    def mind_map_agent(cls, text_context: str) -> Dict[str, Any]:
+    def mind_map_agent(cls, text_context: str) -> dict[str, Any]:
         """
         [Primary Model - Gemini 2.5 Pro]
         Specialized Mind Map Agent extracting conceptual entities and node links.

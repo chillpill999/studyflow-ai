@@ -79,7 +79,6 @@ def test_ai_agents_embeddings(mock_embed):
     assert embedding[0] == 0.1
 
 
-@patch("app.services.hybrid_rag.supabase_client")
 def test_hybrid_rag_bm25(mock_supabase):
     # Mock database select response
     mock_select = MagicMock()
@@ -89,6 +88,7 @@ def test_hybrid_rag_bm25(mock_supabase):
     mock_supabase.table.return_value = mock_select
     mock_select.select.return_value = mock_eq
     mock_eq.eq.return_value = mock_execute
+    mock_execute.range.return_value = mock_execute
     mock_execute.execute.return_value = MagicMock(
         data=[
             {
@@ -160,7 +160,6 @@ def test_get_vector_retrieval_no_client(mock_embedding, mock_supabase):
         assert results == []
 
 
-@patch("app.services.hybrid_rag.supabase_client")
 @patch("app.services.hybrid_rag.AIAgents.get_embedding")
 def test_hybrid_rag_vector_success(mock_embedding, mock_supabase):
     mock_embedding.return_value = [0.1] * 768

@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -15,9 +15,9 @@ class LogActivityPayload(BaseModel):
     duration_seconds: int
 
 
-@router.get("", response_model=Dict[str, Any])
+@router.get("", response_model=dict[str, Any])
 async def get_analytics_summary(
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Aggregates learning stats (streaks, total time, quiz accuracy, weak topics) and queries Gemini to generate personalized recommendations.
@@ -108,13 +108,13 @@ async def get_analytics_summary(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to compile analytics summary: {str(e)}",
-        )
+        ) from e
 
 
-@router.post("/log", response_model=Dict[str, Any])
+@router.post("/log", response_model=dict[str, Any])
 async def log_study_activity(
     payload: LogActivityPayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Logs a study session duration (e.g. reading a book, checking mindmaps).
@@ -150,4 +150,4 @@ async def log_study_activity(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to log study session: {str(e)}",
-        )
+        ) from e

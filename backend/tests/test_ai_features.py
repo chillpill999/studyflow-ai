@@ -1,5 +1,5 @@
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
-from datetime import datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
@@ -45,7 +45,6 @@ def test_leitner_box_review_correct(mock_supabase, mock_verify_token):
         data=[{"id": "card-123", "leitner_box": 2, "user_id": "mock-user-123"}]
     )
 
-    mock_update = MagicMock()
     mock_select.update.return_value.eq.return_value.execute.return_value = MagicMock(
         data=[{"id": "card-123", "leitner_box": 3}]
     )
@@ -70,7 +69,6 @@ def test_leitner_box_review_incorrect(mock_supabase, mock_verify_token):
         data=[{"id": "card-123", "leitner_box": 4, "user_id": "mock-user-123"}]
     )
 
-    mock_update = MagicMock()
     mock_select.update.return_value.eq.return_value.execute.return_value = MagicMock(
         data=[{"id": "card-123", "leitner_box": 1}]
     )
@@ -137,7 +135,6 @@ def test_planner_tasks_generation(mock_agent, mock_supabase, mock_verify_token):
         {"title": "Read Chapter 1", "description": "Intro details", "priority": "high", "suggested_weeks_offset": 1}
     ]
 
-    mock_insert = MagicMock()
     mock_select.insert.return_value.execute.return_value = MagicMock(
         data=[{"id": "task-123", "title": "Read Chapter 1 - Syllabus.pdf"}]
     )
@@ -145,7 +142,7 @@ def test_planner_tasks_generation(mock_agent, mock_supabase, mock_verify_token):
     headers = {"Authorization": "Bearer mock-token"}
     response = client.post(
         "/api/v1/planner/generate",
-        json={"document_id": "doc-123", "exam_date": (datetime.now(timezone.utc) + timedelta(days=20)).isoformat()},
+        json={"document_id": "doc-123", "exam_date": (datetime.now(UTC) + timedelta(days=20)).isoformat()},
         headers=headers,
     )
 

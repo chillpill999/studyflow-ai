@@ -7,13 +7,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./setup.tsx'],
-    include: ['**/*.test.{ts,tsx}'],
+    setupFiles: ['./tests/setup.tsx'],
+    include: ['tests/**/*.test.{ts,tsx}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
         'node_modules/',
+        'tests/',
         '**/*.d.ts',
         '**/*.config.*',
         '**/coverage/**',
@@ -22,11 +23,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '../'),
-      'src': path.resolve(__dirname, '../'),
-      '@components': path.resolve(__dirname, '../components'),
-      '@hooks': path.resolve(__dirname, '../hooks'),
-      '@store': path.resolve(__dirname, '../store'),
+      '@': path.resolve(__dirname, './'),
+      'src': path.resolve(__dirname, './'),
+      '@components': path.resolve(__dirname, './components'),
+      '@hooks': path.resolve(__dirname, './hooks'),
+      '@store': path.resolve(__dirname, './store'),
     },
   },
 });

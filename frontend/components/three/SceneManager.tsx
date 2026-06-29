@@ -18,7 +18,7 @@ interface SceneManagerProps {
 }
 
 export const SceneManager: React.FC<SceneManagerProps> = ({ children }) => {
-  const { performanceProfile } = useStore();
+  const { performanceProfile, theme } = useStore();
   const [webglSupported, setWebglSupported] = useState<boolean>(true);
   const [assetsLoaded, setAssetsLoaded] = useState<boolean>(false);
 
@@ -30,6 +30,40 @@ export const SceneManager: React.FC<SceneManagerProps> = ({ children }) => {
     }, 0);
     return () => clearTimeout(timer);
   }, []);
+
+  // Synchronize Three.js materials with theme
+  useEffect(() => {
+    import('src/lib/three/materials').then(({ glassGlowMaterial, pearlMetalMaterial, frostedGlassMaterial }) => {
+      const glassGlow = glassGlowMaterial.clone();
+      const pearlMetal = pearlMetalMaterial.clone();
+      const frostedGlass = frostedGlassMaterial.clone();
+      if (theme === 'dark') {
+        glassGlow.color.set('#3B82F6');
+        glassGlow.emissive.set('#60A5FA');
+        glassGlow.emissiveIntensity = 2.0;
+        pearlMetal.color.set('#2E1E4E');
+        frostedGlass.color.set('#1E1035');
+        frostedGlass.opacity = 0.6;
+      } else if (theme === 'light') {
+        glassGlow.color.set('#A78BFA');
+        glassGlow.emissive.set('#C084FC');
+        glassGlow.emissiveIntensity = 0.8;
+        pearlMetal.color.set('#F3EEF6');
+        frostedGlass.color.set('#FFFFFF');
+        frostedGlass.opacity = 0.9;
+      } else { // pearl
+        glassGlow.color.set('#8B5CF6');
+        glassGlow.emissive.set('#7C3AED');
+        glassGlow.emissiveIntensity = 1.5;
+        pearlMetal.color.set('#F0E6F2');
+        frostedGlass.color.set('#FFFFFF');
+        frostedGlass.opacity = 0.8;
+      }
+      Object.assign(glassGlowMaterial, glassGlow);
+      Object.assign(pearlMetalMaterial, pearlMetal);
+      Object.assign(frostedGlassMaterial, frostedGlass);
+    });
+  }, [theme]);
 
   // WebGL Fallback layout if unsupported
   if (!webglSupported) {

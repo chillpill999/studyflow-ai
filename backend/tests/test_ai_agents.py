@@ -4,8 +4,6 @@ Unit tests for AI Agents service.
 import json
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from app.services.ai_agents import AIAgents
 
 

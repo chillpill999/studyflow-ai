@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 export default function MindMapPage() {
-  const { documents, activeDocument } = useStore();
+  const { documents, activeDocument, addNotification } = useStore();
   const [selectedDocId, setSelectedDocId] = useState<string>('');
   
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -99,9 +99,18 @@ export default function MindMapPage() {
 
       setNodes(layoutNodes);
       setEdges(layoutEdges);
-    } catch (err) {
+      addNotification({
+        title: 'Mind Map ready',
+        message: `Successfully generated a concept map with ${layoutNodes.length} nodes.`,
+        type: 'success'
+      });
+    } catch (err: any) {
       console.error('Mind map generation error', err);
-      alert('Failed to generate mind map. Check API Key configuration.');
+      addNotification({
+        title: 'Mind Map generation failed',
+        message: err.response?.data?.detail || err.message || 'Failed to generate Mind Map.',
+        type: 'error'
+      });
     } finally {
       setLoading(false);
     }

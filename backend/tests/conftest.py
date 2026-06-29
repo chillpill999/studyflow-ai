@@ -11,7 +11,6 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 
-
 # ---------------------------------------------------------------------------
 # Core fixtures
 # ---------------------------------------------------------------------------
@@ -139,7 +138,7 @@ def make_table_mock(data=None, single_data=None):
     mock = MagicMock()
     result = MagicMock(data=data or [])
 
-    # Support arbitrarily deep chaining (.select().eq().eq().order().limit().execute())
+    # Support arbitrarily deep chaining (.select().eq().eq().order().limit().range().execute())
     chain = mock
     for _ in range(10):
         chain.select.return_value = chain
@@ -150,6 +149,7 @@ def make_table_mock(data=None, single_data=None):
         chain.is_.return_value = chain
         chain.order.return_value = chain
         chain.limit.return_value = chain
+        chain.range.return_value = chain
         chain.insert.return_value = chain
         chain.update.return_value = chain
         chain.delete.return_value = chain

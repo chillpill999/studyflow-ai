@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
@@ -11,10 +11,10 @@ from app.services.pdf_parser import PDFParser
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 
-@router.post("/upload", response_model=Dict[str, Any])
+@router.post("/upload", response_model=dict[str, Any])
 async def upload_document(
     file: UploadFile = File(...),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Handles PDF document uploads.
@@ -105,14 +105,24 @@ async def upload_document(
         }
 
     except Exception as err:
+        # Cleanup: remove orphaned storage file if DB insert failed after upload
+        try:
+            supabase_client.storage.from_("documents").remove([storage_path])
+        except Exception:
+            pass
+        # Cleanup: remove orphaned document entry if embedding step failed
+        try:
+            supabase_client.table("documents").delete().eq("id", document_id).execute()
+        except Exception:
+            pass
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Upload processing failed: {str(err)}",
-        )
+        ) from err
 
 
-@router.get("", response_model=List[Dict[str, Any]])
-async def list_documents(current_user: Dict[str, Any] = Depends(get_current_user)):
+@router.get("", response_model=list[dict[str, Any]])
+async def list_documents(current_user: dict[str, Any] = Depends(get_current_user)):
     """
     Lists all documents owned by the active user.
     """
@@ -129,12 +139,12 @@ async def list_documents(current_user: Dict[str, Any] = Depends(get_current_user
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch documents: {str(err)}",
-        )
+        ) from err
 
 
-@router.delete("/{document_id}", response_model=Dict[str, Any])
+@router.delete("/{document_id}", response_model=dict[str, Any])
 async def delete_document(
-    document_id: str, current_user: Dict[str, Any] = Depends(get_current_user)
+    document_id: str, current_user: dict[str, Any] = Depends(get_current_user)
 ):
     """
     Deletes a document from Database and Storage bucket.
@@ -172,4 +182,4 @@ async def delete_document(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete document: {str(err)}",
-        )
+        ) from err

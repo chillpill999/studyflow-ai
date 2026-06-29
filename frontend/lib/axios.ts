@@ -2,11 +2,16 @@ import axios, { AxiosInstance } from 'axios';
 import { useStore } from '../store/useStore';
 
 // Get base url from environment variables or default to local FastAPI dev port
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || (() => {
+  if (typeof window !== 'undefined') {
+    console.warn('NEXT_PUBLIC_API_URL is not set — falling back to http://localhost:8000/api/v1');
+  }
+  return 'http://localhost:8000/api/v1';
+})();
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 30000, // 30 seconds timeout
+  timeout: 120000, // 30 seconds timeout
   headers: {
     'Content-Type': 'application/json',
   },

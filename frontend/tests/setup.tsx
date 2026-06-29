@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { vi, beforeAll, afterAll } from 'vitest';
 
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
@@ -44,17 +44,81 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }));
 
+// Mock Supabase Client and Lib
+vi.mock('src/lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+      onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
+      signInWithPassword: vi.fn().mockResolvedValue({ data: { user: null, session: null }, error: null }),
+      signInWithOAuth: vi.fn().mockResolvedValue({ error: null }),
+      signUp: vi.fn().mockResolvedValue({ data: { user: null, session: null }, error: null }),
+      signOut: vi.fn().mockResolvedValue({ error: null }),
+      getUser: vi.fn().mockResolvedValue({ data: { user: null } }),
+    },
+  },
+}));
+
+// Mock Axios Client
+vi.mock('src/lib/axios', () => {
+  const mockAxios = {
+    get: vi.fn().mockResolvedValue({ data: [] }),
+    post: vi.fn().mockResolvedValue({ data: {} }),
+    put: vi.fn().mockResolvedValue({ data: {} }),
+    delete: vi.fn().mockResolvedValue({ data: {} }),
+    patch: vi.fn().mockResolvedValue({ data: {} }),
+    interceptors: {
+      request: { use: vi.fn(), eject: vi.fn() },
+      response: { use: vi.fn(), eject: vi.fn() },
+    },
+    create: vi.fn(() => mockAxios),
+  };
+  return {
+    apiClient: mockAxios,
+    default: mockAxios,
+  };
+});
+
 // Mock Zustand store
-vi.mock('@/store/useStore', () => ({
-  useStore: vi.fn(() => ({
-    user: null,
+vi.mock('src/store/useStore', () => {
+  const store = {
+    user: { email: 'student@example.com', user_metadata: { full_name: 'Test Student' } },
+    session: { access_token: 'mock-token' },
     setUser: vi.fn(),
+    setSession: vi.fn(),
+    logout: vi.fn(),
     documents: [],
     setDocuments: vi.fn(),
     addDocument: vi.fn(),
     removeDocument: vi.fn(),
-  })),
-}));
+    
+    // Custom added actions and variables for Phase 10
+    theme: 'pearl',
+    setTheme: vi.fn(),
+    commandPaletteOpen: false,
+    setCommandPaletteOpen: vi.fn(),
+    notifications: [],
+    addNotification: vi.fn(),
+    clearNotification: vi.fn(),
+    clearAllNotifications: vi.fn(),
+    markAllAsRead: vi.fn(),
+    
+    // Additional refetch / state actions
+    refetchChats: vi.fn(),
+    refetchNotes: vi.fn(),
+    refetchTasks: vi.fn(),
+    refetchFlashcards: vi.fn(),
+    performanceProfile: 'high',
+    setPerformanceProfile: vi.fn(),
+  };
+  return {
+    useStore: vi.fn((selector) => {
+      if (selector) return selector(store);
+      return store;
+    }),
+  };
+});
+
 
 // Mock React Query
 vi.mock('@tanstack/react-query', () => ({
@@ -145,6 +209,26 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
+
+HTMLElement.prototype.scrollIntoView = vi.fn();
+// Mock @xyflow/react
+vi.mock('@xyflow/react', () => {
+  const React = require('react');
+  return {
+    ReactFlow: ({ children }: any) => React.createElement('div', { 'data-testid': 'react-flow' }, children),
+    MiniMap: () => null,
+    Controls: () => null,
+    Background: () => null,
+    useNodesState: (initial: any) => {
+      const [state, setState] = React.useState(initial);
+      return [state, setState, vi.fn()];
+    },
+    useEdgesState: (initial: any) => {
+      const [state, setState] = React.useState(initial);
+      return [state, setState, vi.fn()];
+    },
+  };
+});
 
 // Suppress console errors in tests
 const originalError = console.error;

@@ -28,14 +28,60 @@
   animation: logo-float 5s ease-in-out infinite, logo-glow 5s ease-in-out infinite;
 }
 
-body {
-  background: linear-gradient(
+:root {
+  --background-gradient: linear-gradient(
     135deg,
     #FDFCFB 0%,
     #F7F1F8 30%,
     #E8D7EA 65%,
     #D8BFD8 100%
-  ) !important;
-  color: #1a0826;
+  );
+  --text-primary: #1a0826;
+  --text-muted: rgba(26, 8, 38, 0.6);
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-bg-hover: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-border-hover: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(185, 152, 210, 0.15);
+  --glass-shadow-hover: 0 12px 40px 0 rgba(185, 152, 210, 0.25);
+}
+
+.theme-dark {
+  --background-gradient: linear-gradient(
+    135deg,
+    #0E0716 0%,
+    #160D25 50%,
+    #201335 100%
+  );
+  --text-primary: #f3e8ff;
+  --text-muted: rgba(243, 232, 255, 0.6);
+  --glass-bg: rgba(22, 13, 37, 0.65);
+  --glass-bg-hover: rgba(30, 18, 50, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --glass-shadow-hover: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+}
+
+.theme-light {
+  --background-gradient: linear-gradient(
+    135deg,
+    #FAF8FC 0%,
+    #F3EDF7 100%
+  );
+  --text-primary: #1c0f2a;
+  --text-muted: rgba(28, 15, 42, 0.6);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-bg-hover: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-border-hover: rgba(0, 0, 0, 0.1);
+  --glass-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
+  --glass-shadow-hover: 0 8px 24px 0 rgba(0, 0, 0, 0.08);
+}
+
+body {
+  background: var(--background-gradient) !important;
+  color: var(--text-primary);
   min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
 }

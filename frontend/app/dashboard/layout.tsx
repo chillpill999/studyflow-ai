@@ -21,6 +21,9 @@ import { GlassCard } from 'src/components/GlassCard';
 import { Logo } from 'src/components/Logo';
 import { SceneManager } from 'src/components/three/SceneManager';
 import { ThreeIcon } from 'src/components/three/ThreeIcon';
+import { ThemeSwitcher } from 'src/components/ThemeSwitcher';
+import { NotificationCenter } from 'src/components/NotificationCenter';
+import { CommandPalette } from 'src/components/CommandPalette';
 
 interface SidebarLinkProps {
   name: 'Book' | 'Chat' | 'Upload' | 'Flashcard' | 'Brain' | 'Mind Map' | 'Quiz' | 'Planner' | 'Analytics' | 'Profile' | 'Settings';
@@ -67,7 +70,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, logout } = useStore();
+  const { user, logout, setCommandPaletteOpen } = useStore();
 
   const handleLogout = async () => {
     await logout();
@@ -86,7 +89,15 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="relative min-h-screen flex bg-gradient-to-br from-[#FDFCFB] via-[#F7F1F8] to-[#D8BFD8] overflow-hidden">
+    <div className="relative min-h-screen flex bg-transparent overflow-hidden">
+      {/* Skip to Main Content Link for Screen Readers (WCAG 2.2 AA) */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-purple-950 focus:border focus:border-[#B998D2] focus:rounded-xl focus:shadow-lg focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* Global Canvas container tracking all viewport portals */}
       <SceneManager />
 
@@ -150,10 +161,31 @@ export default function DashboardLayout({
 
       {/* Main Panel Viewport */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10 p-4 pl-0">
-        <main className="flex-1 overflow-y-auto">
+        {/* Top Header Bar */}
+        <header className="flex items-center justify-between mb-4 h-14 px-4 bg-white/20 border border-white/20 rounded-2xl backdrop-blur-md">
+          {/* Left section: Command palette search trigger bar */}
+          <button 
+            onClick={() => setCommandPaletteOpen(true)}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs text-purple-950/40 hover:text-purple-950/60 bg-white/30 hover:bg-white/40 border border-white/30 rounded-xl transition-all font-sans cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#B998D2]"
+          >
+            <span>Search or command...</span>
+            <kbd className="ml-2 px-1.5 py-0.5 text-[9px] bg-purple-950/5 border border-purple-950/10 rounded-md font-mono text-purple-950/50 font-semibold shadow-sm">Ctrl + K</kbd>
+          </button>
+
+          {/* Right section: Notifications Center and Theme Switcher */}
+          <div className="flex items-center gap-3">
+            <ThemeSwitcher />
+            <NotificationCenter />
+          </div>
+        </header>
+
+        <main id="main-content" className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>
+
+      {/* Command Palette */}
+      <CommandPalette />
     </div>
   );
 }

@@ -22,6 +22,7 @@ import {
 } from 'src/lib/three/materials';
 import { handlePointerOver, handlePointerOut } from 'src/lib/three/events';
 import { useStore } from 'src/store/useStore';
+import { detectCapabilities } from 'src/lib/three/capabilities';
 
 interface ThreeIconProps {
   name: 'Book' | 'Chat' | 'Upload' | 'Flashcard' | 'Brain' | 'Mind Map' | 'Quiz' | 'Planner' | 'Analytics' | 'Profile' | 'Settings';
@@ -29,7 +30,7 @@ interface ThreeIconProps {
   className?: string;
 }
 
-export const ThreeIcon: React.FC<ThreeIconProps> = ({ name, trackRef, className = '' }) => {
+const ThreeIconInner: React.FC<ThreeIconProps> = ({ name, trackRef, className = '' }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const { performanceProfile } = useStore();
@@ -105,4 +106,15 @@ export const ThreeIcon: React.FC<ThreeIconProps> = ({ name, trackRef, className 
     </View>
   );
 };
+
+export const ThreeIcon: React.FC<ThreeIconProps> = ({ name, trackRef, className = '' }) => {
+  const [webglSupported] = useState<boolean>(() => detectCapabilities().webgl2);
+
+  if (!webglSupported) {
+    return null;
+  }
+
+  return <ThreeIconInner name={name} trackRef={trackRef} className={className} />;
+};
+
 export default ThreeIcon;

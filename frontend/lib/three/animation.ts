@@ -64,7 +64,7 @@ export const animationPresets = {
     const targetX = mouse.x * targetXRange;
     const targetY = mouse.y * targetYRange;
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX, lerpFactor);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY + camera.position.y * 0.0, lerpFactor);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, lerpFactor);
   },
 
   // 7. Glow intensity pulsing

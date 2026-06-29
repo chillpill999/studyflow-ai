@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -14,35 +14,49 @@ router = APIRouter(prefix="/planner", tags=["planner"])
 class PlannerGeneratePayload(BaseModel):
     document_id: str
     exam_date: str
-    available_hours: Optional[float] = 2.0
+    available_hours: float | None = 2.0
 
 
 class TaskCreatePayload(BaseModel):
     title: str
-    description: Optional[str] = ""
-    status: Optional[str] = "todo"
-    priority: Optional[str] = "medium"
-    due_date: Optional[str] = None
-    ai_source_doc: Optional[str] = None
+    description: str | None = ""
+    status: str | None = "todo"
+    priority: str | None = "medium"
+    due_date: str | None = None
+    ai_source_doc: str | None = None
 
 
 class TaskUpdatePayload(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    status: Optional[str] = None
-    priority: Optional[str] = None
-    due_date: Optional[str] = None
+    title: str | None = None
+    description: str | None = None
+    status: str | None = None
+    priority: str | None = None
+    due_date: str | None = None
 
 
-@router.post("/generate", response_model=List[Dict[str, Any]])
+@router.post("/generate", response_model=list[dict[str, Any]])
 async def generate_planner(
     payload: PlannerGeneratePayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Analyzes document context to generate study milestones and tasks leading to the exam date.
     """
     try:
+        # 0. Verify document ownership
+        doc_check = (
+            supabase_client.table("documents")
+            .select("id")
+            .eq("id", payload.document_id)
+            .eq("user_id", current_user["id"])
+            .execute()
+        )
+        if not doc_check.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Document not found.",
+            )
+
         # 1. Fetch document chunks to use as context
         chunks_response = (
             supabase_client.table("document_chunks")
@@ -79,7 +93,7 @@ async def generate_planner(
         for task in tasks_suggested:
             # Add weeks offset to target due_date
             weeks_offset = task.get("suggested_weeks_offset", 1)
-            target_dt = datetime.now(timezone.utc) + timedelta(weeks=weeks_offset)
+            target_dt = datetime.now(UTC) + timedelta(weeks=weeks_offset)
 
             # Bound due_date to exam date
             if target_dt > exam_dt:
@@ -105,13 +119,13 @@ async def generate_planner(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Study plan generation failed: {str(e)}",
-        )
+        ) from e
 
 
-@router.get("/tasks", response_model=List[Dict[str, Any]])
+@router.get("/tasks", response_model=list[dict[str, Any]])
 async def list_tasks(
-    status_filter: Optional[str] = None,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    status_filter: str | None = None,
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Lists all tasks.
@@ -127,13 +141,13 @@ async def list_tasks(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch tasks: {str(e)}",
-        )
+        ) from e
 
 
-@router.post("/tasks", response_model=Dict[str, Any])
+@router.post("/tasks", response_model=dict[str, Any])
 async def create_task(
     payload: TaskCreatePayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Manually create a task.
@@ -154,14 +168,14 @@ async def create_task(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create task: {str(e)}",
-        )
+        ) from e
 
 
-@router.patch("/tasks/{task_id}", response_model=Dict[str, Any])
+@router.patch("/tasks/{task_id}", response_model=dict[str, Any])
 async def update_task(
     task_id: str,
     payload: TaskUpdatePayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Updates task properties (e.g. status transition, rescheduling).
@@ -185,13 +199,13 @@ async def update_task(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to update task: {str(e)}",
-        )
+        ) from e
 
 
 @router.delete("/tasks/{task_id}")
 async def delete_task(
     task_id: str,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Deletes a task.
@@ -203,4 +217,4 @@ async def delete_task(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete task: {str(e)}",
-        )
+        ) from e

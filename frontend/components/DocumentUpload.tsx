@@ -6,6 +6,7 @@ import { GlassCard } from './GlassCard';
 import { Progress } from './ui/Progress';
 import { apiClient } from 'src/lib/axios';
 import axios from 'axios';
+import { useStore } from 'src/store/useStore';
 
 interface UploadQueueItem {
   id: string;
@@ -68,6 +69,14 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUploadSuccess,
       if (response.status === 200 || response.status === 201) {
         // 2. Set to completed
         setQueue(prev => prev.map(q => q.id === item.id ? { ...q, status: 'completed', progress: 100 } : q));
+        
+        // Add success notification
+        useStore.getState().addNotification({
+          title: 'Upload complete',
+          message: `${item.fileName} has been uploaded and indexed successfully.`,
+          type: 'success'
+        });
+
         if (onUploadSuccess) onUploadSuccess();
       } else {
         throw new Error('Upload response returned error code');
@@ -81,6 +90,13 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUploadSuccess,
         errorMsg = error.message;
       }
       setQueue(prev => prev.map(q => q.id === item.id ? { ...q, status: 'failed', error: errorMsg } : q));
+
+      // Add failure notification
+      useStore.getState().addNotification({
+        title: 'Upload failed',
+        message: `Failed to upload ${item.fileName}: ${errorMsg}`,
+        type: 'error'
+      });
     }
   };
 

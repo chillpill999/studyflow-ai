@@ -4,8 +4,6 @@ Unit tests for configuration module.
 import os
 from unittest.mock import patch
 
-import pytest
-
 
 class TestConfig:
     """Tests for app.core.config.Settings."""
@@ -24,6 +22,7 @@ class TestConfig:
         """Test that settings load from environment variables."""
         # Need to reload module after env change
         import importlib
+
         from app.core import config
 
         importlib.reload(config)

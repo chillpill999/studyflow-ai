@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useStore, Flashcard } from 'src/store/useStore';
 import { GlassCard } from 'src/components/GlassCard';
 import { apiClient } from 'src/lib/axios';
@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export default function FlashcardsPage() {
-  const { documents, flashcards, setFlashcards, activeDocument } = useStore();
+  const { documents, flashcards, setFlashcards, activeDocument, addNotification } = useStore();
   const [selectedDocId, setSelectedDocId] = useState<string>('');
   
   // Carousel states
@@ -87,9 +87,18 @@ export default function FlashcardsPage() {
         count: 8
       });
       setFlashcards([...res.data, ...flashcards]);
-    } catch (err) {
+      addNotification({
+        title: 'Flashcards generated',
+        message: `Successfully generated ${res.data.length} flashcards from document.`,
+        type: 'success'
+      });
+    } catch (err: any) {
       console.error('Flashcards generation error', err);
-      alert('Failed to generate cards. Check backend logs and API key configuration.');
+      addNotification({
+        title: 'Flashcards generation failed',
+        message: err.response?.data?.detail || err.message || 'Failed to generate flashcards.',
+        type: 'error'
+      });
     } finally {
       setLoading(false);
     }

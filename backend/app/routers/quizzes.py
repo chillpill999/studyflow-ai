@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -12,24 +12,38 @@ router = APIRouter(prefix="/quizzes", tags=["quizzes"])
 
 class QuizGeneratePayload(BaseModel):
     document_id: str
-    count: Optional[int] = 5
-    difficulty: Optional[str] = "medium"
-    types: Optional[List[str]] = ["mcq"]
+    count: int | None = 5
+    difficulty: str | None = "medium"
+    types: list[str] | None = ["mcq"]
 
 
 class QuizSubmitPayload(BaseModel):
-    answers: Dict[str, str]  # question_id -> chosen option string
+    answers: dict[str, str]  # question_id -> chosen option string
 
 
-@router.post("/generate", response_model=Dict[str, Any])
+@router.post("/generate", response_model=dict[str, Any])
 async def generate_quiz(
     payload: QuizGeneratePayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Generates a quiz from document chunks using Gemini and saves the quiz session.
     """
     try:
+        # 0. Verify document ownership
+        doc_check = (
+            supabase_client.table("documents")
+            .select("id")
+            .eq("id", payload.document_id)
+            .eq("user_id", current_user["id"])
+            .execute()
+        )
+        if not doc_check.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Document not found.",
+            )
+
         # 1. Fetch document chunks to use as context
         chunks_response = (
             supabase_client.table("document_chunks")
@@ -81,14 +95,14 @@ async def generate_quiz(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Quiz generation failed: {str(e)}",
-        )
+        ) from e
 
 
-@router.post("/{quiz_id}/submit", response_model=Dict[str, Any])
+@router.post("/{quiz_id}/submit", response_model=dict[str, Any])
 async def submit_quiz(
     quiz_id: str,
     payload: QuizSubmitPayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Grades user answers against stored correct choices, logs to analytics, and returns results.
@@ -158,13 +172,13 @@ async def submit_quiz(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to submit quiz grading: {str(e)}",
-        )
+        ) from e
 
 
-@router.get("", response_model=List[Dict[str, Any]])
+@router.get("", response_model=list[dict[str, Any]])
 async def list_quizzes(
-    document_id: Optional[str] = None,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    document_id: str | None = None,
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Returns historical quiz sessions.
@@ -180,4 +194,4 @@ async def list_quizzes(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch quiz sessions: {str(e)}",
-        )
+        ) from e

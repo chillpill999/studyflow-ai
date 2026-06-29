@@ -1,4 +1,3 @@
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
@@ -12,7 +11,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 class UserRegister(BaseModel):
     email: EmailStr
     password: str
-    full_name: Optional[str] = None
+    full_name: str | None = None
 
 
 class UserLogin(BaseModel):
@@ -55,7 +54,7 @@ def register(user_data: UserRegister):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Registration failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/login")
@@ -95,7 +94,7 @@ def login(user_data: UserLogin):
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Login failed: {str(e)}"
-        )
+        ) from e
 
 
 @router.post("/logout")
@@ -114,7 +113,7 @@ def logout(user=Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=f"Logout failed: {str(e)}"
-        )
+        ) from e
 
 
 @router.get("/session")
@@ -127,7 +126,7 @@ def get_session(user=Depends(get_current_user)):
 
 @router.get("/google")
 def get_google_oauth_url(
-    redirect_to: Optional[str] = "http://localhost:3000/auth/callback",
+    redirect_to: str | None = "http://localhost:3000/auth/callback",
 ):
     """
     Generates a Google OAuth authorization URL redirect link.
@@ -146,4 +145,4 @@ def get_google_oauth_url(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"OAuth initialization failed: {str(e)}",
-        )
+        ) from e

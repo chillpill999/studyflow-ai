@@ -5,9 +5,13 @@ from supabase import Client, create_client
 from app.core.config import settings
 
 # Initialize Supabase Client
-supabase_client: Client = None
-if settings.SUPABASE_URL and settings.SUPABASE_ANON_KEY:
-    supabase_client = create_client(settings.SUPABASE_URL, settings.SUPABASE_ANON_KEY)
+# NOTE: Service role key is used so backend DB queries bypass RLS.
+# User auth is enforced in the API layer via get_current_user.
+supabase_client: Client | None = None
+if settings.SUPABASE_URL and settings.SUPABASE_SERVICE_ROLE_KEY:
+    supabase_client = create_client(
+        settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY
+    )
 
 
 def verify_token(token: str) -> dict:
@@ -45,7 +49,7 @@ def verify_token(token: str) -> dict:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token signature has expired",
-            )
+            ) from None
         except jwt.InvalidTokenError:
             # Fallback to Supabase API if local decode fails (e.g. key mismatch or token format)
             pass
@@ -71,4 +75,4 @@ def verify_token(token: str) -> dict:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Authentication check failed: {str(e)}",
-        )
+        ) from e

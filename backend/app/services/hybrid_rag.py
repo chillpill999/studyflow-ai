@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from rank_bm25 import BM25Okapi
 
@@ -8,7 +8,7 @@ from app.services.auth import supabase_client
 
 class HybridRAG:
     @staticmethod
-    def tokenize(text: str) -> List[str]:
+    def tokenize(text: str) -> list[str]:
         """
         Tokenizes text by lowercasing and splitting on non-alphanumeric chars.
         """
@@ -17,22 +17,30 @@ class HybridRAG:
     @classmethod
     def get_bm25_retrieval(
         cls, query: str, document_id: str, top_k: int = 10
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Retrieves top_k document chunks using BM25 keyword matching.
         """
         if not supabase_client:
             return []
 
-        # Pull all chunks of this document
-        response = (
-            supabase_client.table("document_chunks")
-            .select("id, document_id, page_number, content, chunk_index, metadata")
-            .eq("document_id", document_id)
-            .execute()
-        )
-
-        chunks = response.data
+        # Pull chunks with pagination (200 per page to avoid OOM on large docs)
+        chunks: list[dict[str, Any]] = []
+        page = 0
+        page_size = 200
+        while True:
+            response = (
+                supabase_client.table("document_chunks")
+                .select("id, document_id, page_number, content, chunk_index, metadata")
+                .eq("document_id", document_id)
+                .range(page * page_size, (page + 1) * page_size - 1)
+                .execute()
+            )
+            page_data = response.data or []
+            chunks.extend(page_data)
+            if len(page_data) < page_size:
+                break
+            page += 1
         if not chunks:
             return []
 
@@ -59,7 +67,7 @@ class HybridRAG:
         document_id: str,
         top_k: int = 10,
         similarity_threshold: float = 0.3,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Retrieves top_k document chunks using pgvector Cosine Similarity via supabase RPC.
         """
@@ -85,17 +93,17 @@ class HybridRAG:
     @classmethod
     def fuse_results_rrf(
         cls,
-        bm25_results: List[Dict[str, Any]],
-        vector_results: List[Dict[str, Any]],
+        bm25_results: list[dict[str, Any]],
+        vector_results: list[dict[str, Any]],
         top_k: int = 5,
         rrf_constant: int = 60,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Combines Lexical (BM25) and Semantic (pgvector) lists using Reciprocal Rank Fusion (RRF).
         Ranks are merged dynamically: Score = sum(1 / (rrf_constant + rank))
         """
-        rrf_scores: Dict[str, float] = {}
-        chunk_map: Dict[str, Dict[str, Any]] = {}
+        rrf_scores: dict[str, float] = {}
+        chunk_map: dict[str, dict[str, Any]] = {}
 
         # Process BM25 ranks
         for rank, chunk in enumerate(bm25_results):
@@ -132,7 +140,7 @@ class HybridRAG:
     @classmethod
     def hybrid_retrieve(
         cls, query: str, document_id: str, top_k: int = 5
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Primary entry point: Runs BM25 and pgvector searches, fuses via RRF, and returns context.
         """

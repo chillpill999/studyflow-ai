@@ -26,7 +26,7 @@ export const FlowFieldParticles: React.FC = () => {
 
   useEffect(() => {
     const temp = [];
-    for (let i = 0; i < 3000; i++) {
+    for (let i = 0; i < count; i++) {
       temp.push({
         position: new THREE.Vector3(
           (Math.random() - 0.5) * 12,
@@ -39,7 +39,7 @@ export const FlowFieldParticles: React.FC = () => {
       });
     }
     particles.current = temp;
-  }, []);
+  }, [count]);
 
   // Shared reusable Matrix4 instance to avoid garbage collection allocations
   const dummyMatrix = useMemo(() => new THREE.Matrix4(), []);

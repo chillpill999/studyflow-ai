@@ -17,7 +17,7 @@ describe('GlassCard', () => {
   it('applies hoverable styles when hoverable prop is true', () => {
     render(<GlassCard hoverable>Content</GlassCard>);
     const card = screen.getByText('Content').closest('div')?.parentElement;
-    expect(card).toHaveClass('hover:bg-white/50');
+    expect(card).toHaveClass('hover:bg-[var(--glass-bg-hover)]');
   });
 
   it('applies cursor pointer when onClick is provided', () => {

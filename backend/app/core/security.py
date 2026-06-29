@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.services.auth import verify_token
 
-security_bearer = HTTPBearer(auto_error=False)
+security_bearer: HTTPBearer = HTTPBearer(auto_error=False)
 
 
 def get_current_user(

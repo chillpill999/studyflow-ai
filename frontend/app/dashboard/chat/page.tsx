@@ -171,7 +171,7 @@ export default function ChatPage() {
 
     try {
       const token = session?.access_token;
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+      const baseUrl = apiClient.defaults.baseURL;
       const docQueryParam = selectedDocIds.length > 0 ? `&document_id=${selectedDocIds.join(',')}` : '';
       
       const response = await fetch(

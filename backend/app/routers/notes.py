@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -12,29 +12,43 @@ router = APIRouter(prefix="/notes", tags=["notes"])
 
 class NoteGeneratePayload(BaseModel):
     document_id: str
-    mode: Optional[str] = "detailed"  # detailed | concise | summary
+    mode: str | None = "detailed"  # detailed | concise | summary
 
 
 class NoteCreatePayload(BaseModel):
     title: str
     content: str
-    linked_document_id: Optional[str] = None
+    linked_document_id: str | None = None
 
 
 class NoteUpdatePayload(BaseModel):
-    title: Optional[str] = None
-    content: Optional[str] = None
+    title: str | None = None
+    content: str | None = None
 
 
-@router.post("/generate", response_model=Dict[str, Any])
+@router.post("/generate", response_model=dict[str, Any])
 async def generate_notes(
     payload: NoteGeneratePayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Generates structured markdown study notes from document context.
     """
     try:
+        # 0. Verify document ownership
+        doc_check = (
+            supabase_client.table("documents")
+            .select("id")
+            .eq("id", payload.document_id)
+            .eq("user_id", current_user["id"])
+            .execute()
+        )
+        if not doc_check.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Document not found.",
+            )
+
         # 1. Fetch document chunks to use as context
         chunks_response = (
             supabase_client.table("document_chunks")
@@ -85,13 +99,13 @@ async def generate_notes(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Study notes generation failed: {str(e)}",
-        )
+        ) from e
 
 
-@router.get("", response_model=List[Dict[str, Any]])
+@router.get("", response_model=list[dict[str, Any]])
 async def list_notes(
-    document_id: Optional[str] = None,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    document_id: str | None = None,
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Lists all study notes.
@@ -107,13 +121,13 @@ async def list_notes(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch study notes: {str(e)}",
-        )
+        ) from e
 
 
-@router.get("/{note_id}", response_model=Dict[str, Any])
+@router.get("/{note_id}", response_model=dict[str, Any])
 async def get_note(
     note_id: str,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Retrieves a single study note.
@@ -136,13 +150,13 @@ async def get_note(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve note: {str(e)}",
-        )
+        ) from e
 
 
-@router.post("", response_model=Dict[str, Any])
+@router.post("", response_model=dict[str, Any])
 async def create_note(
     payload: NoteCreatePayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Manually create a study note.
@@ -160,14 +174,14 @@ async def create_note(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create study note: {str(e)}",
-        )
+        ) from e
 
 
-@router.patch("/{note_id}", response_model=Dict[str, Any])
+@router.patch("/{note_id}", response_model=dict[str, Any])
 async def update_note(
     note_id: str,
     payload: NoteUpdatePayload,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Updates note title or content.
@@ -191,13 +205,13 @@ async def update_note(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to update note: {str(e)}",
-        )
+        ) from e
 
 
 @router.delete("/{note_id}")
 async def delete_note(
     note_id: str,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Deletes a study note.
@@ -209,4 +223,4 @@ async def delete_note(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete note: {str(e)}",
-        )
+        ) from e

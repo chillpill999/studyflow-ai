@@ -1,6 +1,6 @@
 import io
 import re
-from typing import Any, Dict
+from typing import Any
 
 import fitz  # PyMuPDF
 import pytesseract
@@ -18,7 +18,7 @@ class PDFParser:
         return text.strip()
 
     @staticmethod
-    def extract_metadata(doc: fitz.Document) -> Dict[str, Any]:
+    def extract_metadata(doc: fitz.Document) -> dict[str, Any]:
         """
         Retrieves basic document metadata and structural headers.
         """
@@ -40,7 +40,7 @@ class PDFParser:
         }
 
     @classmethod
-    def parse_pdf(cls, file_bytes: bytes) -> Dict[str, Any]:
+    def parse_pdf(cls, file_bytes: bytes) -> dict[str, Any]:
         """
         Parses a PDF from bytes page by page.
         Extracts structural text, Markdown tables, captures images, and triggers OCR fallback.

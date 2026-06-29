@@ -18,15 +18,15 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       onClick={onClick}
       className={`
         relative overflow-hidden rounded-2xl
-        border border-white/20
-        bg-white/40 backdrop-blur-[24px]
-        shadow-[0_8px_32px_0_rgba(185,152,210,0.15)]
+        border border-[var(--glass-border)]
+        bg-[var(--glass-bg)] backdrop-blur-[24px]
+        shadow-[var(--glass-shadow)]
         before:absolute before:inset-0 before:-z-10 before:bg-gradient-to-tr before:from-white/10 before:to-transparent
         transition-all duration-300 ease-out
         ${onClick ? 'cursor-pointer' : ''}
         ${
           hoverable
-            ? 'hover:bg-white/50 hover:shadow-[0_12px_40px_0_rgba(185,152,210,0.25)] hover:border-white/30 hover:-translate-y-0.5'
+            ? 'hover:bg-[var(--glass-bg-hover)] hover:shadow-[var(--glass-shadow-hover)] hover:border-[var(--glass-border-hover)] hover:-translate-y-0.5'
             : ''
         }
         ${className}

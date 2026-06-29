@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 def test_health_endpoint_healthy(client):
     """Test /health endpoint returns healthy when services are configured."""
-    with patch("app.main.supabase_client") as mock_supabase, \
+    with patch("app.main.supabase_client") as _, \
          patch("app.main.settings") as mock_settings:
         mock_settings.PROJECT_NAME = "The Study Flow"
         mock_settings.ENV = "test"
