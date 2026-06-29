@@ -10,8 +10,12 @@ from tests.conftest import make_table_mock
 @patch("app.routers.documents.Chunker")
 @patch("app.routers.documents.PDFParser")
 def test_upload_pdf_success(
-    mock_parser, mock_chunker, mock_agents,
-    client, mock_supabase, mock_verify_token,
+    mock_parser,
+    mock_chunker,
+    mock_agents,
+    client,
+    mock_supabase,
+    mock_verify_token,
 ):
     """Full happy-path: parse → store → chunk → embed → insert."""
     # PDF parser returns 1 page
@@ -38,6 +42,7 @@ def test_upload_pdf_success(
     )
 
     import io
+
     pdf_bytes = b"%PDF-1.4 fake pdf content"
 
     response = client.post(

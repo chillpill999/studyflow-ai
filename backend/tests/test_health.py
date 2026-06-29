@@ -1,13 +1,13 @@
 """
 Tests for the health check diagnostic endpoint.
 """
+
 from unittest.mock import patch
 
 
 def test_health_endpoint_healthy(client):
     """Test /health endpoint returns healthy when services are configured."""
-    with patch("app.main.supabase_client") as _, \
-         patch("app.main.settings") as mock_settings:
+    with patch("app.main.supabase_client") as _, patch("app.main.settings") as mock_settings:
         mock_settings.PROJECT_NAME = "The Study Flow"
         mock_settings.ENV = "test"
         mock_settings.GEMINI_API_KEY = "mock-key"
@@ -22,8 +22,7 @@ def test_health_endpoint_healthy(client):
 
 def test_health_endpoint_degraded(client):
     """Test /health endpoint returns degraded when services are missing."""
-    with patch("app.main.supabase_client", None), \
-         patch("app.main.settings") as mock_settings:
+    with patch("app.main.supabase_client", None), patch("app.main.settings") as mock_settings:
         mock_settings.PROJECT_NAME = "The Study Flow"
         mock_settings.ENV = "test"
         mock_settings.GEMINI_API_KEY = None

@@ -85,9 +85,7 @@ async def generate_notes(
             "linked_document_id": payload.document_id,
         }
 
-        insert_response = (
-            supabase_client.table("notes").insert(note_data).execute()
-        )
+        insert_response = supabase_client.table("notes").insert(note_data).execute()
         if not insert_response.data:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -187,7 +185,9 @@ async def update_note(
     Updates note title or content.
     """
     try:
-        update_data = {k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None}
+        update_data = {
+            k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None
+        }
         response = (
             supabase_client.table("notes")
             .update(update_data)
@@ -217,7 +217,9 @@ async def delete_note(
     Deletes a study note.
     """
     try:
-        supabase_client.table("notes").delete().eq("id", note_id).eq("user_id", current_user["id"]).execute()
+        supabase_client.table("notes").delete().eq("id", note_id).eq(
+            "user_id", current_user["id"]
+        ).execute()
         return {"detail": "Study note deleted successfully."}
     except Exception as e:
         raise HTTPException(

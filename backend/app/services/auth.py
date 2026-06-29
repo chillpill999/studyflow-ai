@@ -9,9 +9,12 @@ from app.core.config import settings
 # User auth is enforced in the API layer via get_current_user.
 supabase_client: Client | None = None
 if settings.SUPABASE_URL and settings.SUPABASE_SERVICE_ROLE_KEY:
-    supabase_client = create_client(
-        settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY
-    )
+    try:
+        supabase_client = create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY)
+    except Exception as e:
+        if settings.ENV == "production":
+            raise e
+        print(f"[Warning] Bypassing Supabase client initialization error (ENV={settings.ENV}): {e}")
 
 
 def verify_token(token: str) -> dict:

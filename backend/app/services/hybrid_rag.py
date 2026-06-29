@@ -109,22 +109,16 @@ class HybridRAG:
         for rank, chunk in enumerate(bm25_results):
             cid = chunk["id"]
             chunk_map[cid] = chunk
-            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (
-                1.0 / (rrf_constant + (rank + 1))
-            )
+            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (rrf_constant + (rank + 1)))
 
         # Process Vector ranks
         for rank, chunk in enumerate(vector_results):
             cid = chunk["id"]
             chunk_map[cid] = chunk
-            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (
-                1.0 / (rrf_constant + (rank + 1))
-            )
+            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (rrf_constant + (rank + 1)))
 
         # Sort chunk IDs by fused RRF scores descending
-        sorted_cids = sorted(
-            rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True
-        )
+        sorted_cids = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
 
         fused_results = []
         for cid in sorted_cids[:top_k]:
@@ -138,9 +132,7 @@ class HybridRAG:
         return fused_results
 
     @classmethod
-    def hybrid_retrieve(
-        cls, query: str, document_id: str, top_k: int = 5
-    ) -> list[dict[str, Any]]:
+    def hybrid_retrieve(cls, query: str, document_id: str, top_k: int = 5) -> list[dict[str, Any]]:
         """
         Primary entry point: Runs BM25 and pgvector searches, fuses via RRF, and returns context.
         """

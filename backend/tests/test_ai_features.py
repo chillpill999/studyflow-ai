@@ -11,11 +11,13 @@ client = TestClient(app)
 
 @pytest.fixture
 def mock_supabase():
-    with patch("app.routers.flashcards.supabase_client") as mock_fc, \
-         patch("app.routers.quizzes.supabase_client") as mock_qz, \
-         patch("app.routers.planner.supabase_client") as mock_pl, \
-         patch("app.routers.notes.supabase_client") as mock_nt, \
-         patch("app.routers.analytics.supabase_client") as mock_an:
+    with (
+        patch("app.routers.flashcards.supabase_client") as mock_fc,
+        patch("app.routers.quizzes.supabase_client") as mock_qz,
+        patch("app.routers.planner.supabase_client") as mock_pl,
+        patch("app.routers.notes.supabase_client") as mock_nt,
+        patch("app.routers.analytics.supabase_client") as mock_an,
+    ):
         yield {
             "flashcards": mock_fc,
             "quizzes": mock_qz,
@@ -41,8 +43,8 @@ def test_leitner_box_review_correct(mock_supabase, mock_verify_token):
     # Setup mock for flashcard review
     mock_select = MagicMock()
     mock_supabase["flashcards"].table.return_value = mock_select
-    mock_select.select.return_value.eq.return_value.eq.return_value.execute.return_value = MagicMock(
-        data=[{"id": "card-123", "leitner_box": 2, "user_id": "mock-user-123"}]
+    mock_select.select.return_value.eq.return_value.eq.return_value.execute.return_value = (
+        MagicMock(data=[{"id": "card-123", "leitner_box": 2, "user_id": "mock-user-123"}])
     )
 
     mock_select.update.return_value.eq.return_value.execute.return_value = MagicMock(
@@ -65,8 +67,8 @@ def test_leitner_box_review_incorrect(mock_supabase, mock_verify_token):
     # Setup mock for flashcard review reset
     mock_select = MagicMock()
     mock_supabase["flashcards"].table.return_value = mock_select
-    mock_select.select.return_value.eq.return_value.eq.return_value.execute.return_value = MagicMock(
-        data=[{"id": "card-123", "leitner_box": 4, "user_id": "mock-user-123"}]
+    mock_select.select.return_value.eq.return_value.eq.return_value.execute.return_value = (
+        MagicMock(data=[{"id": "card-123", "leitner_box": 4, "user_id": "mock-user-123"}])
     )
 
     mock_select.update.return_value.eq.return_value.execute.return_value = MagicMock(
@@ -90,16 +92,28 @@ def test_quiz_submit_grading(mock_supabase, mock_verify_token):
     # Setup mock quiz questions
     mock_select = MagicMock()
     mock_supabase["quizzes"].table.return_value = mock_select
-    mock_select.select.return_value.eq.return_value.eq.return_value.execute.return_value = MagicMock(
-        data=[
-            {
-                "id": "quiz-123",
-                "questions": [
-                    {"id": "q-1", "question": "Q1", "choices": ["A", "B"], "correct_answer": "A"},
-                    {"id": "q-2", "question": "Q2", "choices": ["C", "D"], "correct_answer": "D"},
-                ],
-            }
-        ]
+    mock_select.select.return_value.eq.return_value.eq.return_value.execute.return_value = (
+        MagicMock(
+            data=[
+                {
+                    "id": "quiz-123",
+                    "questions": [
+                        {
+                            "id": "q-1",
+                            "question": "Q1",
+                            "choices": ["A", "B"],
+                            "correct_answer": "A",
+                        },
+                        {
+                            "id": "q-2",
+                            "question": "Q2",
+                            "choices": ["C", "D"],
+                            "correct_answer": "D",
+                        },
+                    ],
+                }
+            ]
+        )
     )
 
     headers = {"Authorization": "Bearer mock-token"}
@@ -124,15 +138,20 @@ def test_planner_tasks_generation(mock_agent, mock_supabase, mock_verify_token):
     # Setup mocks
     mock_select = MagicMock()
     mock_supabase["planner"].table.return_value = mock_select
-    mock_select.select.return_value.eq.return_value.limit.return_value.execute.return_value = MagicMock(
-        data=[{"content": "Syllabus details"}]
+    mock_select.select.return_value.eq.return_value.limit.return_value.execute.return_value = (
+        MagicMock(data=[{"content": "Syllabus details"}])
     )
     mock_select.select.return_value.eq.return_value.execute.return_value = MagicMock(
         data=[{"file_name": "Syllabus.pdf"}]
     )
 
     mock_agent.return_value = [
-        {"title": "Read Chapter 1", "description": "Intro details", "priority": "high", "suggested_weeks_offset": 1}
+        {
+            "title": "Read Chapter 1",
+            "description": "Intro details",
+            "priority": "high",
+            "suggested_weeks_offset": 1,
+        }
     ]
 
     mock_select.insert.return_value.execute.return_value = MagicMock(
@@ -142,7 +161,10 @@ def test_planner_tasks_generation(mock_agent, mock_supabase, mock_verify_token):
     headers = {"Authorization": "Bearer mock-token"}
     response = client.post(
         "/api/v1/planner/generate",
-        json={"document_id": "doc-123", "exam_date": (datetime.now(UTC) + timedelta(days=20)).isoformat()},
+        json={
+            "document_id": "doc-123",
+            "exam_date": (datetime.now(UTC) + timedelta(days=20)).isoformat(),
+        },
         headers=headers,
     )
 

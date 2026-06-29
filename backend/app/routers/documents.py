@@ -160,9 +160,7 @@ async def delete_document(
         )
 
         if not response.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Document not found."
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found.")
 
         file_path = response.data[0]["file_path"]
 

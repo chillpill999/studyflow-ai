@@ -41,8 +41,7 @@ def test_register_success(mock_supabase):
     assert response.status_code == 201
     data = response.json()
     assert (
-        data["message"]
-        == "User registered successfully. Check email for confirmation if required."
+        data["message"] == "User registered successfully. Check email for confirmation if required."
     )
     assert data["user"]["id"] == "mock-user-uuid-1234"
     assert data["user"]["email"] == "test@example.com"

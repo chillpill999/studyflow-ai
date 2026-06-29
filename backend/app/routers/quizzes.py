@@ -81,9 +81,7 @@ async def generate_quiz(
             "score": None,
         }
 
-        insert_response = (
-            supabase_client.table("quizzes").insert(quiz_data).execute()
-        )
+        insert_response = supabase_client.table("quizzes").insert(quiz_data).execute()
         if not insert_response.data:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -135,19 +133,21 @@ async def submit_quiz(
             correct_ans = q.get("correct_answer")
             user_ans = payload.answers.get(q_id)
 
-            is_correct = (user_ans == correct_ans)
+            is_correct = user_ans == correct_ans
             if is_correct:
                 correct_count += 1
 
-            results.append({
-                "id": q_id,
-                "question": q.get("question"),
-                "choices": q.get("choices"),
-                "user_answer": user_ans,
-                "correct_answer": correct_ans,
-                "is_correct": is_correct,
-                "explanation": q.get("explanation")
-            })
+            results.append(
+                {
+                    "id": q_id,
+                    "question": q.get("question"),
+                    "choices": q.get("choices"),
+                    "user_answer": user_ans,
+                    "correct_answer": correct_ans,
+                    "is_correct": is_correct,
+                    "explanation": q.get("explanation"),
+                }
+            )
 
         final_score = int((correct_count / total_questions) * 100) if total_questions > 0 else 0
 
@@ -155,18 +155,20 @@ async def submit_quiz(
         supabase_client.table("quizzes").update({"score": final_score}).eq("id", quiz_id).execute()
 
         # 4. Log to analytics
-        supabase_client.table("analytics_logs").insert({
-            "user_id": current_user["id"],
-            "activity_type": "quiz",
-            "duration_seconds": 60 * total_questions,  # Estimated 1 min per question
-        }).execute()
+        supabase_client.table("analytics_logs").insert(
+            {
+                "user_id": current_user["id"],
+                "activity_type": "quiz",
+                "duration_seconds": 60 * total_questions,  # Estimated 1 min per question
+            }
+        ).execute()
 
         return {
             "quiz_id": quiz_id,
             "score": final_score,
             "correct_answers": correct_count,
             "total_questions": total_questions,
-            "results": results
+            "results": results,
         }
     except Exception as e:
         raise HTTPException(

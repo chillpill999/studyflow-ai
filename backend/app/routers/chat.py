@@ -130,9 +130,7 @@ async def stream_chat(
     )
 
     if not chat_check.data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Chat session not found."
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chat session not found.")
 
     # Fetch context snippets using Hybrid RAG if a document_id is provided
     context_chunks = []
@@ -140,7 +138,13 @@ async def stream_chat(
     if document_id:
         try:
             doc_ids = [d.strip() for d in document_id.split(",") if d.strip()]
-            docs_res = supabase_client.table("documents").select("id, file_name").in_("id", doc_ids).eq("user_id", current_user["id"]).execute()
+            docs_res = (
+                supabase_client.table("documents")
+                .select("id, file_name")
+                .in_("id", doc_ids)
+                .eq("user_id", current_user["id"])
+                .execute()
+            )
             doc_name_map = {d["id"]: d["file_name"] for d in (docs_res.data or [])}
 
             for d_id in doc_ids:
@@ -157,7 +161,7 @@ async def stream_chat(
                     "chunk_id": chunk["id"],
                     "page_number": chunk["page_number"],
                     "file_name": chunk.get("file_name", "Document"),
-                    "snippet": chunk.get("content", "")[:120] + "..."
+                    "snippet": chunk.get("content", "")[:120] + "...",
                 }
                 for chunk in context_chunks
             ]
@@ -232,9 +236,7 @@ async def stream_chat(
             except TimeoutError:
                 yield {
                     "event": "error",
-                    "data": json.dumps(
-                        {"detail": "Model stream timed out after 120 seconds."}
-                    ),
+                    "data": json.dumps({"detail": "Model stream timed out after 120 seconds."}),
                 }
                 return
             if item is None:

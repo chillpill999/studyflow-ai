@@ -1,6 +1,7 @@
 """
 Unit tests for AI Agents service.
 """
+
 import json
 from unittest.mock import MagicMock, patch
 

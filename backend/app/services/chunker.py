@@ -80,10 +80,7 @@ class Chunker:
 
                     # Move start index forward, subtracting the overlap
                     start_idx += chunk_size_words - overlap_words
-                    if (
-                        start_idx >= total_words
-                        or (total_words - start_idx) <= overlap_words
-                    ):
+                    if start_idx >= total_words or (total_words - start_idx) <= overlap_words:
                         break  # Avoid creating tiny residual chunks at the end
 
         return chunks

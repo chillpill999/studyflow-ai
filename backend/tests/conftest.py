@@ -15,6 +15,7 @@ from app.main import app
 # Core fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def client():
     """FastAPI TestClient instance."""
@@ -41,6 +42,7 @@ def mock_user():
 # ---------------------------------------------------------------------------
 # Authentication mock
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def mock_verify_token(mock_user):
@@ -95,14 +97,17 @@ def mock_supabase():
 # Gemini mock
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def mock_gemini():
     """
     Patches the google.generativeai SDK to prevent real API calls.
     Provides mock embedding and generation responses.
     """
-    with patch("google.generativeai.embed_content") as mock_embed, \
-         patch("google.generativeai.GenerativeModel") as mock_model_cls:
+    with (
+        patch("google.generativeai.embed_content") as mock_embed,
+        patch("google.generativeai.GenerativeModel") as mock_model_cls,
+    ):
 
         # Mock embedding response
         mock_embed.return_value = {"embedding": [0.1] * 768}
@@ -126,6 +131,7 @@ def mock_gemini():
 # ---------------------------------------------------------------------------
 # Convenience: Supabase table helper
 # ---------------------------------------------------------------------------
+
 
 def make_table_mock(data=None, single_data=None):
     """
@@ -190,6 +196,3 @@ def test_document():
         "total_pages": 10,
         "metadata": {"title": "Test Document", "author": "Test Author"},
     }
-
-
-

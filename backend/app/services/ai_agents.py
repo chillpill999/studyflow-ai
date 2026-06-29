@@ -103,9 +103,7 @@ class AIAgents:
             yield f"[Agent stream error: {str(e)}]"
 
     @classmethod
-    def quiz_agent(
-        cls, text_context: str, num_questions: int = 5
-    ) -> list[dict[str, Any]]:
+    def quiz_agent(cls, text_context: str, num_questions: int = 5) -> list[dict[str, Any]]:
         """
         [Secondary Model - Gemini 2.5 Flash]
         Specialized Quiz Agent formulating assessments in strict JSON schema format.
@@ -142,9 +140,7 @@ class AIAgents:
             ]
 
     @classmethod
-    def flashcard_agent(
-        cls, text_context: str, num_cards: int = 8
-    ) -> list[dict[str, str]]:
+    def flashcard_agent(cls, text_context: str, num_cards: int = 8) -> list[dict[str, str]]:
         """
         [Secondary Model - Gemini 2.5 Flash]
         Specialized Flashcard Agent extracting key terms and definitions.
@@ -286,4 +282,3 @@ class AIAgents:
             return response.text
         except Exception as e:
             return f"# Generated Notes\n\nFailed to call Gemini API: {str(e)}\n\nFallback content from document."
-

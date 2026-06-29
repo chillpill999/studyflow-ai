@@ -35,6 +35,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"[Startup] Environment validation FAILED: {str(e)}")
         import sys
+
         sys.exit(1)
     yield
     # Shutdown tasks: close connections, release resources
@@ -102,7 +103,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+        )
         return response
 
 
@@ -132,14 +135,16 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
 
     def _evict_stale_buckets(self, now: float) -> None:
         stale_before = now - max(self.auth_window, self.ai_window, self.default_window) * 2
-        self.buckets = {
-            k: v for k, v in self.buckets.items()
-            if v["last_updated"] >= stale_before
-        }
+        self.buckets = {k: v for k, v in self.buckets.items() if v["last_updated"] >= stale_before}
 
     async def dispatch(self, request: Request, call_next):
         # Bypass OPTIONS requests, root, and health checks
-        if request.method == "OPTIONS" or request.url.path in ["/health", "/", "/api/v1/health", "/api/v1/"]:
+        if request.method == "OPTIONS" or request.url.path in [
+            "/health",
+            "/",
+            "/api/v1/health",
+            "/api/v1/",
+        ]:
             return await call_next(request)
 
         client_ip = request.client.host if request.client else "127.0.0.1"
@@ -148,7 +153,18 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
         # Determine rate limit category based on route path
         path = request.url.path
         is_auth = "/auth/" in path
-        is_ai = any(x in path for x in ["/chat", "/flashcards", "/quizzes", "/planner", "/notes", "/mindmap", "/analytics"])
+        is_ai = any(
+            x in path
+            for x in [
+                "/chat",
+                "/flashcards",
+                "/quizzes",
+                "/planner",
+                "/notes",
+                "/mindmap",
+                "/analytics",
+            ]
+        )
 
         if is_auth:
             limit, window = self.auth_limit, self.auth_window
@@ -181,7 +197,7 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
                     content=json.dumps({"detail": "Rate limit exceeded. Try again later."}),
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                     media_type="application/json",
-                    headers={"Retry-After": str(int(window / limit))}
+                    headers={"Retry-After": str(int(window / limit))},
                 )
 
             bucket["tokens"] -= 1.0

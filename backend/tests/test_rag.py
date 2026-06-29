@@ -142,9 +142,7 @@ def test_hybrid_rag_bm25(mock_supabase):
         ]
     )
 
-    results = HybridRAG.get_bm25_retrieval(
-        query="Calculus", document_id="doc-1", top_k=1
-    )
+    results = HybridRAG.get_bm25_retrieval(query="Calculus", document_id="doc-1", top_k=1)
 
     assert len(results) == 1
     assert "Calculus" in results[0]["content"]
@@ -182,7 +180,7 @@ def test_hybrid_rag_vector_success(mock_embedding, mock_supabase):
             "match_threshold": 0.3,
             "match_count": 1,
             "filter_document_id": "doc-1",
-        }
+        },
     )
 
 
@@ -198,4 +196,3 @@ def test_hybrid_retrieve_calls_both(mock_vector, mock_bm25, test_chunks):
     mock_bm25.assert_called_once_with("test query", "doc-id", top_k=15)
     mock_vector.assert_called_once_with("test query", "doc-id", top_k=15)
     assert len(results) <= 3
-

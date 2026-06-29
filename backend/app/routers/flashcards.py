@@ -95,9 +95,7 @@ async def generate_flashcards(
                 }
             )
 
-        insert_response = (
-            supabase_client.table("flashcards").insert(db_cards).execute()
-        )
+        insert_response = supabase_client.table("flashcards").insert(db_cards).execute()
         return insert_response.data or []
     except Exception as e:
         raise HTTPException(
@@ -239,7 +237,9 @@ async def delete_flashcard(
     Deletes a flashcard.
     """
     try:
-        supabase_client.table("flashcards").delete().eq("id", card_id).eq("user_id", current_user["id"]).execute()
+        supabase_client.table("flashcards").delete().eq("id", card_id).eq(
+            "user_id", current_user["id"]
+        ).execute()
         return {"detail": "Flashcard deleted successfully."}
     except Exception as e:
         raise HTTPException(

@@ -32,11 +32,7 @@ class PDFParser:
             "keywords": metadata.get("keywords", ""),
             "creator": metadata.get("creator", ""),
             "producer": metadata.get("producer", ""),
-            "toc": (
-                [{"level": t[0], "title": t[1], "page": t[2]} for t in toc]
-                if toc
-                else []
-            ),
+            "toc": ([{"level": t[0], "title": t[1], "page": t[2]} for t in toc] if toc else []),
         }
 
     @classmethod
@@ -79,9 +75,7 @@ class PDFParser:
                         row_strings = []
                         for row in table_data[1:]:
                             row_strings.append(
-                                "| "
-                                + " | ".join([str(cell or "").strip() for cell in row])
-                                + " |"
+                                "| " + " | ".join([str(cell or "").strip() for cell in row]) + " |"
                             )
 
                         markdown_table = (
@@ -119,9 +113,7 @@ class PDFParser:
             # Combine Text with extracted Markdown Tables
             combined_content = raw_text
             if tables_md:
-                combined_content += "\n\n### Extracted Tables:\n" + "\n\n".join(
-                    tables_md
-                )
+                combined_content += "\n\n### Extracted Tables:\n" + "\n\n".join(tables_md)
 
             pages_data.append(
                 {

@@ -111,9 +111,7 @@ async def generate_planner(
                 }
             )
 
-        insert_response = (
-            supabase_client.table("tasks").insert(db_tasks).execute()
-        )
+        insert_response = supabase_client.table("tasks").insert(db_tasks).execute()
         return insert_response.data or []
     except Exception as e:
         raise HTTPException(
@@ -181,7 +179,9 @@ async def update_task(
     Updates task properties (e.g. status transition, rescheduling).
     """
     try:
-        update_data = {k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None}
+        update_data = {
+            k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None
+        }
         response = (
             supabase_client.table("tasks")
             .update(update_data)
@@ -211,7 +211,9 @@ async def delete_task(
     Deletes a task.
     """
     try:
-        supabase_client.table("tasks").delete().eq("id", task_id).eq("user_id", current_user["id"]).execute()
+        supabase_client.table("tasks").delete().eq("id", task_id).eq(
+            "user_id", current_user["id"]
+        ).execute()
         return {"detail": "Task deleted successfully."}
     except Exception as e:
         raise HTTPException(

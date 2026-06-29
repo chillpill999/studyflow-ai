@@ -47,8 +47,18 @@ def test_list_messages(client, mock_supabase, mock_verify_token):
     # Since mock_supabase is shared, we configure table mock to handle both
     mock_supabase.table.return_value = make_table_mock(
         data=[
-            {"id": "msg-001", "chat_id": "chat-001", "sender": "user", "content": "What is gravity?"},
-            {"id": "msg-002", "chat_id": "chat-001", "sender": "assistant", "content": "Gravity is a force..."},
+            {
+                "id": "msg-001",
+                "chat_id": "chat-001",
+                "sender": "user",
+                "content": "What is gravity?",
+            },
+            {
+                "id": "msg-002",
+                "chat_id": "chat-001",
+                "sender": "assistant",
+                "content": "Gravity is a force...",
+            },
         ]
     )
 
@@ -67,21 +77,27 @@ def test_list_messages(client, mock_supabase, mock_verify_token):
 @patch("app.routers.chat.HybridRAG")
 @patch("app.routers.chat.AIAgents")
 def test_stream_chat_sse_events(
-    mock_agents, mock_rag,
-    client, mock_supabase, mock_verify_token,
+    mock_agents,
+    mock_rag,
+    client,
+    mock_supabase,
+    mock_verify_token,
 ):
     """
     Verifies the SSE stream emits events in order:
     citations → token(s) → done
     """
     # Chat ownership check passes
-    mock_supabase.table.return_value = make_table_mock(
-        data=[{"id": "chat-001"}]
-    )
+    mock_supabase.table.return_value = make_table_mock(data=[{"id": "chat-001"}])
 
     # RAG returns context
     mock_rag.hybrid_retrieve.return_value = [
-        {"id": "chunk-1", "page_number": 1, "content": "Test context snippet", "file_name": "test.pdf"}
+        {
+            "id": "chunk-1",
+            "page_number": 1,
+            "content": "Test context snippet",
+            "file_name": "test.pdf",
+        }
     ]
 
     # LLM streams tokens

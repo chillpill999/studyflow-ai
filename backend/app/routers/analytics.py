@@ -32,7 +32,11 @@ async def get_analytics_summary(
             .eq("id", user_id)
             .execute()
         )
-        profile = profile_response.data[0] if profile_response.data else {"study_streak": 0, "total_study_time": 0}
+        profile = (
+            profile_response.data[0]
+            if profile_response.data
+            else {"study_streak": 0, "total_study_time": 0}
+        )
 
         # 2. Get activity logs distribution
         logs_response = (
@@ -77,7 +81,9 @@ async def get_analytics_summary(
         )
         quizzes = quizzes_response.data or []
         total_quizzes = len(quizzes)
-        avg_quiz_score = int(sum([q["score"] for q in quizzes]) / total_quizzes) if total_quizzes > 0 else 0
+        avg_quiz_score = (
+            int(sum([q["score"] for q in quizzes]) / total_quizzes) if total_quizzes > 0 else 0
+        )
 
         # 5. Formulate stats summary to get custom Gemini Coach Advice
         summary_str = (
@@ -92,8 +98,11 @@ async def get_analytics_summary(
 
         return {
             "streak": profile.get("study_streak", 0),
-            "total_study_time_minutes": profile.get("total_study_time", 0) + (total_time_seconds // 60),
-            "activity_distribution": {k: v // 60 for k, v in activity_distribution.items()}, # In minutes
+            "total_study_time_minutes": profile.get("total_study_time", 0)
+            + (total_time_seconds // 60),
+            "activity_distribution": {
+                k: v // 60 for k, v in activity_distribution.items()
+            },  # In minutes
             "flashcard_stats": {
                 "total": total_cards,
                 "box_distribution": box_counts,
@@ -125,25 +134,26 @@ async def log_study_activity(
         # 1. Insert log row
         log_response = (
             supabase_client.table("analytics_logs")
-            .insert({
-                "user_id": user_id,
-                "activity_type": payload.activity_type,
-                "duration_seconds": payload.duration_seconds,
-            })
+            .insert(
+                {
+                    "user_id": user_id,
+                    "activity_type": payload.activity_type,
+                    "duration_seconds": payload.duration_seconds,
+                }
+            )
             .execute()
         )
 
         # 2. Increment total study time in profile
         profile_response = (
-            supabase_client.table("profiles")
-            .select("total_study_time")
-            .eq("id", user_id)
-            .execute()
+            supabase_client.table("profiles").select("total_study_time").eq("id", user_id).execute()
         )
         if profile_response.data:
             current_time = profile_response.data[0].get("total_study_time", 0)
             new_time = current_time + (payload.duration_seconds // 60)
-            supabase_client.table("profiles").update({"total_study_time": new_time}).eq("id", user_id).execute()
+            supabase_client.table("profiles").update({"total_study_time": new_time}).eq(
+                "id", user_id
+            ).execute()
 
         return log_response.data[0]
     except Exception as e:
