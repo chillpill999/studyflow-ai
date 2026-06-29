@@ -19,8 +19,9 @@ import {
 } from 'lucide-react';
 import { GlassCard } from 'src/components/GlassCard';
 import { Logo } from 'src/components/Logo';
-import { SceneManager } from 'src/components/three/SceneManager';
-import { ThreeIcon } from 'src/components/three/ThreeIcon';
+import dynamic from 'next/dynamic';
+const SceneManager = dynamic(() => import('src/components/three/SceneManager'), { ssr: false });
+const ThreeIcon = dynamic(() => import('src/components/three/ThreeIcon'), { ssr: false });
 import { ThemeSwitcher } from 'src/components/ThemeSwitcher';
 import { NotificationCenter } from 'src/components/NotificationCenter';
 import { CommandPalette } from 'src/components/CommandPalette';

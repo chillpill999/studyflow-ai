@@ -12,7 +12,8 @@ import { Logo } from 'src/components/Logo';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { LogIn } from 'lucide-react';
-import { SceneManager } from 'src/components/three/SceneManager';
+import dynamic from 'next/dynamic';
+const SceneManager = dynamic(() => import('src/components/three/SceneManager'), { ssr: false });
 import { FloatingGlassNodes } from 'src/components/three/FloatingGlassNodes';
 import { GoogleIcon } from 'src/components/GoogleIcon';
 

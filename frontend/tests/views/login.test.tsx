@@ -7,9 +7,13 @@ import { vi } from 'vitest';
 vi.mock('src/components/three/FloatingGlassNodes', () => ({
   FloatingGlassNodes: () => <div data-testid="floating-nodes" />,
 }));
-vi.mock('src/components/three/SceneManager', () => ({
-  SceneManager: ({ children }: any) => <div data-testid="scene-manager">{children}</div>,
-}));
+vi.mock('src/components/three/SceneManager', () => {
+  const MockSceneManager = ({ children }: any) => <div data-testid="scene-manager">{children}</div>;
+  return {
+    SceneManager: MockSceneManager,
+    default: MockSceneManager,
+  };
+});
 
 describe('LoginPage', () => {
   beforeEach(() => {
