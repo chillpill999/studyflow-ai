@@ -16,7 +16,8 @@ export const AssetPreloader: React.FC<AssetPreloaderProps> = ({ onComplete }) =>
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const frame = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {

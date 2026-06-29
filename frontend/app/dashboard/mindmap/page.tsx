@@ -104,11 +104,13 @@ export default function MindMapPage() {
         message: `Successfully generated a concept map with ${layoutNodes.length} nodes.`,
         type: 'success'
       });
-    } catch (err: any) {
-      console.error('Mind map generation error', err);
+    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const error = err as any;
+      console.error('Mind map generation error', error);
       addNotification({
         title: 'Mind Map generation failed',
-        message: err.response?.data?.detail || err.message || 'Failed to generate Mind Map.',
+        message: error.response?.data?.detail || error.message || 'Failed to generate Mind Map.',
         type: 'error'
       });
     } finally {

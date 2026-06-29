@@ -74,11 +74,13 @@ export default function PlannerPage() {
         message: `Successfully generated ${res.data.length} study task milestones.`,
         type: 'success'
       });
-    } catch (err: any) {
-      console.error('Plan generation error', err);
+    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const error = err as any;
+      console.error('Plan generation error', error);
       addNotification({
         title: 'Planner generation failed',
-        message: err.response?.data?.detail || err.message || 'Failed to generate study plan.',
+        message: error.response?.data?.detail || error.message || 'Failed to generate study plan.',
         type: 'error'
       });
     } finally {

@@ -92,11 +92,13 @@ export default function FlashcardsPage() {
         message: `Successfully generated ${res.data.length} flashcards from document.`,
         type: 'success'
       });
-    } catch (err: any) {
-      console.error('Flashcards generation error', err);
+    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const error = err as any;
+      console.error('Flashcards generation error', error);
       addNotification({
         title: 'Flashcards generation failed',
-        message: err.response?.data?.detail || err.message || 'Failed to generate flashcards.',
+        message: error.response?.data?.detail || error.message || 'Failed to generate flashcards.',
         type: 'error'
       });
     } finally {

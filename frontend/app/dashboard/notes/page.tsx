@@ -78,11 +78,13 @@ export default function NotesPage() {
         message: `AI study notes generated successfully: "${generatedNote.title}"`,
         type: 'success'
       });
-    } catch (err: any) {
-      console.error('Notes generation error', err);
+    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const error = err as any;
+      console.error('Notes generation error', error);
       addNotification({
         title: 'Notes generation failed',
-        message: err.response?.data?.detail || err.message || 'Failed to generate AI notes.',
+        message: error.response?.data?.detail || error.message || 'Failed to generate AI notes.',
         type: 'error'
       });
     } finally {

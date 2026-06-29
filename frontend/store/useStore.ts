@@ -188,7 +188,7 @@ export const useStore = create<AppState>((set) => ({
   setPerformanceProfile: (performanceProfile) => set({ performanceProfile }),
 
   // Theme System
-  theme: (typeof window !== 'undefined' && localStorage.getItem('theme') as any) || 'pearl',
+  theme: (typeof window !== 'undefined' && (localStorage.getItem('theme') as 'pearl' | 'dark' | 'light')) || 'pearl',
   setTheme: (theme) => {
     set({ theme });
     if (typeof window !== 'undefined') {

@@ -35,6 +35,7 @@ class TestConfig:
         assert settings.GEMINI_API_KEY == "test-gemini-key"
         assert settings.ENV == "test"
 
+    @patch.dict(os.environ, {"TESTING": "False"})
     def test_settings_defaults(self):
         """Test default settings values."""
         from app.core.config import Settings

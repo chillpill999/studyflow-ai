@@ -76,7 +76,7 @@ export const NotificationCenter: React.FC = () => {
                 <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
                   <Bell size={24} className="text-purple-950/20 mb-2" />
                   <p className="text-xs font-sans font-semibold text-purple-950/50">All quiet here</p>
-                  <p className="text-[10px] font-sans text-purple-950/30 mt-0.5">We'll alert you when tasks finish.</p>
+                  <p className="text-[10px] font-sans text-purple-950/30 mt-0.5">We&apos;ll alert you when tasks finish.</p>
                 </div>
               ) : (
                 notifications.map((n) => (
