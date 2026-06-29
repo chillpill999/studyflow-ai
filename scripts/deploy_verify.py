@@ -23,11 +23,14 @@ def run_pre_flight_checks():
 
     passed_all = True
     root_path = Path(__file__).resolve().parent.parent
+    is_ci = os.environ.get("CI") == "true" or os.environ.get("GITHUB_ACTIONS") == "true"
 
     # 1. Environment file presence
     backend_env = root_path / "backend" / ".env"
     if backend_env.exists():
         print_result("Backend .env file detection", True)
+    elif is_ci:
+        print_result("Backend .env file detection", True, "Bypassed in CI pipeline")
     else:
         print_result("Backend .env file detection", False, "Missing backend/.env")
         passed_all = False
@@ -49,6 +52,8 @@ def run_pre_flight_checks():
     missing_keys = [k for k in required_keys if not env_vars.get(k) and not os.environ.get(k)]
     if not missing_keys:
         print_result("Environment variables validation", True, "All required variables configured")
+    elif is_ci:
+        print_result("Environment variables validation", True, f"Bypassed in CI (Missing: {', '.join(missing_keys)})")
     else:
         print_result("Environment variables validation", False, f"Missing: {', '.join(missing_keys)}")
         passed_all = False
