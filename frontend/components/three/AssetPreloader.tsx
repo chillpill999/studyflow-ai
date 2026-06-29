@@ -35,7 +35,7 @@ export const AssetPreloader: React.FC<AssetPreloaderProps> = ({ onComplete }) =>
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/10 backdrop-blur-2xl z-[9999] transition-opacity duration-700">
       <div className="flex flex-col items-center gap-6 max-w-sm text-center px-8 py-8 rounded-3xl border border-white/30 bg-white/20 shadow-2xl backdrop-blur-md">
         {/* Animated Floating Logo */}
-        <Logo size={80} className="shadow-2xl shadow-purple-950/20 border-white/30 animate-logo-float" />
+        <Logo size={80} blend={true} className="shadow-2xl shadow-purple-950/20 border-white/30 animate-logo-float" />
 
         <div className="space-y-3 w-full">
           <div className="flex justify-between text-[10px] font-bold font-sans text-purple-950/70 uppercase tracking-widest px-1">

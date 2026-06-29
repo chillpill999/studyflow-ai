@@ -5,18 +5,21 @@ interface LogoProps {
   size?: number;
   className?: string;
   animate?: boolean;
+  blend?: boolean;
 }
 
 export const Logo: React.FC<LogoProps> = ({
   size = 40,
   className = '',
   animate = true,
+  blend = false,
 }) => {
   return (
     <div
       className={`
         relative overflow-hidden rounded-xl border border-white/10
-        shadow-[0_4px_20px_rgba(185,152,210,0.15)] bg-black
+        shadow-[0_4px_20px_rgba(185,152,210,0.15)]
+        ${blend ? 'bg-transparent mix-blend-screen' : 'bg-black'}
         ${animate ? 'animate-logo-float hover:scale-105 transition-all duration-300' : ''}
         ${className}
       `}
