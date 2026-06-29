@@ -20,14 +20,17 @@ export const AssetPreloader: React.FC<AssetPreloaderProps> = ({ onComplete }) =>
   }, []);
 
   useEffect(() => {
-    if (!active && progress === 100) {
+    // Complete loading whenever Drei reports no active resources loading queue
+    if (!active) {
       const timer = setTimeout(() => {
         setComplete(true);
         onComplete();
       }, 800); // Smooth transition timing
       return () => clearTimeout(timer);
     }
-  }, [active, progress, onComplete]);
+  }, [active, onComplete]);
+
+  const displayProgress = active ? progress : 100;
 
   if (complete || !mounted) return null;
 
@@ -40,14 +43,14 @@ export const AssetPreloader: React.FC<AssetPreloaderProps> = ({ onComplete }) =>
         <div className="space-y-3 w-full">
           <div className="flex justify-between text-[10px] font-bold font-sans text-purple-950/70 uppercase tracking-widest px-1">
             <span>Precompiling 3D Materials...</span>
-            <span>{Math.round(progress)}%</span>
+            <span>{Math.round(displayProgress)}%</span>
           </div>
 
           {/* Frosted loading slider bar */}
           <div className="w-64 h-1.5 bg-purple-950/5 rounded-full overflow-hidden border border-white/20 relative backdrop-blur-sm">
             <div
               className="h-full bg-gradient-to-r from-[#B998D2] to-purple-800 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              style={{ width: `${displayProgress}%` }}
             />
           </div>
         </div>
