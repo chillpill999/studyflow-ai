@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UserPlus } from 'lucide-react';
 import { GoogleIcon } from 'src/components/GoogleIcon';
+import { getSiteUrl } from 'src/lib/site-url';
 import { FrostedGlassBackground } from 'src/components/ui/FrostedGlassBackground';
 
 const registerSchema = z
@@ -82,7 +83,7 @@ export default function RegisterPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${getSiteUrl()}/auth/callback`,
         },
       });
       if (error) throw error;

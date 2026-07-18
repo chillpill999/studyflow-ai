@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { LogIn } from 'lucide-react';
 import { GoogleIcon } from 'src/components/GoogleIcon';
+import { getSiteUrl } from 'src/lib/site-url';
 import { FrostedGlassBackground } from 'src/components/ui/FrostedGlassBackground';
 
 const loginSchema = z.object({
@@ -66,7 +67,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${getSiteUrl()}/auth/callback`,
         },
       });
       if (error) throw error;
