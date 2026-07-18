@@ -24,7 +24,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'The Study Flow - AI Academic Productivity Platform',
-  description: 'Enterprise AI academic productivity platform with Hybrid RAG document search, Leitner flashcards, and automated mind mapping.',
+  description:
+    'Enterprise AI academic productivity platform with Hybrid RAG document search, Leitner flashcards, and automated mind mapping.',
 };
 
 export default function RootLayout({
@@ -36,8 +37,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${cormorant.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col font-sans text-purple-950 bg-[#FDFCFB]">
+      <body
+        className="min-h-full flex flex-col font-sans text-purple-950 bg-[#FDFCFB]"
+        suppressHydrationWarning
+      >
         <QueryProvider>
           <AppInitializer>{children}</AppInitializer>
         </QueryProvider>

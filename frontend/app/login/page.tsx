@@ -12,10 +12,8 @@ import { Logo } from 'src/components/Logo';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { LogIn } from 'lucide-react';
-import dynamic from 'next/dynamic';
-const SceneManager = dynamic(() => import('src/components/three/SceneManager'), { ssr: false });
-import { FloatingGlassNodes } from 'src/components/three/FloatingGlassNodes';
 import { GoogleIcon } from 'src/components/GoogleIcon';
+import { FrostedGlassBackground } from 'src/components/ui/FrostedGlassBackground';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -51,7 +49,7 @@ export default function LoginPage() {
 
       setUser(authData.user);
       setSession(authData.session);
-      
+
       // Redirect to dashboard on success
       router.push('/dashboard');
     } catch (err: unknown) {
@@ -81,21 +79,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-[#FDFCFB] via-[#F7F1F8] to-[#D8BFD8]">
-      {/* 3D Pearl Glass Floating Nodes Background */}
-      <SceneManager>
-        <FloatingGlassNodes />
-      </SceneManager>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Apple iOS Frosted Glass Ambient Light Background */}
+      <FrostedGlassBackground />
 
-      {/* Visual background decorations */}
-      <div className="absolute top-[20%] left-[10%] w-[30vw] h-[30vw] rounded-full bg-[#B998D2]/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[20%] right-[10%] w-[35vw] h-[35vw] rounded-full bg-[#E8D7EA]/30 blur-[150px] pointer-events-none" />
-      
-      <GlassCard className="w-full max-w-md p-8 md:p-10 shadow-[0_16px_48px_rgba(185,152,210,0.15)] border-white/30">
+      <GlassCard className="w-full max-w-md p-8 md:p-10 shadow-[0_20px_60px_-15px_rgba(140,90,180,0.25)] border-white/60 dark:border-white/15 bg-white/45 dark:bg-slate-900/50 backdrop-blur-[36px] backdrop-saturate-[180%] rounded-3xl relative z-10">
         <div className="flex flex-col items-center mb-8">
           <Logo size={48} className="mb-4 shadow-lg shadow-purple-950/10 border-white/40" />
-          <h1 className="text-3xl font-serif font-semibold text-purple-950 tracking-tight">Welcome Back</h1>
-          <p className="text-sm font-sans text-purple-950/60 mt-1">Flow into your learning schedule</p>
+          <h1 className="text-3xl font-serif font-semibold text-purple-950 tracking-tight">
+            Welcome Back
+          </h1>
+          <p className="text-sm font-sans text-purple-950/60 mt-1">
+            Flow into your learning schedule
+          </p>
         </div>
 
         {authError && (
@@ -122,8 +118,8 @@ export default function LoginPage() {
           />
 
           <div className="flex justify-end px-1">
-            <Link 
-              href="/forgot-password" 
+            <Link
+              href="/forgot-password"
               className="text-xs font-semibold text-[#B998D2] hover:text-purple-900 transition-colors"
             >
               Forgot Password?
@@ -166,8 +162,8 @@ export default function LoginPage() {
 
         <div className="mt-8 text-center text-sm font-sans text-purple-950/60">
           Don&apos;t have an account?{' '}
-          <Link 
-            href="/register" 
+          <Link
+            href="/register"
             className="font-semibold text-[#B998D2] hover:text-purple-900 transition-colors"
           >
             Sign Up
