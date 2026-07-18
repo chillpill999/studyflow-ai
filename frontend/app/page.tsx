@@ -5,16 +5,13 @@ import Link from 'next/link';
 import { ArrowRight, Sparkles, BookOpen, Layers, Target } from 'lucide-react';
 import { GlassCard } from 'src/components/GlassCard';
 import { Logo } from 'src/components/Logo';
-import { SceneManager } from 'src/components/three/SceneManager';
-import { FlowFieldParticles } from 'src/components/three/FlowFieldParticles';
+import { FrostedGlassBackground } from 'src/components/ui/FrostedGlassBackground';
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-gradient-to-br from-[#FDFCFB] via-[#F7F1F8] to-[#D8BFD8]">
-      {/* 3D Flow Field Volumetric Particle Background */}
-      <SceneManager>
-        <FlowFieldParticles />
-      </SceneManager>
+    <div className="relative min-h-screen flex flex-col justify-between overflow-hidden">
+      {/* Apple iOS Frosted Glass Ambient Light Background */}
+      <FrostedGlassBackground />
 
       {/* Decorative Blur Spheres */}
       <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#B998D2]/20 blur-[150px] pointer-events-none z-0" />
@@ -67,7 +64,9 @@ export default function LandingPage() {
         </h1>
 
         <p className="max-w-2xl text-base md:text-lg font-sans text-purple-950/60 leading-relaxed mb-10">
-          The Study Flow is a premium, AI-driven operating system designed to synthesize your lectures, textbooks, and notes into customized Leitner decks, interactive RAG chats, and dynamic mind maps.
+          The Study Flow is a premium, AI-driven operating system designed to synthesize your
+          lectures, textbooks, and notes into customized Leitner decks, interactive RAG chats, and
+          dynamic mind maps.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-20 justify-center">
@@ -88,33 +87,51 @@ export default function LandingPage() {
 
         {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-          <GlassCard className="p-6 text-left border-white/30" hoverable>
+          <GlassCard
+            className="p-6 text-left border-white/60 dark:border-white/15 bg-white/45 dark:bg-slate-900/50 backdrop-blur-[36px] backdrop-saturate-[180%] shadow-[0_12px_40px_rgba(185,152,210,0.18)]"
+            hoverable
+          >
             <div className="h-10 w-10 rounded-lg bg-[#B998D2]/20 flex items-center justify-center text-[#B998D2] mb-4">
               <BookOpen size={20} />
             </div>
-            <h3 className="text-lg font-serif font-semibold text-purple-950 mb-2">Hybrid RAG Chat</h3>
+            <h3 className="text-lg font-serif font-semibold text-purple-950 mb-2">
+              Hybrid RAG Chat
+            </h3>
             <p className="text-sm font-sans text-purple-950/60 leading-relaxed">
-              Upload study guides and textbooks, search details in milliseconds, and get answers annotated with exact page citations.
+              Upload study guides and textbooks, search details in milliseconds, and get answers
+              annotated with exact page citations.
             </p>
           </GlassCard>
 
-          <GlassCard className="p-6 text-left border-white/30" hoverable>
+          <GlassCard
+            className="p-6 text-left border-white/60 dark:border-white/15 bg-white/45 dark:bg-slate-900/50 backdrop-blur-[36px] backdrop-saturate-[180%] shadow-[0_12px_40px_rgba(185,152,210,0.18)]"
+            hoverable
+          >
             <div className="h-10 w-10 rounded-lg bg-[#B998D2]/20 flex items-center justify-center text-[#B998D2] mb-4">
               <Layers size={20} />
             </div>
-            <h3 className="text-lg font-serif font-semibold text-purple-950 mb-2">Leitner Repetition</h3>
+            <h3 className="text-lg font-serif font-semibold text-purple-950 mb-2">
+              Leitner Repetition
+            </h3>
             <p className="text-sm font-sans text-purple-950/60 leading-relaxed">
-              Generate customizable flashcards automatically. Study them using the Ebbinghaus forgetting curve scheduling Box 1-5.
+              Generate customizable flashcards automatically. Study them using the Ebbinghaus
+              forgetting curve scheduling Box 1-5.
             </p>
           </GlassCard>
 
-          <GlassCard className="p-6 text-left border-white/30" hoverable>
+          <GlassCard
+            className="p-6 text-left border-white/60 dark:border-white/15 bg-white/45 dark:bg-slate-900/50 backdrop-blur-[36px] backdrop-saturate-[180%] shadow-[0_12px_40px_rgba(185,152,210,0.18)]"
+            hoverable
+          >
             <div className="h-10 w-10 rounded-lg bg-[#B998D2]/20 flex items-center justify-center text-[#B998D2] mb-4">
               <Target size={20} />
             </div>
-            <h3 className="text-lg font-serif font-semibold text-purple-950 mb-2">AI Planner & Mind Maps</h3>
+            <h3 className="text-lg font-serif font-semibold text-purple-950 mb-2">
+              AI Planner & Mind Maps
+            </h3>
             <p className="text-sm font-sans text-purple-950/60 leading-relaxed">
-              Map out logical dependencies between concepts and organize study milestones dynamically based on deadlines.
+              Map out logical dependencies between concepts and organize study milestones
+              dynamically based on deadlines.
             </p>
           </GlassCard>
         </div>
@@ -124,9 +141,15 @@ export default function LandingPage() {
       <footer className="relative z-20 max-w-6xl w-full mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between border-t border-purple-950/5 text-xs font-sans text-purple-950/40 mt-12">
         <p>© 2026 The Study Flow. Handcrafted for academic excellence.</p>
         <div className="flex gap-6 mt-4 sm:mt-0">
-          <a href="#" className="hover:text-purple-950 transition-colors">Privacy</a>
-          <a href="#" className="hover:text-purple-950 transition-colors">Terms</a>
-          <a href="#" className="hover:text-purple-950 transition-colors">Security</a>
+          <a href="#" className="hover:text-purple-950 transition-colors">
+            Privacy
+          </a>
+          <a href="#" className="hover:text-purple-950 transition-colors">
+            Terms
+          </a>
+          <a href="#" className="hover:text-purple-950 transition-colors">
+            Security
+          </a>
         </div>
       </footer>
     </div>
