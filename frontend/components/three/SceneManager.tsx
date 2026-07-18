@@ -33,36 +33,39 @@ export const SceneManager: React.FC<SceneManagerProps> = ({ children }) => {
 
   // Synchronize Three.js materials with theme
   useEffect(() => {
-    import('src/lib/three/materials').then(({ glassGlowMaterial, pearlMetalMaterial, frostedGlassMaterial }) => {
-      const glassGlow = glassGlowMaterial.clone();
-      const pearlMetal = pearlMetalMaterial.clone();
-      const frostedGlass = frostedGlassMaterial.clone();
-      if (theme === 'dark') {
-        glassGlow.color.set('#3B82F6');
-        glassGlow.emissive.set('#60A5FA');
-        glassGlow.emissiveIntensity = 2.0;
-        pearlMetal.color.set('#2E1E4E');
-        frostedGlass.color.set('#1E1035');
-        frostedGlass.opacity = 0.6;
-      } else if (theme === 'light') {
-        glassGlow.color.set('#A78BFA');
-        glassGlow.emissive.set('#C084FC');
-        glassGlow.emissiveIntensity = 0.8;
-        pearlMetal.color.set('#F3EEF6');
-        frostedGlass.color.set('#FFFFFF');
-        frostedGlass.opacity = 0.9;
-      } else { // pearl
-        glassGlow.color.set('#8B5CF6');
-        glassGlow.emissive.set('#7C3AED');
-        glassGlow.emissiveIntensity = 1.5;
-        pearlMetal.color.set('#F0E6F2');
-        frostedGlass.color.set('#FFFFFF');
-        frostedGlass.opacity = 0.8;
+    import('src/lib/three/materials').then(
+      ({ glassGlowMaterial, pearlMetalMaterial, frostedGlassMaterial }) => {
+        const glassGlow = glassGlowMaterial.clone();
+        const pearlMetal = pearlMetalMaterial.clone();
+        const frostedGlass = frostedGlassMaterial.clone();
+        if (theme === 'dark') {
+          glassGlow.color.set('#3B82F6');
+          glassGlow.emissive.set('#60A5FA');
+          glassGlow.emissiveIntensity = 2.0;
+          pearlMetal.color.set('#2E1E4E');
+          frostedGlass.color.set('#1E1035');
+          frostedGlass.opacity = 0.6;
+        } else if (theme === 'light') {
+          glassGlow.color.set('#A78BFA');
+          glassGlow.emissive.set('#C084FC');
+          glassGlow.emissiveIntensity = 0.8;
+          pearlMetal.color.set('#F3EEF6');
+          frostedGlass.color.set('#FFFFFF');
+          frostedGlass.opacity = 0.9;
+        } else {
+          // pearl
+          glassGlow.color.set('#8B5CF6');
+          glassGlow.emissive.set('#7C3AED');
+          glassGlow.emissiveIntensity = 1.5;
+          pearlMetal.color.set('#F0E6F2');
+          frostedGlass.color.set('#FFFFFF');
+          frostedGlass.opacity = 0.8;
+        }
+        Object.assign(glassGlowMaterial, glassGlow);
+        Object.assign(pearlMetalMaterial, pearlMetal);
+        Object.assign(frostedGlassMaterial, frostedGlass);
       }
-      Object.assign(glassGlowMaterial, glassGlow);
-      Object.assign(pearlMetalMaterial, pearlMetal);
-      Object.assign(frostedGlassMaterial, frostedGlass);
-    });
+    );
   }, [theme]);
 
   // WebGL Fallback layout if unsupported
@@ -82,37 +85,35 @@ export const SceneManager: React.FC<SceneManagerProps> = ({ children }) => {
     <div className="absolute inset-0 pointer-events-none z-0">
       {/* Performance monitoring scripts */}
       <PerformanceManager />
-      
+
       {/* Frosted loading screen */}
-      {!assetsLoaded && (
-        <AssetPreloader onComplete={() => setAssetsLoaded(true)} />
-      )}
+      {!assetsLoaded && <AssetPreloader onComplete={() => setAssetsLoaded(true)} />}
 
       {/* Single shared global WebGL Canvas */}
       <Canvas
         flat
         shadows
-        gl={{ 
-          antialias: performanceProfile !== 'low', 
+        gl={{
+          antialias: performanceProfile !== 'low',
           alpha: true,
-          powerPreference: "high-performance",
+          powerPreference: 'high-performance',
           stencil: false,
-          depth: true
+          depth: true,
         }}
         dpr={[0.75, dprLimit]}
         camera={{
           fov: ENGINE_CONFIG.CAMERA.fov,
           near: ENGINE_CONFIG.CAMERA.near,
           far: ENGINE_CONFIG.CAMERA.far,
-          position: ENGINE_CONFIG.CAMERA.defaultPosition
+          position: ENGINE_CONFIG.CAMERA.defaultPosition,
         }}
         className="w-full h-full"
       >
         <Suspense fallback={null}>
           {/* Shared lighting rig */}
-          <ambientLight 
-            intensity={ENGINE_CONFIG.LIGHTS.ambient.intensity} 
-            color={ENGINE_CONFIG.LIGHTS.ambient.color} 
+          <ambientLight
+            intensity={ENGINE_CONFIG.LIGHTS.ambient.intensity}
+            color={ENGINE_CONFIG.LIGHTS.ambient.color}
           />
           <hemisphereLight
             intensity={ENGINE_CONFIG.LIGHTS.hemisphere.intensity}
@@ -144,4 +145,49 @@ export const SceneManager: React.FC<SceneManagerProps> = ({ children }) => {
     </div>
   );
 };
-export default SceneManager;
+
+// Error boundary wrapping the entire 3D scene so WebGL/R3F crashes
+// never propagate to the dashboard UI — falls back to static blurs.
+class SceneErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): { hasError: boolean } {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        '[SceneManager] R3F error caught, falling back to static background:',
+        error.message
+      );
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // Static fallback — same as the WebGL-unsupported branch
+      return (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FDFCFB] via-[#F7F1F8] to-[#D8BFD8] pointer-events-none z-0">
+          <div className="absolute top-[20%] left-[10%] w-[35vw] h-[35vw] rounded-full bg-[#B998D2]/10 blur-[100px]" />
+          <div className="absolute bottom-[20%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-[#E8D7EA]/30 blur-[130px]" />
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const SceneManagerWithBoundary: React.FC<SceneManagerProps> = (props) => (
+  <SceneErrorBoundary>
+    <SceneManager {...props} />
+  </SceneErrorBoundary>
+);
+
+export default SceneManagerWithBoundary;

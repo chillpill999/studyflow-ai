@@ -4,28 +4,39 @@ import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { View } from '@react-three/drei';
 import * as THREE from 'three';
-import { 
+import {
   boxGeometry,
   sphereGeometry,
   torusGeometry,
   torusKnotGeometry,
   icosahedronGeometry,
-  capsuleGeometry
+  capsuleGeometry,
 } from 'src/lib/three/geometries';
-import { 
+import {
   pearlMetalMaterial,
   frostedGlassMaterial,
   goldMetallicMaterial,
   glassGlowMaterial,
   transparentCrystalMaterial,
-  accentMaterial
+  accentMaterial,
 } from 'src/lib/three/materials';
 import { handlePointerOver, handlePointerOut } from 'src/lib/three/events';
 import { useStore } from 'src/store/useStore';
 import { detectCapabilities } from 'src/lib/three/capabilities';
 
 interface ThreeIconProps {
-  name: 'Book' | 'Chat' | 'Upload' | 'Flashcard' | 'Brain' | 'Mind Map' | 'Quiz' | 'Planner' | 'Analytics' | 'Profile' | 'Settings';
+  name:
+    | 'Book'
+    | 'Chat'
+    | 'Upload'
+    | 'Flashcard'
+    | 'Brain'
+    | 'Mind Map'
+    | 'Quiz'
+    | 'Planner'
+    | 'Analytics'
+    | 'Profile'
+    | 'Settings';
   trackRef: React.RefObject<HTMLDivElement | null>;
   className?: string;
 }
@@ -68,10 +79,10 @@ const ThreeIconInner: React.FC<ThreeIconProps> = ({ name, trackRef, className = 
   // Frame-rate independent animation adjustments
   useFrame((state, delta) => {
     if (!meshRef.current || performanceProfile === 'reducedMotion') return;
-    
+
     const mesh = meshRef.current;
     const time = state.clock.getElapsedTime();
-    
+
     // Constant rotation
     mesh.rotation.y += 0.4 * delta;
     mesh.rotation.x = Math.sin(time * 0.5) * 0.2;
@@ -87,7 +98,7 @@ const ThreeIconInner: React.FC<ThreeIconProps> = ({ name, trackRef, className = 
       <ambientLight intensity={0.4} />
       <pointLight position={[5, 5, 5]} intensity={1.5} color="#ffffff" />
       <pointLight position={[-5, -5, -5]} intensity={0.5} color="#b998d2" />
-      
+
       <mesh
         ref={meshRef}
         geometry={geometry}
@@ -107,6 +118,33 @@ const ThreeIconInner: React.FC<ThreeIconProps> = ({ name, trackRef, className = 
   );
 };
 
+// Error boundary to catch R3F "hooks must be inside Canvas" errors
+class ThreeIconErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): { hasError: boolean } {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error) {
+    // Silently swallow R3F context errors — the Lucide fallback icon is already visible
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[ThreeIcon] R3F error caught, falling back to 2D icon:', error.message);
+    }
+  }
+
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
 export const ThreeIcon: React.FC<ThreeIconProps> = ({ name, trackRef, className = '' }) => {
   const [webglSupported] = useState<boolean>(() => detectCapabilities().webgl2);
 
@@ -114,7 +152,11 @@ export const ThreeIcon: React.FC<ThreeIconProps> = ({ name, trackRef, className 
     return null;
   }
 
-  return <ThreeIconInner name={name} trackRef={trackRef} className={className} />;
+  return (
+    <ThreeIconErrorBoundary>
+      <ThreeIconInner name={name} trackRef={trackRef} className={className} />
+    </ThreeIconErrorBoundary>
+  );
 };
 
 export default ThreeIcon;
