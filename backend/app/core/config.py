@@ -27,11 +27,15 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "https://thestudyflow.vercel.app",
+        "https://www.thestudyflow.in",
+        "https://thestudyflow.in",
     ]
     ALLOWED_HOSTS: list[str] = [
         "localhost",
         "127.0.0.1",
         "testserver",
+        "yoshikr-studyflow-ai.hf.space",
+        ".hf.space",
     ]
 
     # Environment
