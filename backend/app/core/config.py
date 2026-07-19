@@ -36,6 +36,7 @@ class Settings(BaseSettings):
         "testserver",
         "yoshikr-studyflow-ai.hf.space",
         ".hf.space",
+        ".onrender.com",
     ]
 
     # Environment
