@@ -139,7 +139,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="relative z-20 max-w-6xl w-full mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between border-t border-zinc-200 dark:border-zinc-800 text-xs font-sans text-zinc-500 dark:text-zinc-400 mt-12">
-        <p>© 2026 The Study Flow. Handcrafted for academic excellence.</p>
+        <p>© 2026 The Study Flow. Handcrafted for academic excellence. Made with love of Hothlali Memebers.</p>
         <div className="flex gap-6 mt-4 sm:mt-0">
           <a href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
             Privacy
