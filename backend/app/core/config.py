@@ -31,6 +31,7 @@ class Settings(BaseSettings):
         "https://thestudyflow.in",
     ]
     ALLOWED_HOSTS: str | list[str] = [
+        "*",
         "localhost",
         "127.0.0.1",
         "testserver",
