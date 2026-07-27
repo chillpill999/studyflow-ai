@@ -23,7 +23,6 @@ from app.routers import (
     planner,
     quizzes,
 )
-from app.services.auth import supabase_admin_client
 
 
 @asynccontextmanager
@@ -272,7 +271,7 @@ def health_check():
     services_ok = 0
     services_total = 2
 
-    if supabase_admin_client is not None:
+    if bool(settings.SUPABASE_URL):
         services_ok += 1
 
     if bool(settings.GEMINI_API_KEY):
