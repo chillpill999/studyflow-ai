@@ -24,13 +24,13 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = ""
 
     # Security Configuration
-    CORS_ORIGINS: list[str] = [
+    CORS_ORIGINS: str | list[str] = [
         "http://localhost:3000",
         "https://thestudyflow.vercel.app",
         "https://www.thestudyflow.in",
         "https://thestudyflow.in",
     ]
-    ALLOWED_HOSTS: list[str] = [
+    ALLOWED_HOSTS: str | list[str] = [
         "localhost",
         "127.0.0.1",
         "testserver",
@@ -43,14 +43,13 @@ class Settings(BaseSettings):
     ENV: str = "development"
     TESTING: bool = False
 
-    @field_validator("CORS_ORIGINS", mode="before")
+    @field_validator("CORS_ORIGINS", "ALLOWED_HOSTS", mode="before")
     @classmethod
-    def assemble_cors_origins(cls, v: str | list[str]) -> list[str]:
+    def assemble_list_from_str(cls, v: str | list[str]) -> list[str]:
         if isinstance(v, str):
             v_str = v.strip()
             if v_str.startswith("[") and v_str.endswith("]"):
                 import json
-
                 return json.loads(v_str)
             return [i.strip() for i in v_str.split(",") if i.strip()]
         return v
