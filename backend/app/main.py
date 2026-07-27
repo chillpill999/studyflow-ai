@@ -23,7 +23,7 @@ from app.routers import (
     planner,
     quizzes,
 )
-from app.services.auth import supabase_client
+from app.services.auth import supabase_admin_client
 
 
 @asynccontextmanager
@@ -103,9 +103,18 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-        response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+        csp_directives = (
+            "default-src 'self'; "
+            "script-src 'self'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data:; "
+            "font-src 'self' data:; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'; "
+            "frame-ancestors 'none'"
         )
+        response.headers["Content-Security-Policy"] = csp_directives
         return response
 
 
@@ -147,7 +156,11 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
         ]:
             return await call_next(request)
 
-        client_ip = request.client.host if request.client else "127.0.0.1"
+        forwarded = request.headers.get("X-Forwarded-For")
+        if forwarded:
+            client_ip = forwarded.split(",")[0].strip()
+        else:
+            client_ip = request.client.host if request.client else "127.0.0.1"
         now = time.time()
 
         # Determine rate limit category based on route path
@@ -205,10 +218,7 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
 
 
 # Register Middlewares
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=settings.ALLOWED_HOSTS,
-)
+# Removed TrustedHostMiddleware as it interferes with Render health checks
 app.add_middleware(
     GZipMiddleware,
     minimum_size=1000,
@@ -223,8 +233,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=[
+        "Authorization",
+        "Content-Type",
+        "Accept",
+        "Origin",
+        "X-Request-ID",
+    ],
 )
 
 # Register Routers
@@ -253,15 +269,18 @@ def health_check():
     """
     Health check diagnostic endpoint. Checks actual Supabase and Gemini connectivity.
     """
-    supabase_ok = supabase_client is not None
-    gemini_ok = bool(settings.GEMINI_API_KEY)
-    overall_status = "healthy" if supabase_ok and gemini_ok else "degraded"
+    services_ok = 0
+    services_total = 2
+
+    if supabase_admin_client is not None:
+        services_ok += 1
+
+    if bool(settings.GEMINI_API_KEY):
+        services_ok += 1
+
+    overall_status = "healthy" if services_ok == services_total else "degraded"
 
     return {
         "status": overall_status,
-        "services": {
-            "database": "connected" if supabase_ok else "disconnected",
-            "gemini_api": "configured" if gemini_ok else "missing_key",
-        },
         "time": time.time(),
     }
