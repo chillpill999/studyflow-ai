@@ -92,7 +92,7 @@ export const CommandPalette: React.FC = () => {
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-4">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-purple-950/20 backdrop-blur-sm"
+        className="fixed inset-0 bg-zinc-950 dark:bg-zinc-50/20 backdrop-blur-sm"
         onClick={() => setCommandPaletteOpen(false)}
       />
 
@@ -100,13 +100,13 @@ export const CommandPalette: React.FC = () => {
       <div 
         ref={containerRef}
         onKeyDown={handleKeyDown}
-        className="relative w-full max-w-lg rounded-2xl border border-white/40 bg-white/70 shadow-2xl backdrop-blur-xl flex flex-col max-h-[50vh] overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-lg rounded-2xl border border-white/40 bg-white dark:bg-zinc-950 dark:bg-zinc-50/70 shadow-2xl backdrop-blur-xl flex flex-col max-h-[50vh] overflow-hidden animate-in fade-in zoom-in-95 duration-150"
         role="dialog"
         aria-modal="true"
       >
         {/* Search Input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-purple-950/10">
-          <Search size={18} className="text-purple-950/40" />
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-950/10">
+          <Search size={18} className="text-zinc-950 dark:text-zinc-50/40" />
           <input
             ref={inputRef}
             type="text"
@@ -116,15 +116,15 @@ export const CommandPalette: React.FC = () => {
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            className="flex-1 bg-transparent border-0 text-sm text-purple-950 placeholder-purple-950/40 outline-none"
+            className="flex-1 bg-transparent border-0 text-sm text-zinc-950 dark:text-zinc-50 placeholder-zinc-900/40 outline-none"
           />
-          <span className="text-[10px] font-sans text-purple-950/30 bg-purple-950/5 border border-purple-950/10 px-1.5 py-0.5 rounded">ESC</span>
+          <span className="text-[10px] font-sans text-zinc-950 dark:text-zinc-50/30 bg-zinc-950 dark:bg-zinc-50/5 border border-zinc-950/10 px-1.5 py-0.5 rounded">ESC</span>
         </div>
 
         {/* Results List */}
         <div className="flex-1 overflow-y-auto py-2">
           {filteredItems.length === 0 ? (
-            <div className="py-6 text-center text-xs text-purple-950/40">
+            <div className="py-6 text-center text-xs text-zinc-950 dark:text-zinc-50/40">
               No results found for &quot;{query}&quot;
             </div>
           ) : (
@@ -140,16 +140,16 @@ export const CommandPalette: React.FC = () => {
                   }}
                   className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-all ${
                     isSelected 
-                      ? 'bg-[#B998D2]/25 text-purple-950' 
-                      : 'text-purple-950/70 hover:bg-purple-950/5 hover:text-purple-950'
+                      ? 'bg-[#a1a1aa]/25 text-zinc-950 dark:text-zinc-50' 
+                      : 'text-zinc-950 dark:text-zinc-50/70 hover:bg-zinc-950 dark:bg-zinc-50/5 hover:text-zinc-950 dark:text-zinc-50'
                   }`}
                 >
-                  <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-white/40' : 'bg-purple-950/5'}`}>
-                    <Icon size={14} className="text-purple-900" />
+                  <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-white dark:bg-zinc-950 dark:bg-zinc-50/40' : 'bg-zinc-950 dark:bg-zinc-50/5'}`}>
+                    <Icon size={14} className="text-zinc-900 dark:text-zinc-100" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-sans font-bold leading-none">{item.name}</p>
-                    <p className="text-[10px] font-sans text-purple-950/50 mt-1 truncate">{item.description}</p>
+                    <p className="text-[10px] font-sans text-zinc-950 dark:text-zinc-50/50 mt-1 truncate">{item.description}</p>
                   </div>
                 </div>
               );

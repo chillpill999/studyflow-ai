@@ -48,7 +48,7 @@ export default function DashboardPage() {
     { name: 'Study Streak', value: `${user?.user_metadata?.study_streak || 5} Days`, icon: Flame, color: 'text-orange-500 bg-orange-500/10' },
     { name: 'Study Time Today', value: `${user?.user_metadata?.total_study_time || 45} mins`, icon: Clock, color: 'text-blue-500 bg-blue-500/10' },
     { name: 'Documents Indexed', value: fileCountLabel, icon: BookOpen, color: 'text-green-500 bg-green-500/10' },
-    { name: 'Total Pages', value: totalPagesLabel, icon: HelpCircle, color: 'text-purple-500 bg-purple-500/10' },
+    { name: 'Total Pages', value: totalPagesLabel, icon: HelpCircle, color: 'text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-9000/10' },
   ];
 
   const formatBytes = (bytes: number): string => {
@@ -71,19 +71,19 @@ export default function DashboardPage() {
       {/* Welcome header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-light text-purple-950 tracking-tight leading-none">
+          <h1 className="text-4xl font-serif font-light text-zinc-950 dark:text-zinc-50 tracking-tight leading-none">
             Welcome back,{' '}
-            <span className="font-semibold italic text-transparent bg-clip-text bg-gradient-to-tr from-[#B998D2] to-purple-800">
+            <span className="font-semibold italic text-transparent bg-clip-text bg-gradient-to-tr from-[#a1a1aa] to-zinc-800">
               {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Student'}
             </span>
           </h1>
-          <p className="text-sm font-sans text-purple-950/60 mt-2">
+          <p className="text-sm font-sans text-zinc-950 dark:text-zinc-50/60 mt-2">
             Ready to flow into your academic schedule? Manage files and start RAG chat below.
           </p>
         </div>
         <Link
           href="/dashboard/chat"
-          className="self-start px-5 py-3 rounded-xl bg-purple-950 hover:bg-purple-900 text-white font-sans font-semibold text-sm transition-all duration-200 hover:shadow-lg shadow-purple-950/20 active:scale-95 flex items-center gap-2"
+          className="self-start px-5 py-3 rounded-xl bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-900 dark:bg-zinc-100 text-white font-sans font-semibold text-sm transition-all duration-200 hover:shadow-lg shadow-zinc-950/20 active:scale-95 flex items-center gap-2"
         >
           Open Chat Workspace
         </Link>
@@ -96,14 +96,14 @@ export default function DashboardPage() {
           return (
             <GlassCard key={stat.name} className="p-6 border-white/30" hoverable>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold uppercase tracking-wider text-purple-950/40 font-sans">
+                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-950 dark:text-zinc-50/40 font-sans">
                   {stat.name}
                 </span>
                 <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${stat.color}`}>
                   <Icon size={16} />
                 </div>
               </div>
-              <span className="text-2xl font-serif font-bold text-purple-950">
+              <span className="text-2xl font-serif font-bold text-zinc-950 dark:text-zinc-50">
                 {stat.value}
               </span>
             </GlassCard>
@@ -116,25 +116,25 @@ export default function DashboardPage() {
         
         {/* Upload Column */}
         <div className="space-y-4">
-          <h2 className="text-lg font-serif font-semibold text-purple-950 px-1">Upload Documents</h2>
+          <h2 className="text-lg font-serif font-semibold text-zinc-950 dark:text-zinc-50 px-1">Upload Documents</h2>
           <DocumentUpload onUploadSuccess={() => refetch()} />
         </div>
 
         {/* Documents list column */}
         <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-lg font-serif font-semibold text-purple-950 px-1">Recent Library Documents</h2>
+          <h2 className="text-lg font-serif font-semibold text-zinc-950 dark:text-zinc-50 px-1">Recent Library Documents</h2>
           
           {isLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-20 rounded-xl border border-white/20 bg-white/10 animate-pulse" />
+                <div key={i} className="h-20 rounded-xl border border-white/20 bg-white dark:bg-zinc-950 dark:bg-zinc-50/10 animate-pulse" />
               ))}
             </div>
           ) : documents.length === 0 ? (
             <GlassCard className="p-8 text-center border-white/30 flex flex-col items-center justify-center">
-              <BookOpen size={40} className="text-purple-950/20 mb-3" />
-              <h3 className="text-sm font-semibold text-purple-950">No documents found</h3>
-              <p className="text-xs text-purple-950/50 mt-1 max-w-xs">
+              <BookOpen size={40} className="text-zinc-950 dark:text-zinc-50/20 mb-3" />
+              <h3 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">No documents found</h3>
+              <p className="text-xs text-zinc-950 dark:text-zinc-50/50 mt-1 max-w-xs">
                 Drag and drop your syllabus or textbook in the left panel to begin your Study Flow.
               </p>
             </GlassCard>
@@ -146,14 +146,14 @@ export default function DashboardPage() {
                   className="p-4 border-white/30 flex items-center justify-between text-sm hover:shadow-md transition-shadow relative overflow-hidden group"
                 >
                   <div className="flex items-center gap-3.5 min-w-0 pr-4">
-                    <div className="p-2.5 rounded-lg bg-[#B998D2]/10 text-[#B998D2] shrink-0">
+                    <div className="p-2.5 rounded-lg bg-[#a1a1aa]/10 text-[#a1a1aa] shrink-0">
                       <FileText size={20} />
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-semibold text-purple-950 truncate max-w-[200px] sm:max-w-md" title={doc.file_name}>
+                      <h4 className="font-semibold text-zinc-950 dark:text-zinc-50 truncate max-w-[200px] sm:max-w-md" title={doc.file_name}>
                         {doc.file_name}
                       </h4>
-                      <p className="text-[10px] text-purple-950/40 mt-1 font-sans">
+                      <p className="text-[10px] text-zinc-950 dark:text-zinc-50/40 mt-1 font-sans">
                         Pages: {doc.total_pages || 1} • Size: {formatBytes(doc.file_size)} • Uploaded: {new Date(doc.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -165,7 +165,7 @@ export default function DashboardPage() {
                         pathname: '/dashboard/chat',
                         query: { docId: doc.id }
                       }}
-                      className="text-xs font-semibold text-purple-950/70 hover:text-purple-900 border border-purple-950/10 px-3 py-2 rounded-xl bg-white/40 hover:bg-white/60 transition-colors cursor-pointer"
+                      className="text-xs font-semibold text-zinc-950 dark:text-zinc-50/70 hover:text-zinc-900 dark:text-zinc-100 border border-zinc-950/10 px-3 py-2 rounded-xl bg-white dark:bg-zinc-950 dark:bg-zinc-50/40 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 transition-colors cursor-pointer"
                     >
                       Chat RAG
                     </Link>
@@ -186,22 +186,22 @@ export default function DashboardPage() {
           {/* Quick Schedule widget */}
           <GlassCard className="p-6 border-white/30 mt-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-purple-950 uppercase tracking-wider font-sans">Upcoming Tasks</h2>
-              <CalendarDays size={18} className="text-purple-950/30" />
+              <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50 uppercase tracking-wider font-sans">Upcoming Tasks</h2>
+              <CalendarDays size={18} className="text-zinc-950 dark:text-zinc-50/30" />
             </div>
             <div className="space-y-3.5">
               <div className="flex gap-4 items-start text-xs">
                 <div className="h-2 w-2 rounded-full bg-orange-400 mt-1.5 shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-purple-950">Review Leitner Flashcards Box 1</h4>
-                  <p className="text-[10px] text-purple-950/50 mt-0.5">Due in 2 hours • 15 cards</p>
+                  <h4 className="font-semibold text-zinc-950 dark:text-zinc-50">Review Leitner Flashcards Box 1</h4>
+                  <p className="text-[10px] text-zinc-950 dark:text-zinc-50/50 mt-0.5">Due in 2 hours • 15 cards</p>
                 </div>
               </div>
               <div className="flex gap-4 items-start text-xs">
-                <div className="h-2 w-2 rounded-full bg-[#B998D2] mt-1.5 shrink-0" />
+                <div className="h-2 w-2 rounded-full bg-[#a1a1aa] mt-1.5 shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-purple-950">Solve Cognitive Science Quiz</h4>
-                  <p className="text-[10px] text-purple-950/50 mt-0.5">Due tomorrow • 10 questions</p>
+                  <h4 className="font-semibold text-zinc-950 dark:text-zinc-50">Solve Cognitive Science Quiz</h4>
+                  <p className="text-[10px] text-zinc-950 dark:text-zinc-50/50 mt-0.5">Due tomorrow • 10 questions</p>
                 </div>
               </div>
             </div>

@@ -170,8 +170,8 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUploadSuccess,
         onDrop={handleDrop}
         onClick={onButtonClick}
         className={`
-          relative border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 backdrop-blur-md bg-white/20
-          ${dragActive ? 'border-[#B998D2] bg-[#B998D2]/10 scale-[1.01]' : 'border-purple-950/15 hover:border-[#B998D2]'}
+          relative border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 backdrop-blur-md bg-white dark:bg-zinc-950 dark:bg-zinc-50/20
+          ${dragActive ? 'border-[#a1a1aa] bg-[#a1a1aa]/10 scale-[1.01]' : 'border-zinc-950/15 hover:border-[#a1a1aa]'}
         `}
       >
         <input
@@ -183,14 +183,14 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUploadSuccess,
           onChange={handleFileChange}
         />
         
-        <div className="h-12 w-12 rounded-xl bg-purple-950/5 flex items-center justify-center mb-4 text-[#B998D2] transition-transform duration-300 group-hover:scale-110">
+        <div className="h-12 w-12 rounded-xl bg-zinc-950 dark:bg-zinc-50/5 flex items-center justify-center mb-4 text-[#a1a1aa] transition-transform duration-300 group-hover:scale-110">
           <Upload size={24} />
         </div>
         
-        <h3 className="text-sm font-sans font-semibold text-purple-950">
+        <h3 className="text-sm font-sans font-semibold text-zinc-950 dark:text-zinc-50">
           Drag & Drop PDF Syllabus / Textbook
         </h3>
-        <p className="text-xs text-purple-950/50 mt-1 font-sans">
+        <p className="text-xs text-zinc-950 dark:text-zinc-50/50 mt-1 font-sans">
           Support PDF files up to 20MB
         </p>
       </div>
@@ -198,7 +198,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUploadSuccess,
       {/* Upload queue list */}
       {queue.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-xs font-sans font-bold text-purple-950/40 uppercase tracking-widest px-1">
+          <h4 className="text-xs font-sans font-bold text-zinc-950 dark:text-zinc-50/40 uppercase tracking-widest px-1">
             Uploading Status
           </h4>
           
@@ -213,14 +213,14 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUploadSuccess,
                 <GlassCard key={item.id} className="p-4 border-white/40 shadow-sm relative overflow-hidden">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex gap-3 items-center min-w-0">
-                      <div className={`p-2 rounded-lg ${isFailed ? 'bg-red-50 text-red-600' : 'bg-purple-950/5 text-[#B998D2]'}`}>
+                      <div className={`p-2 rounded-lg ${isFailed ? 'bg-red-50 text-red-600' : 'bg-zinc-950 dark:bg-zinc-50/5 text-[#a1a1aa]'}`}>
                         <FileText size={18} />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-sm font-semibold text-purple-950 truncate max-w-[200px] sm:max-w-xs" title={item.fileName}>
+                        <h4 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50 truncate max-w-[200px] sm:max-w-xs" title={item.fileName}>
                           {item.fileName}
                         </h4>
-                        <span className="text-[10px] text-purple-950/40 font-sans block mt-0.5">
+                        <span className="text-[10px] text-zinc-950 dark:text-zinc-50/40 font-sans block mt-0.5">
                           {formatBytes(item.fileSize)}
                         </span>
                       </div>
@@ -231,7 +231,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUploadSuccess,
                       {isFailed && (
                         <button 
                           onClick={(e) => { e.stopPropagation(); retryItem(item); }}
-                          className="p-1 hover:bg-purple-950/5 rounded text-purple-950/50 hover:text-purple-950 transition-colors"
+                          className="p-1 hover:bg-zinc-950 dark:bg-zinc-50/5 rounded text-zinc-950 dark:text-zinc-50/50 hover:text-zinc-950 dark:text-zinc-50 transition-colors"
                           title="Retry"
                         >
                           <RefreshCw size={14} className="animate-spin-slow" />
@@ -239,7 +239,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUploadSuccess,
                       )}
                       <button 
                         onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
-                        className="p-1 hover:bg-purple-950/5 rounded text-purple-950/40 hover:text-purple-950 transition-colors"
+                        className="p-1 hover:bg-zinc-950 dark:bg-zinc-50/5 rounded text-zinc-950 dark:text-zinc-50/40 hover:text-zinc-950 dark:text-zinc-50 transition-colors"
                         title="Remove"
                       >
                         <X size={14} />
@@ -251,12 +251,12 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onUploadSuccess,
                   {!isCompleted && !isFailed && (
                     <div className="space-y-1.5 mt-2">
                       <Progress value={item.progress} />
-                      <div className="flex justify-between items-center text-[10px] font-sans font-medium text-purple-950/50">
+                      <div className="flex justify-between items-center text-[10px] font-sans font-medium text-zinc-950 dark:text-zinc-50/50">
                         <span>
                           {isUploading ? `Uploading... ${item.progress}%` : 'Processing & Vector Indexing...'}
                         </span>
                         {(isUploading || isProcessing) && (
-                          <RefreshCw size={10} className="animate-spin text-[#B998D2]" />
+                          <RefreshCw size={10} className="animate-spin text-[#a1a1aa]" />
                         )}
                       </div>
                     </div>

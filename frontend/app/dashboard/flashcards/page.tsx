@@ -222,15 +222,15 @@ export default function FlashcardsPage() {
     <div className="h-full flex flex-col p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-40px)] z-10 relative">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-purple-950">AI Flashcard Review</h1>
-          <p className="text-purple-950/60 mt-1">Leitner Box spaced repetition system to optimize memory retention</p>
+          <h1 className="text-3xl font-serif font-bold text-zinc-950 dark:text-zinc-50">AI Flashcard Review</h1>
+          <p className="text-zinc-950 dark:text-zinc-50/60 mt-1">Leitner Box spaced repetition system to optimize memory retention</p>
         </div>
 
-        <div className="flex items-center gap-3 bg-white/40 border border-white/40 p-1 rounded-xl">
+        <div className="flex items-center gap-3 bg-white dark:bg-zinc-950 dark:bg-zinc-50/40 border border-white/40 p-1 rounded-xl">
           <button
             onClick={() => setReviewMode(true)}
             className={`px-4 py-1.5 rounded-lg text-xs font-medium font-sans transition-all ${
-              reviewMode ? 'bg-purple-950 text-white shadow-sm' : 'text-purple-950/70 hover:bg-white/20'
+              reviewMode ? 'bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white shadow-sm' : 'text-zinc-950 dark:text-zinc-50/70 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/20'
             }`}
           >
             Review Deck
@@ -238,7 +238,7 @@ export default function FlashcardsPage() {
           <button
             onClick={() => setReviewMode(false)}
             className={`px-4 py-1.5 rounded-lg text-xs font-medium font-sans transition-all ${
-              !reviewMode ? 'bg-purple-950 text-white shadow-sm' : 'text-purple-950/70 hover:bg-white/20'
+              !reviewMode ? 'bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white shadow-sm' : 'text-zinc-950 dark:text-zinc-50/70 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/20'
             }`}
           >
             Manage Deck
@@ -250,15 +250,15 @@ export default function FlashcardsPage() {
         {/* Document Selection & Control Card */}
         <div className="space-y-6 lg:col-span-1">
           <GlassCard className="p-5 space-y-4">
-            <h2 className="text-sm font-semibold text-purple-950 uppercase tracking-wider">Configure Deck</h2>
+            <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50 uppercase tracking-wider">Configure Deck</h2>
             
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-purple-950/70">Select Book/Document</label>
+                <label className="text-xs font-semibold text-zinc-950 dark:text-zinc-50/70">Select Book/Document</label>
                 <select
                   value={selectedDocId}
                   onChange={(e) => setSelectedDocId(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 bg-white/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-purple-950"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-zinc-950 dark:text-zinc-50"
                 >
                   <option value="">All Documents</option>
                   {documents.map((doc) => (
@@ -272,7 +272,7 @@ export default function FlashcardsPage() {
               <button
                 disabled={loading || !selectedDocId}
                 onClick={handleGenerateCards}
-                className="w-full bg-purple-950 text-white font-sans font-medium text-xs py-2.5 rounded-xl hover:bg-purple-900 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                className="w-full bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white font-sans font-medium text-xs py-2.5 rounded-xl hover:bg-zinc-900 dark:bg-zinc-100 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
               >
                 {loading ? (
                   <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -287,12 +287,12 @@ export default function FlashcardsPage() {
           </GlassCard>
 
           <GlassCard className="p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-purple-950 uppercase tracking-wider">Export & Import</h3>
+            <h3 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50 uppercase tracking-wider">Export & Import</h3>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={handleExportJSON}
                 disabled={!selectedDocId}
-                className="bg-white/60 hover:bg-white/80 border border-white/40 text-purple-950 text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
+                className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 border border-white/40 text-zinc-950 dark:text-zinc-50 text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
               >
                 <Download size={13} />
                 Export
@@ -300,7 +300,7 @@ export default function FlashcardsPage() {
               <button
                 onClick={() => setShowImportModal(true)}
                 disabled={!selectedDocId}
-                className="bg-white/60 hover:bg-white/80 border border-white/40 text-purple-950 text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
+                className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 border border-white/40 text-zinc-950 dark:text-zinc-50 text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
               >
                 <UploadCloud size={13} />
                 Import
@@ -317,9 +317,9 @@ export default function FlashcardsPage() {
               {reviewDeck.length > 0 && currentCard ? (
                 <div className="w-full max-w-xl space-y-6">
                   {/* Progress Indicators */}
-                  <div className="flex justify-between items-center text-xs text-purple-950/60 font-sans">
+                  <div className="flex justify-between items-center text-xs text-zinc-950 dark:text-zinc-50/60 font-sans">
                     <span>Card {currentIndex + 1} of {reviewDeck.length}</span>
-                    <span className="bg-[#B998D2]/25 px-2 py-0.5 rounded-full border border-white/30 text-purple-950">
+                    <span className="bg-[#a1a1aa]/25 px-2 py-0.5 rounded-full border border-white/30 text-zinc-950 dark:text-zinc-50">
                       Box {currentCard.leitner_box}
                     </span>
                   </div>
@@ -331,25 +331,25 @@ export default function FlashcardsPage() {
                   >
                     <div
                       className={`
-                        w-full h-full duration-500 transform style-preserve-3d relative rounded-3xl border border-white/30 bg-white/40 backdrop-blur-[24px] shadow-lg flex items-center justify-center p-8 text-center
+                        w-full h-full duration-500 transform style-preserve-3d relative rounded-3xl border border-white/30 bg-white dark:bg-zinc-950 dark:bg-zinc-50/40 backdrop-blur-[24px] shadow-lg flex items-center justify-center p-8 text-center
                         ${isFlipped ? 'rotate-y-180' : ''}
                       `}
                     >
                       {/* Front Side */}
                       <div className={`absolute inset-0 backface-hidden flex flex-col justify-center items-center p-8 ${isFlipped ? 'opacity-0' : 'opacity-100'}`}>
-                        <div className="text-xs uppercase font-semibold text-purple-950/50 mb-4 tracking-widest">Question / Term</div>
-                        <div className="text-lg font-serif font-bold text-purple-950 select-text leading-relaxed">
+                        <div className="text-xs uppercase font-semibold text-zinc-950 dark:text-zinc-50/50 mb-4 tracking-widest">Question / Term</div>
+                        <div className="text-lg font-serif font-bold text-zinc-950 dark:text-zinc-50 select-text leading-relaxed">
                           {currentCard.front}
                         </div>
-                        <div className="text-[10px] text-purple-950/40 mt-8 flex items-center gap-1">
+                        <div className="text-[10px] text-zinc-950 dark:text-zinc-50/40 mt-8 flex items-center gap-1">
                           <RefreshCcw size={10} /> Click to flip card
                         </div>
                       </div>
 
                       {/* Back Side */}
                       <div className={`absolute inset-0 backface-hidden rotate-y-180 flex flex-col justify-center items-center p-8 ${isFlipped ? 'opacity-100' : 'opacity-0'}`}>
-                        <div className="text-xs uppercase font-semibold text-[#B998D2] mb-4 tracking-widest">Answer / Concept</div>
-                        <div className="text-md font-sans text-purple-950 select-text leading-relaxed">
+                        <div className="text-xs uppercase font-semibold text-[#a1a1aa] mb-4 tracking-widest">Answer / Concept</div>
+                        <div className="text-md font-sans text-zinc-950 dark:text-zinc-50 select-text leading-relaxed">
                           {currentCard.back}
                         </div>
                       </div>
@@ -375,10 +375,10 @@ export default function FlashcardsPage() {
                   </div>
                 </div>
               ) : (
-                <GlassCard className="p-8 text-center text-purple-950/50 w-full max-w-xl min-h-[300px] flex flex-col justify-center items-center">
-                  <BookOpen size={48} className="text-purple-900/20 mb-3" />
+                <GlassCard className="p-8 text-center text-zinc-950 dark:text-zinc-50/50 w-full max-w-xl min-h-[300px] flex flex-col justify-center items-center">
+                  <BookOpen size={48} className="text-zinc-900 dark:text-zinc-100/20 mb-3" />
                   <p className="font-serif text-lg font-medium">All caught up!</p>
-                  <p className="text-xs text-purple-950/40 mt-1">No flashcards need review today. Check back tomorrow or generate more cards!</p>
+                  <p className="text-xs text-zinc-950 dark:text-zinc-50/40 mt-1">No flashcards need review today. Check back tomorrow or generate more cards!</p>
                 </GlassCard>
               )}
             </div>
@@ -386,10 +386,10 @@ export default function FlashcardsPage() {
             /* Manage Deck View */
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-sm font-semibold text-purple-950 uppercase tracking-wider">Manage Active Flashcards</h3>
+                <h3 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50 uppercase tracking-wider">Manage Active Flashcards</h3>
                 <button
                   onClick={() => setIsCreating(true)}
-                  className="bg-purple-950 text-white text-xs font-medium px-3 py-2 rounded-xl hover:bg-purple-900 transition-all flex items-center gap-1 shadow-sm"
+                  className="bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white text-xs font-medium px-3 py-2 rounded-xl hover:bg-zinc-900 dark:bg-zinc-100 transition-all flex items-center gap-1 shadow-sm"
                 >
                   <Plus size={13} />
                   Add Card
@@ -404,25 +404,25 @@ export default function FlashcardsPage() {
                       placeholder="Front Side (Question/Term)"
                       value={newFront}
                       onChange={(e) => setNewFront(e.target.value)}
-                      className="bg-white/60 border border-white/40 rounded-lg p-2 text-xs font-sans focus:outline-none text-purple-950"
+                      className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-lg p-2 text-xs font-sans focus:outline-none text-zinc-950 dark:text-zinc-50"
                     />
                     <input
                       placeholder="Back Side (Answer/Definition)"
                       value={newBack}
                       onChange={(e) => setNewBack(e.target.value)}
-                      className="bg-white/60 border border-white/40 rounded-lg p-2 text-xs font-sans focus:outline-none text-purple-950"
+                      className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-lg p-2 text-xs font-sans focus:outline-none text-zinc-950 dark:text-zinc-50"
                     />
                   </div>
                   <div className="flex justify-end gap-2">
                     <button
                       onClick={() => setIsCreating(false)}
-                      className="text-xs text-purple-950/60 hover:text-purple-950 px-3 py-1.5"
+                      className="text-xs text-zinc-950 dark:text-zinc-50/60 hover:text-zinc-950 dark:text-zinc-50 px-3 py-1.5"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleCreateCard}
-                      className="bg-purple-950 text-white text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm"
+                      className="bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm"
                     >
                       Save Card
                     </button>
@@ -441,19 +441,19 @@ export default function FlashcardsPage() {
                           <input
                             value={editFront}
                             onChange={(e) => setEditFront(e.target.value)}
-                            className="w-full bg-white/60 border border-white/40 rounded-lg p-1.5 text-xs text-purple-950"
+                            className="w-full bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-lg p-1.5 text-xs text-zinc-950 dark:text-zinc-50"
                           />
                           <input
                             value={editBack}
                             onChange={(e) => setEditBack(e.target.value)}
-                            className="w-full bg-white/60 border border-white/40 rounded-lg p-1.5 text-xs text-purple-950"
+                            className="w-full bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-lg p-1.5 text-xs text-zinc-950 dark:text-zinc-50"
                           />
                         </div>
                       ) : (
                         <div>
-                          <div className="text-xs font-semibold text-purple-950">Q: {card.front}</div>
-                          <div className="text-xs text-purple-950/70 mt-1">A: {card.back}</div>
-                          <div className="text-[9px] text-[#B998D2] mt-2">Leitner: Box {card.leitner_box}</div>
+                          <div className="text-xs font-semibold text-zinc-950 dark:text-zinc-50">Q: {card.front}</div>
+                          <div className="text-xs text-zinc-950 dark:text-zinc-50/70 mt-1">A: {card.back}</div>
+                          <div className="text-[9px] text-[#a1a1aa] mt-2">Leitner: Box {card.leitner_box}</div>
                         </div>
                       )}
 
@@ -462,13 +462,13 @@ export default function FlashcardsPage() {
                           <>
                             <button
                               onClick={() => setIsEditing(false)}
-                              className="text-[10px] text-purple-950/60 hover:text-purple-950"
+                              className="text-[10px] text-zinc-950 dark:text-zinc-50/60 hover:text-zinc-950 dark:text-zinc-50"
                             >
                               Cancel
                             </button>
                             <button
                               onClick={() => handleSaveEdit(card.id)}
-                              className="bg-purple-950 text-white text-[10px] font-medium px-2 py-1 rounded-lg"
+                              className="bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white text-[10px] font-medium px-2 py-1 rounded-lg"
                             >
                               Save
                             </button>
@@ -477,7 +477,7 @@ export default function FlashcardsPage() {
                           <>
                             <button
                               onClick={() => handleStartEdit(card)}
-                              className="text-[10px] hover:bg-white/40 p-1.5 rounded-lg text-purple-950/60"
+                              className="text-[10px] hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/40 p-1.5 rounded-lg text-zinc-950 dark:text-zinc-50/60"
                             >
                               <Edit3 size={11} />
                             </button>
@@ -500,28 +500,28 @@ export default function FlashcardsPage() {
 
       {/* Import Modal */}
       {showImportModal && (
-        <div className="fixed inset-0 bg-purple-950/20 backdrop-blur-[4px] z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-zinc-950 dark:bg-zinc-50/20 backdrop-blur-[4px] z-50 flex items-center justify-center p-4">
           <GlassCard className="p-6 max-w-lg w-full space-y-4">
-            <h2 className="text-lg font-serif font-semibold text-purple-950">Import Flashcards Deck</h2>
-            <p className="text-xs text-purple-950/60">
+            <h2 className="text-lg font-serif font-semibold text-zinc-950 dark:text-zinc-50">Import Flashcards Deck</h2>
+            <p className="text-xs text-zinc-950 dark:text-zinc-50/60">
               Paste a JSON array containing <code>front</code> and <code>back</code> QA properties:
             </p>
             <textarea
               placeholder='[\n  { "front": "Equation", "back": "Result" }\n]'
               value={importRaw}
               onChange={(e) => setImportRaw(e.target.value)}
-              className="w-full h-48 bg-white/60 border border-white/40 rounded-xl p-3 text-xs font-mono focus:outline-none text-purple-950 resize-y"
+              className="w-full h-48 bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl p-3 text-xs font-mono focus:outline-none text-zinc-950 dark:text-zinc-50 resize-y"
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowImportModal(false)}
-                className="text-xs text-purple-950/60 hover:text-purple-950 px-3 py-1.5"
+                className="text-xs text-zinc-950 dark:text-zinc-50/60 hover:text-zinc-950 dark:text-zinc-50 px-3 py-1.5"
               >
                 Cancel
               </button>
               <button
                 onClick={handleImportJSON}
-                className="bg-purple-950 text-white text-xs font-medium px-4 py-1.5 rounded-xl shadow-sm"
+                className="bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white text-xs font-medium px-4 py-1.5 rounded-xl shadow-sm"
               >
                 Import Deck
               </button>

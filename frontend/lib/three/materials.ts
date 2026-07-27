@@ -56,7 +56,7 @@ export const transparentCrystalMaterial = new THREE.MeshPhysicalMaterial({
 
 // 6. Accent Material: Premium deep violet clearcoat lacquer
 export const accentMaterial = new THREE.MeshPhysicalMaterial({
-  color: new THREE.Color('#B998D2'),
+  color: new THREE.Color('#a1a1aa'),
   metalness: 0.6,
   roughness: 0.2,
   clearcoat: 1.0,

@@ -37,7 +37,7 @@ export class DashboardPage {
   }
 
   async getDocumentCount(): Promise<number> {
-    return this.page.locator('[class*="text-purple-950"] >> text=.pdf').count();
+    return this.page.locator('[class*="text-zinc-950 dark:text-zinc-50"] >> text=.pdf').count();
   }
 
   async clickChatRAG(): Promise<void> {

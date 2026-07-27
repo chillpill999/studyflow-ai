@@ -40,7 +40,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className="min-h-full flex flex-col font-sans text-purple-950 bg-[#FDFCFB]"
+        className="min-h-full flex flex-col font-sans text-zinc-950 dark:text-zinc-50 bg-[#FDFCFB]"
         suppressHydrationWarning
       >
         <QueryProvider>

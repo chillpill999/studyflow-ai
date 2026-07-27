@@ -11,7 +11,7 @@ export const FrostedGlassBackground: React.FC = () => {
       <div className="absolute top-[25%] right-[10%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-zinc-200/50 dark:bg-zinc-800/15 blur-[110px] animate-ios-orb-3" />
 
       {/* Multi-layered Frosted Glass Overlay */}
-      <div className="absolute inset-0 backdrop-blur-[60px] backdrop-saturate-[180%] bg-white/40 dark:bg-zinc-950/50" />
+      <div className="absolute inset-0 backdrop-blur-[60px] backdrop-saturate-[180%] bg-white dark:bg-zinc-950 dark:bg-zinc-50/40 dark:bg-zinc-950 dark:bg-zinc-50/50" />
 
       {/* Specular Ambient Reflection Sheen */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-white/10 dark:from-white/5 dark:to-transparent opacity-60" />

@@ -43,8 +43,8 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ name, href, isActive, lucideI
         flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-sans font-medium transition-all duration-200 group
         ${
           isActive
-            ? 'bg-[#B998D2]/25 text-purple-950 shadow-sm border border-white/20'
-            : 'text-purple-950/60 hover:text-purple-950 hover:bg-white/20'
+            ? 'bg-[#a1a1aa]/25 text-zinc-950 dark:text-zinc-50 shadow-sm border border-white/20'
+            : 'text-zinc-950 dark:text-zinc-50/60 hover:text-zinc-950 dark:text-zinc-50 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/20'
         }
       `}
     >
@@ -53,7 +53,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ name, href, isActive, lucideI
         <LucideIcon 
           size={16} 
           className={`absolute inset-0 m-auto transition-opacity duration-300 ${
-            isActive ? 'text-[#B998D2]' : 'text-purple-950/50'
+            isActive ? 'text-[#a1a1aa]' : 'text-zinc-950 dark:text-zinc-50/50'
           }`} 
         />
         {/* Drei Portal overlays 3D geometry over Lucide fallback */}
@@ -94,7 +94,7 @@ export default function DashboardLayout({
       {/* Skip to Main Content Link for Screen Readers (WCAG 2.2 AA) */}
       <a 
         href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-purple-950 focus:border focus:border-[#B998D2] focus:rounded-xl focus:shadow-lg focus:outline-none"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white dark:bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 focus:text-zinc-950 dark:text-zinc-50 focus:border focus:border-[#a1a1aa] focus:rounded-xl focus:shadow-lg focus:outline-none"
       >
         Skip to main content
       </a>
@@ -103,7 +103,7 @@ export default function DashboardLayout({
       <SceneManager />
 
       {/* Dynamic Background Blurs */}
-      <div className="absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-[#B998D2]/10 blur-[120px] pointer-events-none z-0" />
+      <div className="absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-[#a1a1aa]/10 blur-[120px] pointer-events-none z-0" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[45vw] h-[45vw] rounded-full bg-[#E8D7EA]/25 blur-[150px] pointer-events-none z-0" />
 
       {/* Glass Sidebar */}
@@ -113,7 +113,7 @@ export default function DashboardLayout({
             {/* Logo */}
             <div className="flex items-center gap-3 mb-8 px-2">
               <Logo size={36} />
-              <span className="text-lg font-serif font-semibold text-purple-950">Study Flow</span>
+              <span className="text-lg font-serif font-semibold text-zinc-950 dark:text-zinc-50">Study Flow</span>
             </div>
 
             {/* Nav Menu */}
@@ -134,16 +134,16 @@ export default function DashboardLayout({
           </div>
 
           {/* User Section & Logout */}
-          <div className="space-y-4 pt-4 border-t border-purple-950/5">
+          <div className="space-y-4 pt-4 border-t border-zinc-950/5">
             <div className="flex items-center gap-3 px-2">
-              <div className="h-8 w-8 rounded-lg bg-purple-950/5 border border-purple-950/10 flex items-center justify-center text-purple-950/60">
+              <div className="h-8 w-8 rounded-lg bg-zinc-950 dark:bg-zinc-50/5 border border-zinc-950/10 flex items-center justify-center text-zinc-950 dark:text-zinc-50/60">
                 <User size={16} />
               </div>
               <div className="flex flex-col overflow-hidden">
-                <span className="text-xs font-semibold text-purple-950 truncate">
+                <span className="text-xs font-semibold text-zinc-950 dark:text-zinc-50 truncate">
                   {user?.user_metadata?.full_name || 'Student'}
                 </span>
-                <span className="text-[10px] text-purple-950/50 truncate">
+                <span className="text-[10px] text-zinc-950 dark:text-zinc-50/50 truncate">
                   {user?.email}
                 </span>
               </div>
@@ -163,14 +163,14 @@ export default function DashboardLayout({
       {/* Main Panel Viewport */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10 p-4 pl-0">
         {/* Top Header Bar */}
-        <header className="flex items-center justify-between mb-4 h-14 px-4 bg-white/20 border border-white/20 rounded-2xl backdrop-blur-md">
+        <header className="flex items-center justify-between mb-4 h-14 px-4 bg-white dark:bg-zinc-950 dark:bg-zinc-50/20 border border-white/20 rounded-2xl backdrop-blur-md">
           {/* Left section: Command palette search trigger bar */}
           <button 
             onClick={() => setCommandPaletteOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs text-purple-950/40 hover:text-purple-950/60 bg-white/30 hover:bg-white/40 border border-white/30 rounded-xl transition-all font-sans cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#B998D2]"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs text-zinc-950 dark:text-zinc-50/40 hover:text-zinc-950 dark:text-zinc-50/60 bg-white dark:bg-zinc-950 dark:bg-zinc-50/30 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/40 border border-white/30 rounded-xl transition-all font-sans cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#a1a1aa]"
           >
             <span>Search or command...</span>
-            <kbd className="ml-2 px-1.5 py-0.5 text-[9px] bg-purple-950/5 border border-purple-950/10 rounded-md font-mono text-purple-950/50 font-semibold shadow-sm">Ctrl + K</kbd>
+            <kbd className="ml-2 px-1.5 py-0.5 text-[9px] bg-zinc-950 dark:bg-zinc-50/5 border border-zinc-950/10 rounded-md font-mono text-zinc-950 dark:text-zinc-50/50 font-semibold shadow-sm">Ctrl + K</kbd>
           </button>
 
           {/* Right section: Notifications Center and Theme Switcher */}

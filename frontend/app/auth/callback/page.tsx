@@ -44,10 +44,10 @@ function CallbackHandler() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-transparent">
       <div className="flex flex-col items-center gap-4">
-        <div className="h-8 w-8 border-3 border-[#B998D2] border-t-transparent rounded-full animate-spin" />
+        <div className="h-8 w-8 border-3 border-[#a1a1aa] border-t-transparent rounded-full animate-spin" />
         <div className="flex flex-col items-center gap-1">
-          <p className="text-sm font-sans font-semibold text-purple-950">Completing sign in...</p>
-          <p className="text-xs font-sans text-purple-950/40">Please wait while we sync your secure session.</p>
+          <p className="text-sm font-sans font-semibold text-zinc-950 dark:text-zinc-50">Completing sign in...</p>
+          <p className="text-xs font-sans text-zinc-950 dark:text-zinc-50/40">Please wait while we sync your secure session.</p>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@ export default function AuthCallbackPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex flex-col items-center justify-center bg-transparent">
-        <div className="h-8 w-8 border-3 border-[#B998D2] border-t-transparent rounded-full animate-spin" />
+        <div className="h-8 w-8 border-3 border-[#a1a1aa] border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <CallbackHandler />

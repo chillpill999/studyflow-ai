@@ -17,7 +17,7 @@ export const Logo: React.FC<LogoProps> = ({
     <div
       className={`
         relative overflow-hidden rounded-xl flex items-center justify-center
-        ${blend ? 'bg-transparent' : 'bg-purple-950/90 border border-white/20 shadow-lg'}
+        ${blend ? 'bg-transparent' : 'bg-zinc-950 dark:bg-zinc-50/90 border border-white/20 shadow-lg'}
         ${animate ? 'animate-logo-float hover:scale-105 transition-all duration-300' : ''}
         ${className}
       `}

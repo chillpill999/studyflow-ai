@@ -9,7 +9,7 @@ import { FrostedGlassBackground } from 'src/components/ui/FrostedGlassBackground
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+    <div className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-white dark:bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 dark:bg-zinc-100 text-zinc-900 dark:text-zinc-100">
       {/* Apple iOS Frosted Glass Ambient Light Background */}
       <FrostedGlassBackground />
 
@@ -34,7 +34,7 @@ export default function LandingPage() {
           </Link>
           <Link
             href="/register"
-            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-sm font-sans font-semibold transition-all duration-200 hover:shadow-md active:scale-95"
+            className="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 dark:text-zinc-50 text-sm font-sans font-semibold transition-all duration-200 hover:shadow-md active:scale-95"
           >
             Get Started
           </Link>
@@ -44,7 +44,7 @@ export default function LandingPage() {
       {/* Main Hero Section */}
       <main className="relative z-10 flex-1 max-w-5xl w-full mx-auto px-6 flex flex-col items-center justify-center text-center py-16 md:py-24">
         {/* Soft tag */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-300/80 dark:border-zinc-700/80 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-sm mb-6 animate-fade-in">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-300/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 dark:bg-zinc-900 dark:bg-zinc-100/80 backdrop-blur-md shadow-sm mb-6 animate-fade-in">
           <Sparkles size={14} className="text-zinc-800 dark:text-zinc-200" />
           <span className="text-xs font-sans font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200">
             Now Powered by Gemini 2.5 Pro
@@ -72,14 +72,14 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row gap-4 mb-20 justify-center">
           <Link
             href="/register"
-            className="px-8 py-4 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-sans font-semibold text-base transition-all duration-200 flex items-center gap-2 cursor-pointer shadow-lg active:scale-95"
+            className="px-8 py-4 rounded-xl bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 dark:text-zinc-50 font-sans font-semibold text-base transition-all duration-200 flex items-center gap-2 cursor-pointer shadow-lg active:scale-95"
           >
             Create Your Workspace
             <ArrowRight size={18} />
           </Link>
           <Link
             href="/login"
-            className="px-8 py-4 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white/80 dark:bg-zinc-900/80 hover:bg-white dark:hover:bg-zinc-800 text-zinc-900 dark:text-white font-sans font-semibold text-base transition-all duration-200 cursor-pointer shadow-sm active:scale-95"
+            className="px-8 py-4 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 dark:bg-zinc-900 dark:bg-zinc-100/80 hover:bg-white dark:hover:bg-zinc-800 text-zinc-900 dark:text-white font-sans font-semibold text-base transition-all duration-200 cursor-pointer shadow-sm active:scale-95"
           >
             Sign In
           </Link>
@@ -88,10 +88,10 @@ export default function LandingPage() {
         {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
           <GlassCard
-            className="p-6 text-left border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
+            className="p-6 text-left border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 dark:bg-zinc-50/70 dark:bg-zinc-900 dark:bg-zinc-100/70 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
             hoverable
           >
-            <div className="h-10 w-10 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center mb-4">
+            <div className="h-10 w-10 rounded-lg bg-zinc-900 dark:bg-white dark:bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white dark:text-zinc-900 dark:text-zinc-100 flex items-center justify-center mb-4">
               <BookOpen size={20} />
             </div>
             <h3 className="text-lg font-serif font-semibold text-zinc-900 dark:text-white mb-2">
@@ -104,10 +104,10 @@ export default function LandingPage() {
           </GlassCard>
 
           <GlassCard
-            className="p-6 text-left border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
+            className="p-6 text-left border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 dark:bg-zinc-50/70 dark:bg-zinc-900 dark:bg-zinc-100/70 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
             hoverable
           >
-            <div className="h-10 w-10 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center mb-4">
+            <div className="h-10 w-10 rounded-lg bg-zinc-900 dark:bg-white dark:bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white dark:text-zinc-900 dark:text-zinc-100 flex items-center justify-center mb-4">
               <Layers size={20} />
             </div>
             <h3 className="text-lg font-serif font-semibold text-zinc-900 dark:text-white mb-2">
@@ -120,10 +120,10 @@ export default function LandingPage() {
           </GlassCard>
 
           <GlassCard
-            className="p-6 text-left border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
+            className="p-6 text-left border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 dark:bg-zinc-50/70 dark:bg-zinc-900 dark:bg-zinc-100/70 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]"
             hoverable
           >
-            <div className="h-10 w-10 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center mb-4">
+            <div className="h-10 w-10 rounded-lg bg-zinc-900 dark:bg-white dark:bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white dark:text-zinc-900 dark:text-zinc-100 flex items-center justify-center mb-4">
               <Target size={20} />
             </div>
             <h3 className="text-lg font-serif font-semibold text-zinc-900 dark:text-white mb-2">

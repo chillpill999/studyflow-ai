@@ -93,7 +93,7 @@ export default function MindMapPage() {
         label: edge.label,
         type: 'smoothstep',
         animated: true,
-        style: { stroke: '#B998D2', strokeWidth: 2 },
+        style: { stroke: '#a1a1aa', strokeWidth: 2 },
         labelStyle: { fill: '#4c1d95', fontSize: 10, fontWeight: 500 }
       }));
 
@@ -134,7 +134,7 @@ export default function MindMapPage() {
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" width="1000" height="800" style="background:#fdfcfb;">
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="#B998D2" />
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#a1a1aa" />
           </marker>
         </defs>
         ${edges.map(e => {
@@ -143,7 +143,7 @@ export default function MindMapPage() {
           if (!sourceNode || !targetNode) return '';
           return `
             <path d="M ${sourceNode.position.x + 75} ${sourceNode.position.y + 20} L ${targetNode.position.x + 75} ${targetNode.position.y + 20}" 
-                  stroke="#B998D2" stroke-width="2" marker-end="url(#arrow)" />
+                  stroke="#a1a1aa" stroke-width="2" marker-end="url(#arrow)" />
             <text x="${(sourceNode.position.x + targetNode.position.x) / 2 + 75}" 
                   y="${(sourceNode.position.y + targetNode.position.y) / 2 + 15}" 
                   fill="#4c1d95" font-size="10" text-anchor="middle">${e.label || ''}</text>
@@ -151,7 +151,7 @@ export default function MindMapPage() {
         }).join('')}
         ${nodes.map(n => `
           <g transform="translate(${n.position.x}, ${n.position.y})">
-            <rect width="150" height="40" rx="10" fill="${n.type === 'input' ? '#4c1d95' : '#ffffff'}" stroke="#B998D2" stroke-width="1" />
+            <rect width="150" height="40" rx="10" fill="${n.type === 'input' ? '#4c1d95' : '#ffffff'}" stroke="#a1a1aa" stroke-width="1" />
             <text x="75" y="25" fill="${n.type === 'input' ? '#ffffff' : '#1e1b4b'}" font-size="11" font-weight="bold" text-anchor="middle">${n.data.label}</text>
           </g>
         `).join('')}
@@ -172,20 +172,20 @@ export default function MindMapPage() {
     <div className="h-full flex flex-col p-6 space-y-6 overflow-hidden max-h-[calc(100vh-40px)] z-10 relative">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-purple-950">Interactive Concept Map</h1>
-          <p className="text-purple-950/60 mt-1">Extract core subject hierarchies and linkages using generative AI</p>
+          <h1 className="text-3xl font-serif font-bold text-zinc-950 dark:text-zinc-50">Interactive Concept Map</h1>
+          <p className="text-zinc-950 dark:text-zinc-50/60 mt-1">Extract core subject hierarchies and linkages using generative AI</p>
         </div>
       </div>
 
       <div className="flex gap-4 shrink-0">
         <GlassCard className="p-3 flex items-center gap-4 border-white/40 shadow-sm flex-1">
-          <div className="flex items-center gap-2 text-xs font-semibold text-purple-950/70 uppercase">
+          <div className="flex items-center gap-2 text-xs font-semibold text-zinc-950 dark:text-zinc-50/70 uppercase">
             <BookOpen size={16} /> Select Source
           </div>
           <select
             value={selectedDocId}
             onChange={(e) => setSelectedDocId(e.target.value)}
-            className="px-3 py-1.5 bg-white/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-purple-950"
+            className="px-3 py-1.5 bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-zinc-950 dark:text-zinc-50"
           >
             <option value="">-- Select Syllabus PDF --</option>
             {documents.map((doc) => (
@@ -198,7 +198,7 @@ export default function MindMapPage() {
           <button
             disabled={loading || !selectedDocId}
             onClick={handleGenerateMindMap}
-            className="bg-purple-950 text-white text-xs font-sans font-semibold py-2 px-4 rounded-xl hover:bg-purple-900 transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+            className="bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white text-xs font-sans font-semibold py-2 px-4 rounded-xl hover:bg-zinc-900 dark:bg-zinc-100 transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
           >
             {loading ? (
               <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -215,13 +215,13 @@ export default function MindMapPage() {
           <GlassCard className="p-3 flex items-center gap-2 border-white/40 shadow-sm">
             <button
               onClick={handleExportJSON}
-              className="bg-white/60 hover:bg-white/80 border border-white/40 text-purple-950 text-xs font-semibold py-2 px-3 rounded-xl flex items-center gap-1 shadow-sm transition-all"
+              className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 border border-white/40 text-zinc-950 dark:text-zinc-50 text-xs font-semibold py-2 px-3 rounded-xl flex items-center gap-1 shadow-sm transition-all"
             >
               <Download size={13} /> JSON
             </button>
             <button
               onClick={handleExportSVG}
-              className="bg-white/60 hover:bg-white/80 border border-white/40 text-purple-950 text-xs font-semibold py-2 px-3 rounded-xl flex items-center gap-1 shadow-sm transition-all"
+              className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 border border-white/40 text-zinc-950 dark:text-zinc-50 text-xs font-semibold py-2 px-3 rounded-xl flex items-center gap-1 shadow-sm transition-all"
             >
               <Download size={13} /> SVG
             </button>
@@ -230,7 +230,7 @@ export default function MindMapPage() {
       </div>
 
       {/* React Flow Workspace */}
-      <div className="flex-1 min-h-[400px] relative rounded-3xl overflow-hidden border border-white/30 bg-white/20 backdrop-blur-[12px] shadow-inner">
+      <div className="flex-1 min-h-[400px] relative rounded-3xl overflow-hidden border border-white/30 bg-white dark:bg-zinc-950 dark:bg-zinc-50/20 backdrop-blur-[12px] shadow-inner">
         {nodes.length > 0 ? (
           <ReactFlow
             nodes={nodes}
@@ -239,18 +239,18 @@ export default function MindMapPage() {
             onEdgesChange={onEdgesChange}
             fitView
           >
-            <Background color="#B998D2" gap={16} size={1} />
-            <Controls className="!bg-white/80 !backdrop-blur-[10px] !border-white/40 !rounded-xl !shadow-lg text-purple-950" />
+            <Background color="#a1a1aa" gap={16} size={1} />
+            <Controls className="!bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 !backdrop-blur-[10px] !border-white/40 !rounded-xl !shadow-lg text-zinc-950 dark:text-zinc-50" />
             <MiniMap 
               nodeColor={(n) => n.type === 'input' ? 'rgba(76, 29, 149, 0.7)' : 'rgba(255, 255, 255, 0.7)'}
-              className="!bg-white/80 !backdrop-blur-[10px] !border-white/40 !rounded-xl !shadow-lg"
+              className="!bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 !backdrop-blur-[10px] !border-white/40 !rounded-xl !shadow-lg"
             />
           </ReactFlow>
         ) : (
-          <div className="absolute inset-0 flex flex-col justify-center items-center text-purple-950/50 p-6">
-            <Network size={54} className="text-purple-900/20 mb-3 animate-pulse" />
+          <div className="absolute inset-0 flex flex-col justify-center items-center text-zinc-950 dark:text-zinc-50/50 p-6">
+            <Network size={54} className="text-zinc-900 dark:text-zinc-100/20 mb-3 animate-pulse" />
             <p className="font-serif text-lg font-medium">Concept Map Viewer</p>
-            <p className="text-xs text-purple-950/40 mt-1">Select a document and click generate to draw the concept tree!</p>
+            <p className="text-xs text-zinc-950 dark:text-zinc-50/40 mt-1">Select a document and click generate to draw the concept tree!</p>
           </div>
         )}
       </div>

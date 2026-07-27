@@ -53,14 +53,14 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-[#FDFCFB] via-[#F7F1F8] to-[#D8BFD8]">
       {/* Visual background decorations */}
-      <div className="absolute top-[20%] left-[10%] w-[30vw] h-[30vw] rounded-full bg-[#B998D2]/10 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[20%] left-[10%] w-[30vw] h-[30vw] rounded-full bg-[#a1a1aa]/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[20%] right-[10%] w-[35vw] h-[35vw] rounded-full bg-[#E8D7EA]/30 blur-[150px] pointer-events-none" />
 
       <GlassCard className="w-full max-w-md p-8 md:p-10 shadow-[0_16px_48px_rgba(185,152,210,0.15)] border-white/30">
         <div className="flex flex-col items-center mb-8">
-          <Logo size={48} className="mb-4 shadow-lg shadow-purple-950/10 border-white/40" />
-          <h1 className="text-3xl font-serif font-semibold text-purple-950 tracking-tight">Reset Password</h1>
-          <p className="text-sm font-sans text-purple-950/60 mt-1">We will send you a recovery link</p>
+          <Logo size={48} className="mb-4 shadow-lg shadow-zinc-950/10 border-white/40" />
+          <h1 className="text-3xl font-serif font-semibold text-zinc-950 dark:text-zinc-50 tracking-tight">Reset Password</h1>
+          <p className="text-sm font-sans text-zinc-950 dark:text-zinc-50/60 mt-1">We will send you a recovery link</p>
         </div>
 
         {errorMessage && (
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-tr from-[#B998D2] to-[#c7addc] hover:shadow-lg hover:shadow-[#B998D2]/30 active:scale-[0.99] text-white font-semibold text-sm font-sans tracking-wide transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer mt-2"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-tr from-[#a1a1aa] to-[#c7addc] hover:shadow-lg hover:shadow-[#a1a1aa]/30 active:scale-[0.99] text-white font-semibold text-sm font-sans tracking-wide transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer mt-2"
           >
             {loading ? (
               <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -103,7 +103,7 @@ export default function ForgotPasswordPage() {
         <div className="mt-8 text-center">
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#B998D2] hover:text-purple-900 transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#a1a1aa] hover:text-zinc-900 dark:text-zinc-100 transition-colors"
           >
             <ArrowLeft size={16} />
             Back to Sign In

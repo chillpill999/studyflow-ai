@@ -97,7 +97,7 @@ const ThreeIconInner: React.FC<ThreeIconProps> = ({ name, trackRef, className = 
       {/* Local lighting rig so that reflections stand out on materials */}
       <ambientLight intensity={0.4} />
       <pointLight position={[5, 5, 5]} intensity={1.5} color="#ffffff" />
-      <pointLight position={[-5, -5, -5]} intensity={0.5} color="#b998d2" />
+      <pointLight position={[-5, -5, -5]} intensity={0.5} color="#a1a1aa" />
 
       <mesh
         ref={meshRef}

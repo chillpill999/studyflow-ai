@@ -178,8 +178,8 @@ export default function NotesPage() {
     <div className="h-full flex flex-col p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-40px)] z-10 relative">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-purple-950">AI Notes Generator</h1>
-          <p className="text-purple-950/60 mt-1">Generate beautifully structured revision sheets and detailed chapter summaries</p>
+          <h1 className="text-3xl font-serif font-bold text-zinc-950 dark:text-zinc-50">AI Notes Generator</h1>
+          <p className="text-zinc-950 dark:text-zinc-50/60 mt-1">Generate beautifully structured revision sheets and detailed chapter summaries</p>
         </div>
       </div>
 
@@ -187,18 +187,18 @@ export default function NotesPage() {
         {/* Sidebar settings */}
         <div className="space-y-6 lg:col-span-1">
           <GlassCard className="p-5 space-y-4">
-            <h2 className="text-lg font-serif font-semibold text-purple-950 flex items-center gap-2">
-              <Sparkles size={18} className="text-[#B998D2]" />
+            <h2 className="text-lg font-serif font-semibold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
+              <Sparkles size={18} className="text-[#a1a1aa]" />
               Generate Study Notes
             </h2>
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-purple-950/70 uppercase">Select Syllabus Document</label>
+                <label className="text-xs font-semibold text-zinc-950 dark:text-zinc-50/70 uppercase">Select Syllabus Document</label>
                 <select
                   value={selectedDocId}
                   onChange={(e) => setSelectedDocId(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 bg-white/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none focus:ring-1 focus:ring-purple-400 text-purple-950"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none focus:ring-1 focus:ring-zinc-400 text-zinc-950 dark:text-zinc-50"
                 >
                   <option value="">-- Select PDF Document --</option>
                   {documents.map((doc) => (
@@ -210,7 +210,7 @@ export default function NotesPage() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-purple-950/70 uppercase">Notes Mode</label>
+                <label className="text-xs font-semibold text-zinc-950 dark:text-zinc-50/70 uppercase">Notes Mode</label>
                 <div className="grid grid-cols-3 gap-2 mt-1">
                   {(['detailed', 'concise', 'summary'] as const).map((m) => (
                     <button
@@ -219,8 +219,8 @@ export default function NotesPage() {
                       className={`
                         py-1.5 rounded-lg text-xs font-sans capitalize transition-all border
                         ${mode === m
-                          ? 'bg-[#B998D2] text-white border-[#B998D2] shadow-sm'
-                          : 'bg-white/40 text-purple-950/80 border-white/20 hover:bg-white/60'
+                          ? 'bg-[#a1a1aa] text-white border-[#a1a1aa] shadow-sm'
+                          : 'bg-white dark:bg-zinc-950 dark:bg-zinc-50/40 text-zinc-950 dark:text-zinc-50/80 border-white/20 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/60'
                         }
                       `}
                     >
@@ -233,7 +233,7 @@ export default function NotesPage() {
               <button
                 disabled={loading || !selectedDocId}
                 onClick={handleGenerateNotes}
-                className="w-full mt-3 bg-purple-950 text-white font-sans font-medium text-sm py-2.5 rounded-xl hover:bg-purple-900 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                className="w-full mt-3 bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white font-sans font-medium text-sm py-2.5 rounded-xl hover:bg-zinc-900 dark:bg-zinc-100 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
               >
                 {loading ? (
                   <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -249,9 +249,9 @@ export default function NotesPage() {
 
           {/* List of saved notes */}
           <GlassCard className="p-5 space-y-4">
-            <h3 className="text-xs font-semibold text-purple-950/70 uppercase tracking-wider">Your Saved Notes</h3>
+            <h3 className="text-xs font-semibold text-zinc-950 dark:text-zinc-50/70 uppercase tracking-wider">Your Saved Notes</h3>
             {notes.length === 0 ? (
-              <div className="py-8 text-center text-sm text-purple-950/50">
+              <div className="py-8 text-center text-sm text-zinc-950 dark:text-zinc-50/50">
                 <FileText size={24} className="mx-auto mb-2 opacity-30" />
                 No study notes saved yet.
               </div>
@@ -264,14 +264,14 @@ export default function NotesPage() {
                     className={`
                       p-3 rounded-xl cursor-pointer transition-all border flex justify-between items-center group
                       ${selectedNote?.id === note.id
-                        ? 'bg-purple-950/5 border-purple-900/20 shadow-sm'
-                        : 'bg-white/20 border-white/10 hover:bg-white/40'
+                        ? 'bg-zinc-950 dark:bg-zinc-50/5 border-zinc-900/20 shadow-sm'
+                        : 'bg-white dark:bg-zinc-950 dark:bg-zinc-50/20 border-white/10 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/40'
                       }
                     `}
                   >
                     <div className="truncate pr-2">
-                      <div className="font-sans font-medium text-sm text-purple-950 truncate">{note.title}</div>
-                      <div className="text-[10px] text-purple-950/50 mt-0.5">
+                      <div className="font-sans font-medium text-sm text-zinc-950 dark:text-zinc-50 truncate">{note.title}</div>
+                      <div className="text-[10px] text-zinc-950 dark:text-zinc-50/50 mt-0.5">
                         {new Date(note.created_at).toLocaleDateString()}
                       </div>
                     </div>
@@ -285,7 +285,7 @@ export default function NotesPage() {
                       >
                         <Trash2 size={14} />
                       </button>
-                      <ChevronRight size={16} className="text-purple-950/30" />
+                      <ChevronRight size={16} className="text-zinc-950 dark:text-zinc-50/30" />
                     </div>
                   </div>
                 ))}
@@ -305,10 +305,10 @@ export default function NotesPage() {
                       type="text"
                       value={editedTitle}
                       onChange={(e) => setEditedTitle(e.target.value)}
-                      className="w-full text-2xl font-serif font-bold bg-white/60 border border-white/40 rounded-lg px-3 py-1 text-purple-950 focus:outline-none focus:ring-1 focus:ring-purple-400"
+                      className="w-full text-2xl font-serif font-bold bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-lg px-3 py-1 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                     />
                   ) : (
-                    <h2 className="text-2xl font-serif font-bold text-purple-950">{selectedNote.title}</h2>
+                    <h2 className="text-2xl font-serif font-bold text-zinc-950 dark:text-zinc-50">{selectedNote.title}</h2>
                   )}
                 </div>
 
@@ -331,7 +331,7 @@ export default function NotesPage() {
                   ) : (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="bg-white/60 hover:bg-white/80 text-purple-950 text-xs font-medium px-3 py-2 border border-white/40 rounded-xl transition-all flex items-center gap-1 shadow-sm"
+                      className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 text-zinc-950 dark:text-zinc-50 text-xs font-medium px-3 py-2 border border-white/40 rounded-xl transition-all flex items-center gap-1 shadow-sm"
                     >
                       <Edit3 size={13} />
                       Edit
@@ -340,7 +340,7 @@ export default function NotesPage() {
 
                   <button
                     onClick={handleCopyText}
-                    className="bg-white/60 hover:bg-white/80 text-purple-950 text-xs font-medium px-3 py-2 border border-white/40 rounded-xl transition-all flex items-center gap-1 shadow-sm"
+                    className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 text-zinc-950 dark:text-zinc-50 text-xs font-medium px-3 py-2 border border-white/40 rounded-xl transition-all flex items-center gap-1 shadow-sm"
                     title="Copy Markdown"
                   >
                     {copied ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
@@ -348,20 +348,20 @@ export default function NotesPage() {
                   </button>
 
                   <div className="relative group">
-                    <button className="bg-white/60 hover:bg-white/80 text-purple-950 text-xs font-medium px-3 py-2 border border-white/40 rounded-xl transition-all flex items-center gap-1 shadow-sm">
+                    <button className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 text-zinc-950 dark:text-zinc-50 text-xs font-medium px-3 py-2 border border-white/40 rounded-xl transition-all flex items-center gap-1 shadow-sm">
                       <Download size={13} />
                       Export
                     </button>
-                    <div className="absolute right-0 mt-1 w-32 bg-white rounded-xl shadow-lg border border-purple-950/10 py-1 hidden group-hover:block z-20">
+                    <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 rounded-xl shadow-lg border border-zinc-950/10 py-1 hidden group-hover:block z-20">
                       <button
                         onClick={handleExportMarkdown}
-                        className="w-full text-left px-4 py-2 text-xs text-purple-950 hover:bg-purple-50 transition-all"
+                        className="w-full text-left px-4 py-2 text-xs text-zinc-950 dark:text-zinc-50 hover:bg-zinc-50 dark:bg-zinc-900 transition-all"
                       >
                         Markdown (.md)
                       </button>
                       <button
                         onClick={handleExportPDF}
-                        className="w-full text-left px-4 py-2 text-xs text-purple-950 hover:bg-purple-50 transition-all"
+                        className="w-full text-left px-4 py-2 text-xs text-zinc-950 dark:text-zinc-50 hover:bg-zinc-50 dark:bg-zinc-900 transition-all"
                       >
                         PDF (.pdf)
                       </button>
@@ -374,19 +374,19 @@ export default function NotesPage() {
                 <textarea
                   value={editedContent}
                   onChange={(e) => setEditedContent(e.target.value)}
-                  className="w-full min-h-[400px] bg-white/60 border border-white/40 rounded-xl p-4 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-purple-400 text-purple-950 resize-y"
+                  className="w-full min-h-[400px] bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl p-4 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-zinc-400 text-zinc-950 dark:text-zinc-50 resize-y"
                 />
               ) : (
-                <div className="prose prose-purple max-w-none text-purple-950/80 font-sans min-h-[400px] overflow-y-auto whitespace-pre-wrap leading-relaxed select-text">
+                <div className="prose prose-purple max-w-none text-zinc-950 dark:text-zinc-50/80 font-sans min-h-[400px] overflow-y-auto whitespace-pre-wrap leading-relaxed select-text">
                   {selectedNote.content}
                 </div>
               )}
             </GlassCard>
           ) : (
-            <GlassCard className="p-8 text-center text-purple-950/50 min-h-[400px] flex flex-col justify-center items-center">
-              <BookOpen size={48} className="text-purple-900/20 mb-3 animate-pulse" />
+            <GlassCard className="p-8 text-center text-zinc-950 dark:text-zinc-50/50 min-h-[400px] flex flex-col justify-center items-center">
+              <BookOpen size={48} className="text-zinc-900 dark:text-zinc-100/20 mb-3 animate-pulse" />
               <p className="font-serif text-lg font-medium">No note selected or generated.</p>
-              <p className="text-xs text-purple-950/40 mt-1">Select a document and generate your study revision sheet above!</p>
+              <p className="text-xs text-zinc-950 dark:text-zinc-50/40 mt-1">Select a document and generate your study revision sheet above!</p>
             </GlassCard>
           )}
         </div>

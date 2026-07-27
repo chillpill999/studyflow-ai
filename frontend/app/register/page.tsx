@@ -100,7 +100,7 @@ export default function RegisterPage() {
       {/* Apple iOS Frosted Glass Ambient Light Background */}
       <FrostedGlassBackground />
 
-      <GlassCard className="w-full max-w-md p-8 md:p-10 border border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-2xl shadow-xl rounded-3xl relative z-10">
+      <GlassCard className="w-full max-w-md p-8 md:p-10 border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 dark:bg-zinc-900 dark:bg-zinc-100/80 backdrop-blur-2xl shadow-xl rounded-3xl relative z-10">
         <div className="flex flex-col items-center mb-8">
           <Logo size={48} className="mb-4 shadow-md border-white/50" />
           <h1 className="text-3xl font-serif font-semibold text-zinc-900 dark:text-white tracking-tight">
@@ -159,7 +159,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 active:scale-[0.99] font-semibold text-sm font-sans tracking-wide transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-md mt-2"
+            className="w-full py-3.5 rounded-xl bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 dark:text-zinc-50 active:scale-[0.99] font-semibold text-sm font-sans tracking-wide transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-md mt-2"
           >
             {loading ? (
               <span className="h-4 w-4 border-2 border-white dark:border-zinc-950 border-t-transparent rounded-full animate-spin" />
@@ -176,7 +176,7 @@ export default function RegisterPage() {
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-zinc-200 dark:border-zinc-800"></div>
           </div>
-          <span className="relative z-10 px-3 bg-white/0 backdrop-blur-none text-xs font-semibold font-sans text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
+          <span className="relative z-10 px-3 bg-white dark:bg-zinc-950 dark:bg-zinc-50/0 backdrop-blur-none text-xs font-semibold font-sans text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
             or continue with
           </span>
         </div>
@@ -184,7 +184,7 @@ export default function RegisterPage() {
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full py-3.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-700 active:scale-[0.99] text-zinc-900 dark:text-white font-semibold text-sm font-sans transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer shadow-sm"
+          className="w-full py-3.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 dark:bg-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-700 active:scale-[0.99] text-zinc-900 dark:text-white font-semibold text-sm font-sans transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer shadow-sm"
         >
           <GoogleIcon />
           Sign up with Google

@@ -70,7 +70,7 @@ export const ENGINE_CONFIG = {
     hemisphere: {
       intensity: 0.4,
       skyColor: '#ffffff',
-      groundColor: '#b998d2',
+      groundColor: '#a1a1aa',
     },
     directional: {
       intensity: 1.2,
@@ -81,7 +81,7 @@ export const ENGINE_CONFIG = {
 
   // Theme Color Mappings
   THEME_MAPPINGS: {
-    accent: '#B998D2',
+    accent: '#a1a1aa',
     accentDark: '#7C3AED',
     glowColor: '#E8D7EA',
     ambientColor: '#F7F1F8',

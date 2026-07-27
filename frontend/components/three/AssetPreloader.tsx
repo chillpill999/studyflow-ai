@@ -37,20 +37,20 @@ export const AssetPreloader: React.FC<AssetPreloaderProps> = ({ onComplete }) =>
 
   const content = (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/10 backdrop-blur-2xl z-[9999] transition-opacity duration-700">
-      <div className="flex flex-col items-center gap-6 max-w-sm text-center px-8 py-8 rounded-3xl border border-white/30 bg-white/20 shadow-2xl backdrop-blur-md">
+      <div className="flex flex-col items-center gap-6 max-w-sm text-center px-8 py-8 rounded-3xl border border-white/30 bg-white dark:bg-zinc-950 dark:bg-zinc-50/20 shadow-2xl backdrop-blur-md">
         {/* Animated Floating Logo */}
-        <Logo size={80} blend={true} className="shadow-2xl shadow-purple-950/20 border-white/30 animate-logo-float" />
+        <Logo size={80} blend={true} className="shadow-2xl shadow-zinc-950/20 border-white/30 animate-logo-float" />
 
         <div className="space-y-3 w-full">
-          <div className="flex justify-between text-[10px] font-bold font-sans text-purple-950/70 uppercase tracking-widest px-1">
+          <div className="flex justify-between text-[10px] font-bold font-sans text-zinc-950 dark:text-zinc-50/70 uppercase tracking-widest px-1">
             <span>Precompiling 3D Materials...</span>
             <span>{Math.round(displayProgress)}%</span>
           </div>
 
           {/* Frosted loading slider bar */}
-          <div className="w-64 h-1.5 bg-purple-950/5 rounded-full overflow-hidden border border-white/20 relative backdrop-blur-sm">
+          <div className="w-64 h-1.5 bg-zinc-950 dark:bg-zinc-50/5 rounded-full overflow-hidden border border-white/20 relative backdrop-blur-sm">
             <div
-              className="h-full bg-gradient-to-r from-[#B998D2] to-purple-800 rounded-full transition-all duration-300"
+              className="h-full bg-gradient-to-r from-[#a1a1aa] to-zinc-800 rounded-full transition-all duration-300"
               style={{ width: `${displayProgress}%` }}
             />
           </div>
@@ -63,8 +63,8 @@ export const AssetPreloader: React.FC<AssetPreloaderProps> = ({ onComplete }) =>
         )}
 
         <div className="flex items-center gap-2">
-          <Loader2 size={12} className="animate-spin text-[#B998D2]" />
-          <span className="text-[9px] font-sans font-semibold text-purple-950/50 uppercase tracking-wider">
+          <Loader2 size={12} className="animate-spin text-[#a1a1aa]" />
+          <span className="text-[9px] font-sans font-semibold text-zinc-950 dark:text-zinc-50/50 uppercase tracking-wider">
             Optimizing GPU Pipeline
           </span>
         </div>

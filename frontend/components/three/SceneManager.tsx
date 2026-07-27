@@ -73,7 +73,7 @@ export const SceneManager: React.FC<SceneManagerProps> = ({ children }) => {
     return (
       <div className="absolute inset-0 bg-gradient-to-br from-[#FDFCFB] via-[#F7F1F8] to-[#D8BFD8] pointer-events-none z-0">
         {/* Soft static blur spots */}
-        <div className="absolute top-[20%] left-[10%] w-[35vw] h-[35vw] rounded-full bg-[#B998D2]/10 blur-[100px]" />
+        <div className="absolute top-[20%] left-[10%] w-[35vw] h-[35vw] rounded-full bg-[#a1a1aa]/10 blur-[100px]" />
         <div className="absolute bottom-[20%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-[#E8D7EA]/30 blur-[130px]" />
       </div>
     );
@@ -175,7 +175,7 @@ class SceneErrorBoundary extends React.Component<
       // Static fallback — same as the WebGL-unsupported branch
       return (
         <div className="absolute inset-0 bg-gradient-to-br from-[#FDFCFB] via-[#F7F1F8] to-[#D8BFD8] pointer-events-none z-0">
-          <div className="absolute top-[20%] left-[10%] w-[35vw] h-[35vw] rounded-full bg-[#B998D2]/10 blur-[100px]" />
+          <div className="absolute top-[20%] left-[10%] w-[35vw] h-[35vw] rounded-full bg-[#a1a1aa]/10 blur-[100px]" />
           <div className="absolute bottom-[20%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-[#E8D7EA]/30 blur-[130px]" />
         </div>
       );

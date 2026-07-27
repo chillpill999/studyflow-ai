@@ -143,8 +143,8 @@ export default function PlannerPage() {
     <div className="h-full flex flex-col p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-40px)] z-10 relative">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-purple-950">AI Study Planner</h1>
-          <p className="text-purple-950/60 mt-1">Structure study modules, track milestones, and manage tasks leading to exam dates</p>
+          <h1 className="text-3xl font-serif font-bold text-zinc-950 dark:text-zinc-50">AI Study Planner</h1>
+          <p className="text-zinc-950 dark:text-zinc-50/60 mt-1">Structure study modules, track milestones, and manage tasks leading to exam dates</p>
         </div>
       </div>
 
@@ -152,18 +152,18 @@ export default function PlannerPage() {
         {/* Scheduler controls sidebar */}
         <div className="space-y-6 lg:col-span-1">
           <GlassCard className="p-5 space-y-4">
-            <h2 className="text-sm font-semibold text-purple-950 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles size={16} className="text-[#B998D2]" />
+            <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles size={16} className="text-[#a1a1aa]" />
               Schedule Study Plan
             </h2>
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-purple-950/70">Source Document</label>
+                <label className="text-xs font-semibold text-zinc-950 dark:text-zinc-50/70">Source Document</label>
                 <select
                   value={selectedDocId}
                   onChange={(e) => setSelectedDocId(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 bg-white/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-purple-950"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-zinc-950 dark:text-zinc-50"
                 >
                   <option value="">-- Choose Syllabus PDF --</option>
                   {documents.map((doc) => (
@@ -175,31 +175,31 @@ export default function PlannerPage() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-purple-950/70">Target Exam Date</label>
+                <label className="text-xs font-semibold text-zinc-950 dark:text-zinc-50/70">Target Exam Date</label>
                 <input
                   type="date"
                   value={examDate}
                   onChange={(e) => setExamDate(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 bg-white/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-purple-950"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-zinc-950 dark:text-zinc-50"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-purple-950/70">Daily Study Budget (Hours)</label>
+                <label className="text-xs font-semibold text-zinc-950 dark:text-zinc-50/70">Daily Study Budget (Hours)</label>
                 <input
                   type="number"
                   min="0.5"
                   step="0.5"
                   value={studyHours}
                   onChange={(e) => setStudyHours(parseFloat(e.target.value))}
-                  className="w-full mt-1 px-3 py-2 bg-white/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-purple-950"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl text-sm font-sans focus:outline-none text-zinc-950 dark:text-zinc-50"
                 />
               </div>
 
               <button
                 disabled={loading || !selectedDocId || !examDate}
                 onClick={handleGeneratePlan}
-                className="w-full mt-2 bg-purple-950 text-white font-sans font-medium text-xs py-2.5 rounded-xl hover:bg-purple-900 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                className="w-full mt-2 bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white font-sans font-medium text-xs py-2.5 rounded-xl hover:bg-zinc-900 dark:bg-zinc-100 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
               >
                 {loading ? (
                   <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -214,10 +214,10 @@ export default function PlannerPage() {
           </GlassCard>
 
           <GlassCard className="p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-purple-950 uppercase tracking-wider">Quick Actions</h3>
+            <h3 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50 uppercase tracking-wider">Quick Actions</h3>
             <button
               onClick={() => setIsCreating(true)}
-              className="w-full bg-white/60 hover:bg-white/80 border border-white/40 text-purple-950 font-sans font-medium text-xs py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm"
+              className="w-full bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/80 border border-white/40 text-zinc-950 dark:text-zinc-50 font-sans font-medium text-xs py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm"
             >
               <Plus size={14} />
               Add Custom Task
@@ -229,15 +229,15 @@ export default function PlannerPage() {
         <div className="lg:col-span-3 space-y-6">
           {/* Custom creation form overlay */}
           {isCreating && (
-            <GlassCard className="p-5 space-y-4 border-purple-950/10">
-              <h3 className="text-md font-serif font-semibold text-purple-950">Add Custom Study Task</h3>
+            <GlassCard className="p-5 space-y-4 border-zinc-950/10">
+              <h3 className="text-md font-serif font-semibold text-zinc-950 dark:text-zinc-50">Add Custom Study Task</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <input
                     placeholder="Task Title (e.g. Read Physics Chapter 3)"
                     value={taskTitle}
                     onChange={(e) => setTaskTitle(e.target.value)}
-                    className="w-full bg-white/60 border border-white/40 rounded-xl px-3 py-2 text-sm font-sans focus:outline-none text-purple-950"
+                    className="w-full bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl px-3 py-2 text-sm font-sans focus:outline-none text-zinc-950 dark:text-zinc-50"
                   />
                 </div>
                 <div className="col-span-2">
@@ -245,15 +245,15 @@ export default function PlannerPage() {
                     placeholder="Requirements/Description details..."
                     value={taskDesc}
                     onChange={(e) => setTaskDesc(e.target.value)}
-                    className="w-full bg-white/60 border border-white/40 rounded-xl px-3 py-2 text-sm font-sans focus:outline-none text-purple-950 h-20 resize-none"
+                    className="w-full bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl px-3 py-2 text-sm font-sans focus:outline-none text-zinc-950 dark:text-zinc-50 h-20 resize-none"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-purple-950/60 block mb-1">Priority</label>
+                  <label className="text-[10px] uppercase font-bold text-zinc-950 dark:text-zinc-50/60 block mb-1">Priority</label>
                   <select
                     value={taskPriority}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setTaskPriority(e.target.value as 'low' | 'medium' | 'high' | 'urgent')}
-                    className="w-full bg-white/60 border border-white/40 rounded-xl px-3 py-2 text-xs font-sans text-purple-950 focus:outline-none"
+                    className="w-full bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl px-3 py-2 text-xs font-sans text-zinc-950 dark:text-zinc-50 focus:outline-none"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -262,25 +262,25 @@ export default function PlannerPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-purple-950/60 block mb-1">Due Date</label>
+                  <label className="text-[10px] uppercase font-bold text-zinc-950 dark:text-zinc-50/60 block mb-1">Due Date</label>
                   <input
                     type="date"
                     value={taskDueDate}
                     onChange={(e) => setTaskDueDate(e.target.value)}
-                    className="w-full bg-white/60 border border-white/40 rounded-xl px-3 py-2 text-xs font-sans text-purple-950 focus:outline-none"
+                    className="w-full bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 rounded-xl px-3 py-2 text-xs font-sans text-zinc-950 dark:text-zinc-50 focus:outline-none"
                   />
                 </div>
               </div>
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setIsCreating(false)}
-                  className="text-xs text-purple-950/60 hover:text-purple-950 px-4 py-2"
+                  className="text-xs text-zinc-950 dark:text-zinc-50/60 hover:text-zinc-950 dark:text-zinc-50 px-4 py-2"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateTask}
-                  className="bg-purple-950 text-white text-xs font-medium px-4 py-2 rounded-xl shadow-sm"
+                  className="bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-900 text-white text-xs font-medium px-4 py-2 rounded-xl shadow-sm"
                 >
                   Save Task
                 </button>
@@ -292,12 +292,12 @@ export default function PlannerPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* TO DO */}
             <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-purple-950/10 pb-2">
-                <h3 className="text-sm font-serif font-bold text-purple-950 flex items-center gap-1.5">
+              <div className="flex justify-between items-center border-b border-zinc-950/10 pb-2">
+                <h3 className="text-sm font-serif font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-1.5">
                   <AlertCircle size={15} className="text-red-500" />
                   To Do
                 </h3>
-                <span className="bg-white/60 border border-white/40 text-[10px] font-sans font-semibold text-purple-950 px-2 py-0.5 rounded-full">
+                <span className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 text-[10px] font-sans font-semibold text-zinc-950 dark:text-zinc-50 px-2 py-0.5 rounded-full">
                   {todoTasks.length}
                 </span>
               </div>
@@ -310,12 +310,12 @@ export default function PlannerPage() {
 
             {/* IN PROGRESS */}
             <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-purple-950/10 pb-2">
-                <h3 className="text-sm font-serif font-bold text-purple-950 flex items-center gap-1.5">
+              <div className="flex justify-between items-center border-b border-zinc-950/10 pb-2">
+                <h3 className="text-sm font-serif font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-1.5">
                   <Clock size={15} className="text-orange-500" />
                   In Progress
                 </h3>
-                <span className="bg-white/60 border border-white/40 text-[10px] font-sans font-semibold text-purple-950 px-2 py-0.5 rounded-full">
+                <span className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 text-[10px] font-sans font-semibold text-zinc-950 dark:text-zinc-50 px-2 py-0.5 rounded-full">
                   {inProgressTasks.length}
                 </span>
               </div>
@@ -328,12 +328,12 @@ export default function PlannerPage() {
 
             {/* DONE */}
             <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-purple-950/10 pb-2">
-                <h3 className="text-sm font-serif font-bold text-purple-950 flex items-center gap-1.5">
+              <div className="flex justify-between items-center border-b border-zinc-950/10 pb-2">
+                <h3 className="text-sm font-serif font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-1.5">
                   <CheckCircle2 size={15} className="text-green-600" />
                   Completed
                 </h3>
-                <span className="bg-white/60 border border-white/40 text-[10px] font-sans font-semibold text-purple-950 px-2 py-0.5 rounded-full">
+                <span className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 border border-white/40 text-[10px] font-sans font-semibold text-zinc-950 dark:text-zinc-50 px-2 py-0.5 rounded-full">
                   {doneTasks.length}
                 </span>
               </div>
@@ -373,24 +373,24 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onTransition, onDelete }) => 
         </span>
         <button
           onClick={() => onDelete(task.id)}
-          className="text-purple-950/40 hover:text-red-600 transition-colors p-1"
+          className="text-zinc-950 dark:text-zinc-50/40 hover:text-red-600 transition-colors p-1"
         >
           <Trash2 size={12} />
         </button>
       </div>
 
       <div>
-        <h4 className="text-xs font-sans font-bold text-purple-950 leading-snug">{task.title}</h4>
+        <h4 className="text-xs font-sans font-bold text-zinc-950 dark:text-zinc-50 leading-snug">{task.title}</h4>
         {task.description && (
-          <p className="text-[10px] text-purple-950/60 mt-1 select-text line-clamp-2">{task.description}</p>
+          <p className="text-[10px] text-zinc-950 dark:text-zinc-50/60 mt-1 select-text line-clamp-2">{task.description}</p>
         )}
       </div>
 
-      <div className="flex justify-between items-center border-t border-white/10 pt-2 text-[10px] text-purple-950/50">
+      <div className="flex justify-between items-center border-t border-white/10 pt-2 text-[10px] text-zinc-950 dark:text-zinc-50/50">
         <span>Due: {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No limit'}</span>
         <button
           onClick={() => onTransition(task.id, task.status)}
-          className="bg-white/60 hover:bg-white/90 text-purple-950 border border-white/40 px-2.5 py-1 rounded-lg flex items-center gap-1 text-[9px] font-semibold transition-all shadow-sm"
+          className="bg-white dark:bg-zinc-950 dark:bg-zinc-50/60 hover:bg-white dark:bg-zinc-950 dark:bg-zinc-50/90 text-zinc-950 dark:text-zinc-50 border border-white/40 px-2.5 py-1 rounded-lg flex items-center gap-1 text-[9px] font-semibold transition-all shadow-sm"
         >
           {task.status === 'done' ? (
             <>

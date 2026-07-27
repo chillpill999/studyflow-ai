@@ -61,7 +61,7 @@ export class PlannerPage {
   }
 
   async getTaskTitles(): Promise<string[]> {
-    return this.page.locator('[class*="font-bold"][class*="text-purple-950"]').allTextContents();
+    return this.page.locator('[class*="font-bold"][class*="text-zinc-950 dark:text-zinc-50"]').allTextContents();
   }
 
   async isTaskVisible(title: string): Promise<boolean> {

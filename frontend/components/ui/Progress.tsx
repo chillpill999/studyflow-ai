@@ -10,9 +10,9 @@ export const Progress: React.FC<ProgressProps> = ({ value, className = '' }) => 
   const clampedValue = Math.min(Math.max(value, 0), 100);
 
   return (
-    <div className={`w-full h-2 bg-purple-950/5 rounded-full overflow-hidden border border-white/20 relative backdrop-blur-sm ${className}`}>
+    <div className={`w-full h-2 bg-zinc-950 dark:bg-zinc-50/5 rounded-full overflow-hidden border border-white/20 relative backdrop-blur-sm ${className}`}>
       <div
-        className="h-full bg-gradient-to-r from-[#B998D2] to-[#c7addc] rounded-full transition-all duration-300 ease-out"
+        className="h-full bg-gradient-to-r from-[#a1a1aa] to-[#c7addc] rounded-full transition-all duration-300 ease-out"
         style={{ width: `${clampedValue}%` }}
       />
     </div>
