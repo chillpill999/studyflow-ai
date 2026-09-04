@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { createClient } from '@/lib/supabaseServer';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60; // Prevent Vercel timeout on large doc summarization
@@ -80,6 +81,13 @@ async function getSummaryFromGroq(text: string, groqKey: string): Promise<{ titl
 }
 
 export async function POST(req: Request) {
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized. Please log in.' }, { status: 401 });
+  }
+
   const groqKey = process.env.GROQ_API_KEY;
   const geminiKey = process.env.GEMINI_API_KEY;
 
@@ -99,8 +107,6 @@ export async function POST(req: Request) {
     const contentType = req.headers.get('content-type') || '';
 
     if (contentType.includes('application/json')) {
-      // --- CLIENT-SIDE PARSED PATH (PDFs) ---
-      // The browser already extracted text using unpdf; no file binary to parse.
       const body = await req.json();
       rawText = body.text || '';
       filename = body.filename || 'document.pdf';
@@ -112,7 +118,6 @@ export async function POST(req: Request) {
         );
       }
     } else {
-      // --- LEGACY FORMDATA PATH (images, txt, docx, pptx, and fallback) ---
       const formData = await req.formData();
       const file = formData.get('file') as File | null;
 
@@ -162,7 +167,6 @@ export async function POST(req: Request) {
             rawText = `[Image file: ${file.name}] Image text extraction requires OPENROUTER_API_KEY to be configured. Please upload a PDF or text file instead.`;
           }
         } else if (mimeType === 'application/pdf') {
-          // Server-side PDF fallback (for files under 4.5 MB that somehow bypass client parsing)
           const { extractText, getDocumentProxy } = await import('unpdf');
           const pdf = await getDocumentProxy(new Uint8Array(buffer));
           const { text } = await extractText(pdf, { mergePages: true });
@@ -183,7 +187,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // --- SUMMARIZATION (shared by both paths) ---
+    // --- SUMMARIZATION ---
     let parsedSummary;
     try {
       if (geminiKey) {
@@ -259,14 +263,30 @@ Summary: ${s.summary}`).join('\n\n')}`;
       return NextResponse.json({ error: 'Failed to summarize document: ' + (summarizeErr.message || '') }, { status: 502 });
     }
 
-    const documentIdPlaceholder = 'doc_' + Date.now();
+    const chunks = chunkText(rawText);
+    const fileExtension = filename.includes('.') ? filename.split('.').pop() || 'pdf' : 'pdf';
+
+    // INSERT into Supabase
+    const { data: insertedDoc, error: dbError } = await supabase.from('documents').insert({
+      user_id: user.id,
+      filename: filename,
+      file_type: fileExtension,
+      text_content: rawText,
+      summary: parsedSummary,
+      chunks: chunks
+    }).select('id').single();
+
+    if (dbError) {
+      console.error('Database Error:', dbError);
+      return NextResponse.json({ error: 'Failed to save document to database.' }, { status: 500 });
+    }
 
     return NextResponse.json({
       success: true,
-      documentId: documentIdPlaceholder,
+      documentId: insertedDoc.id,
       summary: parsedSummary,
-      text_content: rawText,
-      chunks: chunkText(rawText)
+      text_content: rawText, // Optionally return to frontend if needed instantly, but store is updated
+      chunks: chunks
     });
   } catch (err: any) {
     console.error('Process Route General Error:', err);

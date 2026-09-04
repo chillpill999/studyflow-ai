@@ -133,24 +133,24 @@ export default function StudyTools() {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8 text-black">
       
       {/* Title */}
-      <div>
-        <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
-          Study Workspace Suite
-          <span className="text-xs text-indigo-400 font-semibold border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 rounded-full">AI Tools</span>
+      <div className="bg-neo-magenta border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <h1 className="text-4xl font-black uppercase tracking-tight flex items-center gap-4">
+          Workspace Suite
+          <span className="text-base bg-white border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-bold">AI Tools</span>
         </h1>
-        <p className="text-white/50 text-sm mt-1">Select from flashcards, quizzes, custom tutoring, or visual study planning models.</p>
+        <p className="font-bold mt-4 text-lg">Select from flashcards, quizzes, custom tutoring, or visual study planning models.</p>
       </div>
 
       {/* Tabs Menu */}
-      <div className="flex justify-between items-center border-b border-white/8 pb-1 mb-4">
-        <div className="flex gap-4 overflow-x-auto">
+      <div className="flex border-b-4 border-black pb-0 mb-8 bg-white border-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div className="flex w-full overflow-x-auto custom-scrollbar">
           {[
-            { id: 'flashcards', name: 'Flashcard Decks', icon: Layers },
-            { id: 'quiz', name: 'Practice Quizzes', icon: HelpCircle },
-            { id: 'planner', name: 'Study Planner', icon: Calendar },
+            { id: 'flashcards', name: 'Flashcard Decks', icon: Layers, color: 'bg-neo-cyan' },
+            { id: 'quiz', name: 'Practice Quizzes', icon: HelpCircle, color: 'bg-neo-yellow' },
+            { id: 'planner', name: 'Study Planner', icon: Calendar, color: 'bg-neo-green' },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -159,14 +159,14 @@ export default function StudyTools() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as 'flashcards' | 'quiz' | 'planner')}
                 className={`
-                  flex items-center gap-2 px-4 py-3 font-semibold text-sm whitespace-nowrap border-b-2 cursor-pointer transition-all duration-300
+                  flex-1 flex items-center justify-center gap-3 px-6 py-4 font-black uppercase text-lg border-r-4 border-black last:border-r-0 cursor-pointer transition-colors
                   ${isActive 
-                    ? 'border-indigo-500 text-white' 
-                    : 'border-transparent text-white/50 hover:text-white'
+                    ? `${tab.color} border-b-4 border-b-black shadow-[inset_0_-4px_0_0_rgba(0,0,0,1)]` 
+                    : 'bg-white hover:bg-gray-100'
                   }
                 `}
               >
-                <Icon size={16} />
+                <Icon size={24} strokeWidth={3} />
                 {tab.name}
               </button>
             );
@@ -175,7 +175,7 @@ export default function StudyTools() {
       </div>
 
       {/* Tab Contents */}
-      <div className="min-h-[500px]">
+      <div className="min-h-[600px]">
         <AnimatePresence mode="wait">
           
           {/* FLASHCARDS TAB */}
@@ -188,21 +188,23 @@ export default function StudyTools() {
               className="grid grid-cols-1 lg:grid-cols-3 gap-8"
             >
               {/* Generator Settings panel */}
-              <div className="glass-card p-6 rounded-2xl h-fit space-y-4">
-                <h3 className="text-md font-bold text-white flex items-center gap-2">
-                  <Layers size={16} className="text-indigo-400" />
-                  Flashcard Generator
+              <div className="neo-box bg-white p-6 h-fit space-y-6">
+                <h3 className="text-2xl font-black uppercase flex items-center gap-3 border-b-4 border-black pb-4">
+                  <div className="bg-neo-cyan border-2 border-black p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <Layers size={24} strokeWidth={3} />
+                  </div>
+                  Generator
                 </h3>
-                <p className="text-xs text-white/50 leading-relaxed">
+                <p className="font-bold">
                   Generate active recall flashcards directly from document concepts. Cards are integrated with the Leitner Spaced Repetition box scheduler.
                 </p>
 
-                <div className="space-y-3 pt-2">
-                  <label className="block text-xs text-white/40 uppercase tracking-wider font-semibold">Select Document Source</label>
+                <div className="space-y-4 pt-4 border-t-4 border-black mt-4">
+                  <label className="block font-black uppercase">Select Document Source</label>
                   <select 
                     value={selectedDocId} 
                     onChange={(e) => { setSelectedDocId(e.target.value); setCurrentCardIdx(0); setIsFlipped(false); }}
-                    className="w-full bg-[#030712] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white/85 focus:outline-none focus:border-indigo-500"
+                    className="w-full neo-input"
                   >
                     <option value="">All Flashcard Decks</option>
                     {documents.map((doc) => (
@@ -214,81 +216,78 @@ export default function StudyTools() {
                     <button
                       onClick={handleGenerateCards}
                       disabled={loading}
-                      className="w-full bg-gradient-primary hover:scale-[1.01] hover:shadow-lg hover:shadow-indigo-600/20 py-2.5 rounded-xl text-xs font-semibold text-white transition-all cursor-pointer disabled:opacity-50"
+                      className="neo-button w-full bg-neo-magenta hover:bg-white flex justify-center py-4 text-lg disabled:opacity-50 mt-4"
                     >
-                      {loading ? 'Synthesizing Decks...' : 'Generate New Decks with AI'}
+                      {loading ? 'Synthesizing...' : 'Generate Decks'}
                     </button>
                   )}
                 </div>
               </div>
 
               {/* Interactive Flipping Card Panel */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-2 space-y-8">
                 {activeCards.length === 0 ? (
-                  <div className="text-center py-20 border border-white/5 rounded-2xl bg-white/3">
-                    <Layers className="mx-auto text-white/10 h-10 w-10 mb-2" />
-                    <p className="text-white/60 font-semibold text-sm">No flashcards in deck</p>
-                    <p className="text-white/30 text-xs mt-1">Choose a document on the left and click &apos;Generate&apos; to create cards.</p>
+                  <div className="neo-box bg-neo-yellow p-12 text-center flex flex-col items-center">
+                    <div className="bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">
+                      <Layers className="h-16 w-16" strokeWidth={2} />
+                    </div>
+                    <p className="text-3xl font-black uppercase mb-4">No flashcards in deck</p>
+                    <p className="font-bold text-lg max-w-md">Choose a document on the left and click 'Generate' to create cards.</p>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-6">
+                  <div className="flex flex-col items-center gap-8">
                     {/* Card container */}
                     <div 
                       onClick={() => setIsFlipped(!isFlipped)}
-                      className="w-full max-w-2xl min-h-[380px] cursor-pointer perspective-1000 group"
+                      className="w-full max-w-2xl min-h-[450px] cursor-pointer perspective-1000 group relative"
                     >
                       <motion.div 
                         animate={{ rotateY: isFlipped ? 180 : 0 }}
-                        transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
                         className="w-full h-full relative preserve-3d transition-transform duration-500"
                       >
                         {/* Front Side */}
-                        <div className="absolute inset-0 w-full h-full rounded-2xl p-8 flex flex-col justify-between glass-card backface-hidden border-t border-white/20 overflow-hidden">
-                          {/* Premium glow effect */}
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-[var(--accent-primary)]/10 blur-[50px] pointer-events-none rounded-full" />
+                        <div className="absolute inset-0 w-full h-full neo-box bg-white p-10 flex flex-col justify-between backface-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                           
-                          <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest relative z-10">
-                            <span className="text-[var(--accent-secondary)] flex items-center gap-2">
-                              <Layers size={14} /> Concept Question
+                          <div className="flex justify-between items-center font-black uppercase border-b-4 border-black pb-4">
+                            <span className="flex items-center gap-2 bg-neo-cyan border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                              <Layers size={18} strokeWidth={3} /> Concept
                             </span>
-                            <span className="bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/30 text-[var(--accent-secondary)] px-3 py-1 rounded-full backdrop-blur-md">
+                            <span className="bg-neo-magenta border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                               Box {activeCards[currentCardIdx]?.box}
                             </span>
                           </div>
                           
-                          <div className="flex-1 flex items-center justify-center overflow-y-auto my-6 px-4 relative z-10">
-                            <p className="text-center text-2xl font-semibold text-white/95 whitespace-pre-wrap leading-snug drop-shadow-md">
+                          <div className="flex-1 flex items-center justify-center overflow-y-auto my-8">
+                            <p className="text-center text-4xl font-black uppercase leading-tight">
                               {activeCards[currentCardIdx]?.question}
                             </p>
                           </div>
                           
-                          <div className="text-center text-xs text-white/40 font-medium tracking-wide uppercase flex items-center justify-center gap-2 relative z-10 group-hover:text-[var(--accent-secondary)] transition-colors">
-                            <RefreshCw size={14} className="group-hover:animate-spin-slow" /> Click to reveal answer
+                          <div className="text-center font-bold uppercase flex items-center justify-center gap-3 border-t-4 border-black pt-4 bg-neo-yellow border-2 p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-colors">
+                            <RefreshCw size={20} strokeWidth={3} /> Click to reveal answer
                           </div>
                         </div>
 
                         {/* Back Side */}
                         <div 
-                          className="absolute inset-0 w-full h-full rounded-2xl p-8 flex flex-col justify-between glass-card backface-hidden rotateY-180 border-t border-[var(--accent-primary)]/40 overflow-hidden"
-                          style={{ background: 'rgba(20, 20, 30, 0.95)' }}
+                          className="absolute inset-0 w-full h-full neo-box bg-neo-green p-10 flex flex-col justify-between backface-hidden rotateY-180 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
                         >
-                          {/* Premium glow effect */}
-                          <div className="absolute bottom-0 right-0 w-1/2 h-40 bg-[var(--accent-primary)]/15 blur-[60px] pointer-events-none rounded-full" />
                           
-                          <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest relative z-10">
-                            <span className="text-[var(--accent-primary)] flex items-center gap-2">
-                              <Sparkles size={14} /> Answer & Explanation
+                          <div className="flex justify-between items-center font-black uppercase border-b-4 border-black pb-4">
+                            <span className="flex items-center gap-2 bg-white border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                              <Sparkles size={18} strokeWidth={3} /> Answer
                             </span>
-                            <span className="text-white/40">
+                            <span className="bg-white border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                               Spaced Repetition
                             </span>
                           </div>
                           
-                          <div className="flex-1 overflow-y-auto my-6 px-2 text-left text-base leading-relaxed text-white/85 whitespace-pre-wrap font-medium relative z-10 custom-scrollbar">
+                          <div className="flex-1 overflow-y-auto my-8 text-left text-2xl font-bold leading-relaxed whitespace-pre-wrap custom-scrollbar bg-white border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                             {activeCards[currentCardIdx]?.answer}
                           </div>
                           
-                          <div className="text-center text-xs text-white/30 font-medium tracking-wide uppercase relative z-10">
+                          <div className="text-center font-black uppercase border-t-4 border-black pt-4">
                             Click anywhere to flip back
                           </div>
                         </div>
@@ -296,10 +295,10 @@ export default function StudyTools() {
                     </div>
 
                     {/* Progress indicator */}
-                    <div className="flex items-center gap-4 text-xs text-white/40 font-bold uppercase tracking-widest mt-4">
-                      <span>Card {currentCardIdx + 1} <span className="text-white/20 mx-1">/</span> {activeCards.length}</span>
-                      <div className="h-1.5 w-32 bg-white/10 rounded-full overflow-hidden shadow-inner">
-                        <div className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] h-full transition-all duration-500 ease-out" style={{ width: `${((currentCardIdx + 1) / activeCards.length) * 100}%` }} />
+                    <div className="flex items-center gap-6 font-black uppercase w-full max-w-2xl bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <span className="whitespace-nowrap">Card {currentCardIdx + 1} / {activeCards.length}</span>
+                      <div className="flex-1 h-6 bg-white border-4 border-black overflow-hidden relative shadow-[inset_4px_4px_0px_0px_rgba(0,0,0,0.2)]">
+                        <div className="bg-neo-magenta h-full transition-all duration-500 border-r-4 border-black" style={{ width: `${((currentCardIdx + 1) / activeCards.length) * 100}%` }} />
                       </div>
                     </div>
 
@@ -308,20 +307,21 @@ export default function StudyTools() {
                       <motion.div 
                         initial={{ opacity: 0, y: 15, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="flex gap-4 max-w-sm w-full mt-2"
+                        className="flex gap-6 w-full max-w-2xl"
                       >
                         <button
                           onClick={() => handleCardReview('hard')}
-                          className="flex-1 py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 hover:border-red-500/50 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(239,68,68,0.15)] flex items-center justify-center gap-2"
+                          className="neo-button flex-1 py-4 bg-red-500 hover:bg-white text-black flex justify-center gap-3"
                         >
-                          <X size={16} /> Hard (Review Soon)
+                          <X size={24} strokeWidth={4} /> 
+                          <span className="text-xl">Hard</span>
                         </button>
                         <button
                           onClick={() => handleCardReview('easy')}
-                          className="flex-1 py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all border border-green-500/30 bg-green-500/10 text-green-300 hover:bg-green-500/20 hover:border-green-500/50 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(34,197,94,0.15)] flex items-center justify-center gap-2"
+                          className="neo-button flex-1 py-4 bg-neo-cyan hover:bg-white text-black flex justify-center gap-3"
                         >
-                          <Check size={16} /> Easy (Know It)
+                          <Check size={24} strokeWidth={4} /> 
+                          <span className="text-xl">Easy</span>
                         </button>
                       </motion.div>
                     )}
@@ -338,26 +338,26 @@ export default function StudyTools() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
-              className="max-w-3xl mx-auto space-y-6"
+              className="max-w-4xl mx-auto space-y-8"
             >
               {quizQuestions.length === 0 ? (
                 /* Select document layout */
-                <div className="glass-card p-8 rounded-3xl space-y-6 text-center">
-                  <div className="h-14 w-14 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20 shadow-lg mx-auto">
-                    <HelpCircle size={24} />
+                <div className="neo-box bg-neo-yellow p-12 text-center flex flex-col items-center">
+                  <div className="bg-white border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8">
+                    <HelpCircle size={48} strokeWidth={3} />
                   </div>
-                  <div className="space-y-1.5 max-w-sm mx-auto">
-                    <h3 className="text-lg font-bold text-white">Synthesize Practice Quiz</h3>
-                    <p className="text-xs text-white/50 leading-relaxed">
+                  <div className="space-y-4 max-w-lg mx-auto mb-8 border-b-4 border-black pb-8">
+                    <h3 className="text-4xl font-black uppercase">Synthesize Quiz</h3>
+                    <p className="font-bold text-lg">
                       AI constructs customized MCQs, True/False, and fill-in-the-blanks directly based on document material.
                     </p>
                   </div>
 
-                  <div className="max-w-md mx-auto space-y-3 pt-2">
+                  <div className="w-full max-w-md mx-auto space-y-6">
                     <select 
                       value={quizDocId} 
                       onChange={(e) => setQuizDocId(e.target.value)}
-                      className="w-full bg-[#030712] border border-white/10 rounded-xl px-3 py-3 text-sm text-white/85 focus:outline-none focus:border-indigo-500"
+                      className="w-full neo-input py-4 text-lg"
                     >
                       <option value="">-- Choose Document --</option>
                       {documents.map((doc) => (
@@ -368,37 +368,37 @@ export default function StudyTools() {
                     <button
                       onClick={handleStartQuiz}
                       disabled={loadingQuiz || !quizDocId}
-                      className="w-full bg-gradient-primary hover:scale-[1.01] hover:shadow-lg hover:shadow-indigo-600/20 py-3 rounded-xl text-xs font-semibold text-white transition-all cursor-pointer disabled:opacity-50"
+                      className="neo-button w-full bg-neo-cyan hover:bg-white py-4 text-xl disabled:opacity-50"
                     >
-                      {loadingQuiz ? 'Parsing Text & Writing Questions...' : 'Generate Live Practice Quiz'}
+                      {loadingQuiz ? 'Writing Questions...' : 'Generate Quiz'}
                     </button>
                   </div>
                 </div>
               ) : (
                 /* Active quiz questions list */
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-white/40 font-bold uppercase tracking-wider">Topic Practice Quiz</span>
+                <div className="space-y-8">
+                  <div className="flex justify-between items-center bg-white border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <span className="text-2xl font-black uppercase">Practice Quiz</span>
                     <button 
                       onClick={() => setQuizQuestions([])}
-                      className="text-white/40 hover:text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-white/8 hover:bg-white/5 cursor-pointer"
+                      className="neo-button bg-red-500 hover:bg-white"
                     >
                       Reset Quiz
                     </button>
                   </div>
 
                   {quizQuestions.map((q, idx) => (
-                    <div key={idx} className="glass-card p-5 rounded-2xl space-y-4 border border-white/8">
-                      <div className="flex items-start gap-3">
-                        <span className="h-5 w-5 bg-indigo-500/10 border border-indigo-500/20 rounded flex items-center justify-center font-bold text-xs text-indigo-400 font-mono">
+                    <div key={idx} className="neo-box bg-white p-8 space-y-6">
+                      <div className="flex items-start gap-6 border-b-4 border-black pb-6">
+                        <span className="h-12 w-12 bg-neo-magenta border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-black text-2xl shrink-0">
                           {idx + 1}
                         </span>
-                        <h4 className="text-[15px] font-bold text-white leading-relaxed">{q.question}</h4>
+                        <h4 className="text-2xl font-black uppercase leading-tight">{q.question}</h4>
                       </div>
 
                       {/* Options selection based on type */}
                       {q.type === 'mcq' && (
-                        <div className="grid grid-cols-1 gap-2 pl-8 pt-1">
+                        <div className="grid grid-cols-1 gap-4 pl-0 sm:pl-16">
                           {q.options.map((opt) => {
                             const isSelected = userAnswers[idx] === opt;
                             const isCorrect = q.correct_answer === opt;
@@ -411,12 +411,12 @@ export default function StudyTools() {
                                 disabled={isQuizSubmitted}
                                 onClick={() => handleSelectAnswer(idx, opt)}
                                 className={`
-                                  w-full text-left p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer
-                                  ${isSelected && !isQuizSubmitted ? 'bg-indigo-600/10 border-indigo-500 text-white' : ''}
-                                  ${!isSelected && !isQuizSubmitted ? 'bg-white/3 border-white/5 hover:bg-white/6 hover:border-white/10 text-white/70' : ''}
-                                  ${showSuccess ? 'bg-emerald-500/10 border-emerald-500 text-emerald-300' : ''}
-                                  ${showDanger ? 'bg-rose-500/10 border-rose-500 text-rose-300' : ''}
-                                  ${isQuizSubmitted && !isSelected && !isCorrect ? 'opacity-40 bg-transparent border-white/5 text-white/40' : ''}
+                                  w-full text-left p-4 border-4 border-black font-bold text-lg transition-all
+                                  ${isSelected && !isQuizSubmitted ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : ''}
+                                  ${!isSelected && !isQuizSubmitted ? 'bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-neo-cyan hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' : ''}
+                                  ${showSuccess ? 'bg-neo-green text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : ''}
+                                  ${showDanger ? 'bg-red-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : ''}
+                                  ${isQuizSubmitted && !isSelected && !isCorrect ? 'opacity-50 bg-gray-200' : ''}
                                 `}
                               >
                                 {opt}
@@ -427,7 +427,7 @@ export default function StudyTools() {
                       )}
 
                       {q.type === 'tf' && (
-                        <div className="flex gap-3 pl-8 pt-1">
+                        <div className="flex gap-6 pl-0 sm:pl-16">
                           {['True', 'False'].map((opt) => {
                             const isSelected = userAnswers[idx] === opt;
                             const isCorrect = q.correct_answer === opt;
@@ -440,12 +440,12 @@ export default function StudyTools() {
                                 disabled={isQuizSubmitted}
                                 onClick={() => handleSelectAnswer(idx, opt)}
                                 className={`
-                                  flex-1 text-center p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer
-                                  ${isSelected && !isQuizSubmitted ? 'bg-indigo-600/10 border-indigo-500 text-white' : ''}
-                                  ${!isSelected && !isQuizSubmitted ? 'bg-white/3 border-white/5 hover:bg-white/6 hover:border-white/10 text-white/70' : ''}
-                                  ${showSuccess ? 'bg-emerald-500/10 border-emerald-500 text-emerald-300' : ''}
-                                  ${showDanger ? 'bg-rose-500/10 border-rose-500 text-rose-300' : ''}
-                                  ${isQuizSubmitted && !isSelected && !isCorrect ? 'opacity-40 bg-transparent border-white/5 text-white/40' : ''}
+                                  flex-1 text-center p-6 border-4 border-black font-black text-2xl uppercase transition-all
+                                  ${isSelected && !isQuizSubmitted ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : ''}
+                                  ${!isSelected && !isQuizSubmitted ? 'bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-neo-yellow hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' : ''}
+                                  ${showSuccess ? 'bg-neo-green text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : ''}
+                                  ${showDanger ? 'bg-red-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : ''}
+                                  ${isQuizSubmitted && !isSelected && !isCorrect ? 'opacity-50 bg-gray-200' : ''}
                                 `}
                               >
                                 {opt}
@@ -456,22 +456,22 @@ export default function StudyTools() {
                       )}
 
                       {q.type === 'blank' && (
-                        <div className="pl-8 pt-1">
+                        <div className="pl-0 sm:pl-16 space-y-4">
                           <input
                             type="text"
                             disabled={isQuizSubmitted}
                             value={userAnswers[idx] || ''}
                             onChange={(e) => handleSelectAnswer(idx, e.target.value)}
-                            placeholder="Type fill-in answer here..."
+                            placeholder="Type your answer here..."
                             className={`
-                              w-full glass-input px-3.5 py-2.5 rounded-xl text-xs
-                              ${isQuizSubmitted && q.correct_answer.toLowerCase().includes(userAnswers[idx]?.toLowerCase() || '') && userAnswers[idx] ? 'border-emerald-500 text-emerald-300 bg-emerald-500/5' : ''}
-                              ${isQuizSubmitted && !q.correct_answer.toLowerCase().includes(userAnswers[idx]?.toLowerCase() || '') ? 'border-rose-500 text-rose-300 bg-rose-500/5' : ''}
+                              w-full neo-input py-4 text-xl
+                              ${isQuizSubmitted && q.correct_answer.toLowerCase().includes(userAnswers[idx]?.toLowerCase() || '') && userAnswers[idx] ? 'bg-neo-green' : ''}
+                              ${isQuizSubmitted && !q.correct_answer.toLowerCase().includes(userAnswers[idx]?.toLowerCase() || '') ? 'bg-red-500 text-white' : ''}
                             `}
                           />
                           {isQuizSubmitted && (
-                            <div className="text-[10px] text-white/40 mt-1">
-                              Correct answer: <span className="text-emerald-400 font-bold">{q.correct_answer}</span>
+                            <div className="bg-black text-white border-4 border-black p-4 font-black text-lg uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                              Correct answer: <span className="text-neo-cyan">{q.correct_answer}</span>
                             </div>
                           )}
                         </div>
@@ -479,9 +479,9 @@ export default function StudyTools() {
 
                       {/* Explanation box on submit */}
                       {isQuizSubmitted && (
-                        <div className="bg-white/3 border-l-2 border-indigo-500 p-3 rounded-r-xl text-xs text-white/60 leading-relaxed pl-8">
-                          <span className="font-bold text-white text-[10px] uppercase tracking-wider block mb-1">AI Explanation</span>
-                          {q.explanation}
+                        <div className="mt-6 bg-neo-yellow border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] pl-0 sm:pl-16 ml-0 sm:ml-16">
+                          <span className="font-black text-black uppercase block mb-3 text-xl border-b-4 border-black pb-2 inline-block">Explanation</span>
+                          <p className="font-bold text-lg leading-relaxed">{q.explanation}</p>
                         </div>
                       )}
                     </div>
@@ -492,18 +492,18 @@ export default function StudyTools() {
                     <button
                       onClick={handleSubmitQuiz}
                       disabled={userAnswers.includes('')}
-                      className="w-full bg-gradient-primary hover:scale-[1.01] hover:shadow-lg hover:shadow-indigo-600/20 py-3.5 rounded-2xl font-semibold text-xs text-white transition-all cursor-pointer disabled:opacity-50"
+                      className="neo-button w-full bg-neo-magenta hover:bg-white py-6 text-2xl disabled:opacity-50"
                     >
-                      Submit Answers for Grading
+                      Submit Answers
                     </button>
                   ) : (
-                    <div className="glass-card p-6 rounded-3xl border border-indigo-500/35 bg-indigo-500/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                      <div className="space-y-1 text-center sm:text-left">
-                        <h4 className="text-lg font-bold text-white">Quiz Synthesized Result</h4>
-                        <p className="text-xs text-white/50">Your responses have been graded and logged in Analytics.</p>
+                    <div className="neo-box bg-neo-cyan p-8 flex flex-col sm:flex-row items-center justify-between gap-8">
+                      <div className="space-y-2 text-center sm:text-left">
+                        <h4 className="text-3xl font-black uppercase">Quiz Result</h4>
+                        <p className="font-bold text-lg">Your responses have been graded and logged in Analytics.</p>
                       </div>
-                      <div className="text-3xl font-extrabold text-white bg-indigo-500/20 px-6 py-3 rounded-2xl border border-indigo-500/30">
-                        {quizScore} / {quizQuestions.length} Correct
+                      <div className="text-5xl font-black bg-white border-4 border-black px-8 py-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] shrink-0">
+                        {quizScore} / {quizQuestions.length}
                       </div>
                     </div>
                   )}
@@ -523,66 +523,70 @@ export default function StudyTools() {
               className="grid grid-cols-1 lg:grid-cols-3 gap-8"
             >
               {/* Creator Settings Panel */}
-              <div className="glass-card p-6 rounded-2xl h-fit space-y-4">
-                <h3 className="text-md font-bold text-white flex items-center gap-2">
-                  <Calendar size={16} className="text-indigo-400" />
-                  Planner Generator
+              <div className="neo-box bg-white p-6 h-fit space-y-6">
+                <h3 className="text-2xl font-black uppercase flex items-center gap-3 border-b-4 border-black pb-4">
+                  <div className="bg-neo-green border-2 border-black p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <Calendar size={24} strokeWidth={3} />
+                  </div>
+                  Planner
                 </h3>
-                <p className="text-xs text-white/50 leading-relaxed">
+                <p className="font-bold">
                   Design a customized checklist study plan mapping daily timelines and goals for any topic.
                 </p>
 
-                <div className="space-y-4 pt-2">
+                <div className="space-y-6 pt-4 border-t-4 border-black">
                   <div>
-                    <label className="block text-[10px] text-white/40 uppercase tracking-wider font-semibold mb-1.5">Study Subject/Goal</label>
+                    <label className="block font-black uppercase mb-2">Study Subject/Goal</label>
                     <input 
                       type="text" 
                       value={planTopic}
                       onChange={(e) => setPlanTopic(e.target.value)}
-                      placeholder="e.g. Quantum Physics basics, Calculus limits"
-                      className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs"
+                      placeholder="e.g. Quantum Physics basics"
+                      className="w-full neo-input"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] text-white/40 uppercase tracking-wider font-semibold mb-1.5">Plan Duration: {planDays} Days</label>
+                    <label className="block font-black uppercase mb-4">Duration: {planDays} Days</label>
                     <input
                       type="range"
                       min="3"
                       max="14"
                       value={planDays}
                       onChange={(e) => setPlanDays(Number(e.target.value))}
-                      className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-indigo-400"
+                      className="w-full h-4 bg-white border-2 border-black rounded-none appearance-none cursor-pointer accent-black"
                     />
                   </div>
 
                   <button
                     onClick={handleGeneratePlan}
                     disabled={loading || !planTopic.trim()}
-                    className="w-full bg-gradient-primary hover:scale-[1.01] hover:shadow-lg hover:shadow-indigo-600/20 py-2.5 rounded-xl text-xs font-semibold text-white transition-all cursor-pointer disabled:opacity-50"
+                    className="neo-button w-full bg-neo-yellow hover:bg-white py-4 text-lg flex justify-center disabled:opacity-50"
                   >
-                    {loading ? 'Synthesizing Roadmap...' : 'Construct Study Plan'}
+                    {loading ? 'Synthesizing...' : 'Construct Plan'}
                   </button>
                 </div>
 
                 {/* Available plans drawer list */}
                 {studyPlans.length > 0 && (
-                  <div className="space-y-2 pt-4 border-t border-white/5">
-                    <label className="block text-[9px] text-white/40 uppercase tracking-wider font-semibold mb-2">Saved Roadmaps</label>
+                  <div className="space-y-4 pt-6 border-t-4 border-black mt-6">
+                    <label className="block font-black uppercase text-lg mb-4">Saved Roadmaps</label>
                     {studyPlans.map((pl) => (
                       <button
                         key={pl.id}
                         onClick={() => setActivePlan(pl)}
                         className={`
-                          w-full flex items-center justify-between p-2.5 rounded-lg border text-left text-xs font-bold transition-all cursor-pointer
+                          w-full flex items-center justify-between p-4 border-4 border-black text-left font-bold transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
                           ${activePlan?.id === pl.id 
-                            ? 'bg-indigo-600/15 border-indigo-500/50 text-white' 
-                            : 'bg-white/3 border-white/5 text-white/60 hover:text-white'
+                            ? 'bg-black text-white translate-x-2 translate-y-2 shadow-none' 
+                            : 'bg-white hover:bg-neo-cyan'
                           }
                         `}
                       >
-                        <span className="truncate max-w-[120px]">{pl.topic}</span>
-                        <span className="text-[10px] text-white/40">{pl.duration_days} days</span>
+                        <span className="truncate max-w-[150px] uppercase">{pl.topic}</span>
+                        <span className={`px-2 py-1 border-2 font-black ${activePlan?.id === pl.id ? 'bg-white text-black border-black' : 'bg-black text-white border-white'}`}>
+                          {pl.duration_days}D
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -590,40 +594,42 @@ export default function StudyTools() {
               </div>
 
               {/* Active Plan Dashboard */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-2 space-y-8">
                 {!activePlan ? (
-                  <div className="text-center py-20 border border-white/5 rounded-2xl bg-white/3">
-                    <Calendar className="mx-auto text-white/10 h-10 w-10 mb-2" />
-                    <p className="text-white/60 font-semibold text-sm">No active planner</p>
-                    <p className="text-white/30 text-xs mt-1">Configure study goals on the left to synthesize a structured day-by-day checklist.</p>
+                  <div className="neo-box bg-neo-cyan p-12 text-center flex flex-col items-center">
+                    <div className="bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">
+                      <Calendar className="h-16 w-16" strokeWidth={2} />
+                    </div>
+                    <p className="text-3xl font-black uppercase mb-4">No active planner</p>
+                    <p className="font-bold text-lg max-w-md">Configure study goals on the left to synthesize a structured day-by-day checklist.</p>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    <div className="border-b border-white/5 pb-3">
-                      <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider block">Roadmap Study Plan</span>
-                      <h4 className="text-lg font-bold text-white mt-0.5">{activePlan.topic} Plan</h4>
+                  <div className="space-y-8">
+                    <div className="bg-white border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <span className="font-black bg-neo-green border-2 border-black px-2 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] mb-4 inline-block">Roadmap Plan</span>
+                      <h4 className="text-4xl font-black uppercase">{activePlan.topic} Plan</h4>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {activePlan.plan.map((item) => (
-                        <div key={item.day} className="glass-card p-5 rounded-2xl border border-white/8 relative">
-                          <div className="flex justify-between items-start mb-3">
+                        <div key={item.day} className="neo-box bg-white p-6 relative">
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b-4 border-black pb-4 gap-4">
                             <div>
-                              <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider font-mono">Day {item.day} of {activePlan.duration_days}</span>
-                              <h5 className="font-bold text-white text-md mt-0.5">{item.title}</h5>
+                              <span className="font-black text-xl bg-black text-white px-3 py-1 uppercase shadow-[4px_4px_0px_0px_rgba(0,255,255,1)]">Day {item.day} of {activePlan.duration_days}</span>
+                              <h5 className="font-black text-2xl uppercase mt-4">{item.title}</h5>
                             </div>
-                            <span className="bg-white/5 border border-white/8 text-[10px] text-white/50 px-2 py-0.5 rounded-full font-mono">
-                              {item.time_needed} mins
+                            <span className="bg-neo-yellow border-4 border-black font-black text-lg px-4 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] whitespace-nowrap">
+                              {item.time_needed} MINS
                             </span>
                           </div>
 
-                          <div className="space-y-1.5 pl-2">
+                          <div className="space-y-4">
                             {item.tasks.map((task, tIdx) => (
-                              <div key={tIdx} className="flex gap-2.5 items-center text-xs text-white/70">
-                                <div className="h-4 w-4 border border-white/10 rounded flex items-center justify-center flex-shrink-0 bg-white/3">
-                                  <Check size={10} className="text-transparent" />
+                              <div key={tIdx} className="flex gap-4 items-start font-bold text-lg p-3 bg-gray-50 border-2 border-black">
+                                <div className="h-6 w-6 border-4 border-black bg-white flex items-center justify-center shrink-0 mt-0.5">
+                                  <Check size={16} className="text-transparent" />
                                 </div>
-                                <span>{task}</span>
+                                <span className="leading-tight">{task}</span>
                               </div>
                             ))}
                           </div>

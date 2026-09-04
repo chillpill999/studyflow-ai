@@ -1,139 +1,121 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { FileText, Layers, Network } from 'lucide-react';
-import ThreeDBook from '@/components/ThreeDBook';
+import { createClient } from '@/lib/supabase';
+import LoginForm from '@/components/LoginForm';
 
 export default function LandingPage() {
   const router = useRouter();
-  const { status } = useSession();
-  const [scrolled, setScrolled] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
-    if (status === 'authenticated') {
-      router.push('/dashboard');
-    }
-  }, [status, router]);
-
-  // Navbar Scroll Effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push('/dashboard');
+      }
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Intersection Observer for fade-ups and scale-in
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.15
-    };
-
-    const sectionObserver = new IntersectionObserver((entries, observer) => {
-      const intersectingEntries = entries.filter(entry => entry.isIntersecting);
-      intersectingEntries.forEach((entry, index) => {
-        if (entry.target.classList.contains('fade-up-stagger')) {
-          (entry.target as HTMLElement).style.transitionDelay = `${index * 120}ms`;
-        }
-        entry.target.classList.add('in-view');
-        observer.unobserve(entry.target);
-      });
-    }, observerOptions);
-
-    document.querySelectorAll('.fade-up-stagger, .scale-in').forEach(el => {
-      sectionObserver.observe(el);
-    });
-
-    return () => sectionObserver.disconnect();
-  }, []); // Run once on mount
-
+    checkUser();
+  }, [router, supabase]);
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#0A0A0F] text-[#F0EEF6] overflow-hidden selection:bg-[#C9956A] selection:text-[#0A0A0F]">
-      {/* Background Effects */}
-      <div className="absolute inset-0 z-0 mesh-bg opacity-40 pointer-events-none" />
-      <div className="absolute top-[10%] left-[20%] w-96 h-96 bg-[#C9956A] rounded-full blur-[120px] opacity-15 animate-float-orb-1 pointer-events-none" />
-      <div className="absolute top-[40%] right-[15%] w-80 h-80 bg-[#6B46C1] rounded-full blur-[100px] opacity-10 animate-float-orb-2 pointer-events-none" />
-
-      {/* 1. Navbar */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass-panel border-b border-white/5 py-4' : 'bg-transparent py-6'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#C9956A] shadow-[0_0_10px_#C9956A] animate-pulse" />
-            <span className="font-bold text-xl tracking-tight" style={{ fontFamily: 'var(--font-playfair)' }}>
-              StudyFlow <span className="text-sm opacity-50 tracking-normal font-sans ml-1">AI</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Nav login removed as it's now in the book. You could scroll them up to the book instead */}
-          </div>
+    <div className="min-h-screen flex flex-col bg-neo-yellow text-black">
+      {/* Navbar */}
+      <nav className="border-b-[4px] border-black bg-white px-6 py-4 flex justify-between items-center">
+        <div className="font-black text-2xl tracking-tighter uppercase flex items-center gap-2">
+          <div className="w-4 h-4 bg-neo-magenta border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"></div>
+          StudyFlow
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 z-10">
-        {/* 2. 3D Book Hero Section (Contains Embedded Auth) */}
-        <ThreeDBook />
-
-        {/* 3. Feature Cards Row */}
-        <section id="features" className="max-w-7xl mx-auto px-6 py-24">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <div className="glass-card p-8 fade-up-stagger opacity-0 flex flex-col items-start text-left">
-              <div className="w-12 h-12 rounded-xl bg-[#C9956A]/10 flex items-center justify-center mb-6 border border-[#C9956A]/20">
-                <FileText className="w-6 h-6 text-[#C9956A]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Chat with PDF AI</h3>
-              <p className="text-[#8A8F9E] leading-relaxed">
-                Upload PDFs & lecture slides to our free study AI. Chat with our Gemini model for sourced answers mapped perfectly to your curriculum. The ultimate AI homework helper.
-              </p>
-            </div>
-
-            <div className="glass-card p-8 fade-up-stagger opacity-0 flex flex-col items-start text-left">
-              <div className="w-12 h-12 rounded-xl bg-[#C9956A]/10 flex items-center justify-center mb-6 border border-[#C9956A]/20">
-                <Layers className="w-6 h-6 text-[#C9956A]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">AI Flashcard Generator</h3>
-              <p className="text-[#8A8F9E] leading-relaxed">
-                Auto-generate spaced-repetition flashcards from any text or case study AI notes in seconds using the best study AI engine.
-              </p>
-            </div>
-
-            <div className="glass-card p-8 fade-up-stagger opacity-0 flex flex-col items-start text-left">
-              <div className="w-12 h-12 rounded-xl bg-[#C9956A]/10 flex items-center justify-center mb-6 border border-[#C9956A]/20">
-                <Network className="w-6 h-6 text-[#C9956A]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Visual AI Mind Maps</h3>
-              <p className="text-[#8A8F9E] leading-relaxed">
-                Turn complex topics into interactive node maps with one click. The ultimate student AI tool for understanding the big picture instantly.
-              </p>
-            </div>
-
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        
+        {/* Left Side: Hero Text */}
+        <div className="flex flex-col items-start text-left">
+          <div className="bg-neo-cyan border-4 border-black px-4 py-1 font-bold uppercase mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] inline-block transform -rotate-2">
+            Document Analysis Platform
           </div>
-        </section>
+          <h1 className="text-5xl sm:text-7xl font-black uppercase leading-none mb-6">
+            Understand<br/>
+            <span className="text-white text-shadow-neo">Your Data.</span>
+          </h1>
+          <p className="text-xl font-bold mb-8 max-w-md bg-white p-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            Turn raw documents into searchable insights. Chat with your PDFs, generate structural mind maps, and create flashcards based on actual text.
+          </p>
+        </div>
+
+        {/* Right Side: Login Form */}
+        <div className="relative w-full max-w-md mx-auto">
+          {/* Decorative blocks behind form */}
+          <div className="absolute inset-0 bg-neo-magenta border-4 border-black translate-x-4 translate-y-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"></div>
+          <div className="relative">
+            <LoginForm />
+          </div>
+        </div>
       </main>
 
-      {/* 5. Footer */}
-      <footer className="border-t border-white/5 py-8 mt-12 z-10 text-center">
-        <div className="flex flex-col items-center justify-center gap-4">
-          <div className="text-center space-y-1">
-            <p className="text-[#4A4F5E] text-sm">© 2026 StudyFlow AI. The best free study AI platform designed for elite learning.</p>
-            <p className="text-[#C9956A]/70 text-xs">Made with Love of Hothlali Members ❤️</p>
-            <p className="text-[#C9956A]/70 text-xs">developed by Civil Boys</p>
+      {/* Feature Cards Row */}
+      <section className="bg-white border-y-[4px] border-black">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <h2 className="text-4xl font-black uppercase text-center mb-12">Core Capabilities</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <div className="neo-box p-8 flex flex-col items-start bg-neo-cyan">
+              <div className="w-12 h-12 bg-white border-2 border-black flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <FileText className="w-6 h-6 text-black" strokeWidth={3} />
+              </div>
+              <h3 className="text-2xl font-black uppercase mb-3">Document Chat</h3>
+              <p className="font-semibold text-black/80">
+                Upload PDFs and immediately query the text. Get direct, sourced answers mapped to the provided document.
+              </p>
+            </div>
+
+            <div className="neo-box p-8 flex flex-col items-start bg-neo-magenta text-white">
+              <div className="w-12 h-12 bg-white border-2 border-black flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <Layers className="w-6 h-6 text-black" strokeWidth={3} />
+              </div>
+              <h3 className="text-2xl font-black uppercase mb-3">Flashcard Extraction</h3>
+              <p className="font-semibold text-white/90">
+                Automatically parse structural definitions and key terms from text to create exportable flashcard decks.
+              </p>
+            </div>
+
+            <div className="neo-box p-8 flex flex-col items-start bg-neo-green">
+              <div className="w-12 h-12 bg-white border-2 border-black flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <Network className="w-6 h-6 text-black" strokeWidth={3} />
+              </div>
+              <h3 className="text-2xl font-black uppercase mb-3">Node Mapping</h3>
+              <p className="font-semibold text-black/80">
+                Visualize hierarchical relationships within long documents using interactive, automatically generated node maps.
+              </p>
+            </div>
+
           </div>
-          <div className="flex gap-6 text-sm text-[#4A4F5E]">
-            <a href="#" className="hover:text-[#C9956A] transition-colors">Privacy</a>
-            <a href="#" className="hover:text-[#C9956A] transition-colors">Terms</a>
-            <a href="#" className="hover:text-[#C9956A] transition-colors">Security</a>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-neo-yellow py-8 text-center border-t-4 border-black px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="font-bold uppercase text-sm">
+            © 2026 StudyFlow. Developed by Civil Boys.
+          </div>
+          <div className="flex gap-6 font-bold uppercase text-sm">
+            <a href="#" className="hover:underline underline-offset-4 decoration-2">Privacy</a>
+            <a href="#" className="hover:underline underline-offset-4 decoration-2">Terms</a>
           </div>
         </div>
       </footer>
 
+      {/* Custom Text Shadow for Hero */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .text-shadow-neo {
+          text-shadow: 4px 4px 0px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+        }
+      `}} />
     </div>
   );
 }

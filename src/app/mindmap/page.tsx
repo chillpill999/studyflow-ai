@@ -233,26 +233,26 @@ export default function MindMap() {
   const { nodes: renderNodes, links: renderLinks } = buildRenderCoordinates();
 
   return (
-    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col gap-6 max-w-7xl mx-auto md:overflow-hidden pb-4 md:pb-0">
+    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col gap-6 max-w-7xl mx-auto md:overflow-hidden pb-4 md:pb-0 text-black">
       
       {/* Top Workspace settings */}
-      <div className="bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 z-20">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
-            <BrainCircuit size={20} className="animate-pulse" />
+      <div className="neo-box bg-neo-yellow p-6 flex flex-col md:flex-row items-center justify-between gap-6 z-20">
+        <div className="flex items-center gap-4">
+          <div className="h-16 w-16 bg-white border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <BrainCircuit size={32} strokeWidth={2.5} />
           </div>
           <div>
-            <h2 className="text-md font-bold text-white leading-tight">AI Mind Map Synthesizer</h2>
-            <p className="text-xs text-white/40">Convert studies into interactive concept maps.</p>
+            <h2 className="text-2xl font-black uppercase tracking-tight">Mind Map Synthesizer</h2>
+            <p className="font-bold">Convert studies into interactive concept maps.</p>
           </div>
         </div>
 
         {/* Source selector form */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
           <select 
             value={selectedSourceType} 
             onChange={(e) => { setSelectedSourceType(e.target.value as 'document' | 'note'); setSelectedSourceId(''); }}
-            className="bg-[#030712] border border-white/10 rounded-lg px-2.5 py-2 text-xs text-white/80 focus:outline-none"
+            className="neo-input bg-white w-auto"
           >
             <option value="document">Documents</option>
             <option value="note">Notes Workspace</option>
@@ -261,7 +261,7 @@ export default function MindMap() {
           <select 
             value={selectedSourceId} 
             onChange={(e) => setSelectedSourceId(e.target.value)}
-            className="bg-[#030712] border border-white/10 rounded-lg px-2.5 py-2 text-xs text-white/80 focus:outline-none max-w-[180px] truncate"
+            className="neo-input bg-white max-w-[220px] truncate"
           >
             <option value="">-- Select Source --</option>
             {selectedSourceType === 'document' ? (
@@ -274,40 +274,42 @@ export default function MindMap() {
           <button
             onClick={handleGenerateMindMap}
             disabled={loading || !selectedSourceId}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+            className="neo-button bg-neo-green hover:bg-white flex items-center gap-2 py-3 px-6 disabled:opacity-50"
           >
-            <Sparkles size={13} />
-            Generate Map
+            <Sparkles size={20} strokeWidth={3} />
+            <span className="text-lg">Generate Map</span>
           </button>
         </div>
       </div>
 
       {/* Main Canvas Workspace */}
-      <div className="flex-1 bg-[#030712] border border-white/8 rounded-2xl relative overflow-hidden select-none z-10 min-h-[500px] md:min-h-0">
+      <div className="flex-1 bg-white neo-box relative overflow-hidden select-none z-10 min-h-[500px] md:min-h-0">
         
         {/* Canvas Background Grid patterns */}
         <div 
-          className="absolute inset-0 pointer-events-none opacity-20" 
+          className="absolute inset-0 pointer-events-none opacity-100" 
           style={{ 
-            backgroundImage: 'radial-gradient(rgba(255,255,255,0.15) 1px, transparent 0)', 
-            backgroundSize: '24px 24px' 
+            backgroundImage: 'radial-gradient(rgba(0,0,0,1) 2px, transparent 0)', 
+            backgroundSize: '30px 30px' 
           }} 
         />
 
         {/* Loading overlay spinner */}
         {loading && (
-          <div className="absolute inset-0 bg-[#030712]/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-30">
-            <RefreshCw size={24} className="text-indigo-400 animate-spin" />
-            <span className="text-xs text-white/50 font-medium">Analyzing document node correlations...</span>
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4 z-30">
+            <RefreshCw size={48} strokeWidth={3} className="text-black animate-spin" />
+            <span className="text-xl font-black uppercase">Analyzing document node correlations...</span>
           </div>
         )}
 
         {/* Empty Canvas state */}
         {!treeData && !loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 space-y-3 z-20">
-            <BrainCircuit size={40} className="text-white/10" />
-            <h4 className="text-sm font-bold text-white/60">Canvas Empty</h4>
-            <p className="text-xs text-white/30 max-w-[280px]">Select a source at the top and generate the mind map to render nodes here.</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 space-y-6 z-20 bg-white/80">
+            <div className="bg-neo-cyan border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <BrainCircuit size={64} strokeWidth={2} className="text-black mb-4 mx-auto" />
+              <h4 className="text-3xl font-black uppercase mb-2">Canvas Empty</h4>
+              <p className="font-bold max-w-sm mx-auto">Select a source at the top and generate the mind map to render nodes here.</p>
+            </div>
           </div>
         )}
 
@@ -329,14 +331,6 @@ export default function MindMap() {
               className="absolute top-0 left-0 w-full h-full"
             >
               <svg className="absolute inset-0 overflow-visible w-full h-full">
-                {/* Glow Filter Definition */}
-                <defs>
-                  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                  </filter>
-                </defs>
-
                 {/* Draw connector lines */}
                 {renderLinks.map((link) => (
                   <line
@@ -345,11 +339,9 @@ export default function MindMap() {
                     y1={link.y1}
                     x2={link.x2}
                     y2={link.y2}
-                    stroke={link.level === 1 ? '#8b5cf6' : '#06b6d4'}
-                    strokeWidth={link.level === 1 ? 2.5 : 1.5}
-                    strokeOpacity={0.4}
-                    strokeDasharray={link.level === 2 ? '4,4' : 'none'}
-                    filter="url(#glow)"
+                    stroke="#000"
+                    strokeWidth={link.level === 1 ? 6 : 4}
+                    strokeDasharray={link.level === 2 ? '10,10' : 'none'}
                   />
                 ))}
               </svg>
@@ -371,19 +363,18 @@ export default function MindMap() {
                     <div 
                       onClick={() => node.hasChildren && toggleNodeCollapse(node.id)}
                       className={`
-                        px-4 py-2.5 rounded-xl border font-bold text-xs tracking-tight shadow-xl cursor-pointer transition-all duration-300 whitespace-nowrap
+                        px-6 py-3 border-4 border-black font-black text-sm tracking-tight shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all duration-300 whitespace-nowrap uppercase
                         ${node.isRoot 
-                          ? 'bg-gradient-primary border-indigo-400 text-white shadow-indigo-500/20 text-sm py-3' 
+                          ? 'bg-neo-magenta text-xl py-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]' 
                           : node.level === 1 
-                            ? 'bg-[#0B1120]/90 border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/10' 
-                            : 'bg-[#0B1120]/80 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10'
+                            ? 'bg-neo-cyan hover:bg-white' 
+                            : 'bg-neo-yellow hover:bg-white'
                         }
-                        ${isCollapsed ? 'ring-2 ring-amber-500/50' : ''}
                       `}
                     >
                       {node.label}
                       {node.hasChildren && (
-                        <span className="ml-1.5 opacity-55 font-mono text-[9px]">
+                        <span className="ml-2 font-black bg-white border-2 border-black px-1 py-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                           {isCollapsed ? '+' : '−'}
                         </span>
                       )}
@@ -397,27 +388,27 @@ export default function MindMap() {
 
         {/* Floating Controls Overlay (Zoom In, Zoom Out, Reset View) */}
         {treeData && (
-          <div className="absolute bottom-5 right-5 z-20 flex items-center gap-2 bg-[#0B1120]/85 border border-white/8 rounded-xl p-1.5 shadow-2xl backdrop-blur-xl">
+          <div className="absolute bottom-6 right-6 z-20 flex items-center gap-3 bg-white border-4 border-black p-2 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
             <button 
               onClick={() => handleZoom(1.2)}
               title="Zoom In"
-              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+              className="p-3 bg-neo-yellow border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-all cursor-pointer"
             >
-              <ZoomIn size={14} />
+              <ZoomIn size={24} strokeWidth={3} />
             </button>
             <button 
               onClick={() => handleZoom(0.8)}
               title="Zoom Out"
-              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+              className="p-3 bg-neo-cyan border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-all cursor-pointer"
             >
-              <ZoomOut size={14} />
+              <ZoomOut size={24} strokeWidth={3} />
             </button>
             <button 
               onClick={resetView}
               title="Reset View"
-              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+              className="p-3 bg-neo-magenta border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-all cursor-pointer"
             >
-              <Maximize size={14} />
+              <Maximize size={24} strokeWidth={3} />
             </button>
           </div>
         )}

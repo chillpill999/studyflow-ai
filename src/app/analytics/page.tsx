@@ -57,22 +57,22 @@ export default function AnalyticsWorkspace() {
 
   // Subject proficiency bars
   const subjectsData = [
-    { name: 'Computer Science', score: 92, color: 'from-indigo-500 to-purple-600' },
-    { name: 'Mathematics', score: 78, color: 'from-purple-500 to-cyan-500' },
-    { name: 'Physics', score: 85, color: 'from-cyan-500 to-emerald-500' },
-    { name: 'Organic Chemistry', score: 62, color: 'from-amber-500 to-rose-500' }
+    { name: 'Computer Science', score: 92, color: 'bg-neo-cyan' },
+    { name: 'Mathematics', score: 78, color: 'bg-neo-magenta' },
+    { name: 'Physics', score: 85, color: 'bg-neo-yellow' },
+    { name: 'Organic Chemistry', score: 62, color: 'bg-neo-green' }
   ];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12 text-black">
       
       {/* Title */}
-      <div>
-        <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
+      <div className="bg-neo-yellow border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <h1 className="text-3xl font-black uppercase tracking-tight flex items-center gap-2">
           Analytics & Tasks
-          <span className="text-xs text-indigo-400 font-semibold border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 rounded-full">Productivity</span>
+          <span className="text-xs bg-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-bold">Productivity</span>
         </h1>
-        <p className="text-white/50 text-sm mt-1">Review learning velocity, view performance charts, and organize daily study targets.</p>
+        <p className="font-bold mt-2">Review learning velocity, view performance charts, and organize daily study targets.</p>
       </div>
 
       {/* Grid: SVG Performance Trend Chart vs Checklist Task Manager */}
@@ -82,52 +82,44 @@ export default function AnalyticsWorkspace() {
         <div className="lg:col-span-2 space-y-8">
           
           {/* Custom SVG Study Trend Chart */}
-          <div className="glass-card p-6 rounded-3xl space-y-6">
-            <div className="flex justify-between items-center">
+          <div className="neo-box bg-white p-6 space-y-6">
+            <div className="flex justify-between items-center border-b-4 border-black pb-4">
               <div>
-                <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider block">Daily Study Velocity</span>
-                <h3 className="text-lg font-bold text-white mt-0.5">Study Duration Trend</h3>
+                <span className="font-black uppercase block">Daily Study Velocity</span>
+                <h3 className="text-2xl font-black mt-1">Study Duration Trend</h3>
               </div>
-              <div className="text-right">
-                <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider block">Average Session</span>
-                <span className="text-sm font-bold text-white">2.1 Hours/day</span>
+              <div className="text-right bg-neo-cyan border-2 border-black p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <span className="font-black uppercase block text-xs">Average Session</span>
+                <span className="font-bold text-lg">2.1 Hours/day</span>
               </div>
             </div>
 
             {/* Custom SVG Path Line Chart */}
-            <div className="relative h-64 w-full bg-white/2 border border-white/5 rounded-2xl p-4 flex flex-col justify-between overflow-hidden">
+            <div className="relative h-64 w-full bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 flex flex-col justify-between overflow-hidden">
               
               {/* Background horizontal guide lines */}
-              <div className="absolute inset-0 flex flex-col justify-between p-4 py-8 pointer-events-none opacity-10">
-                <div className="border-b border-white w-full" />
-                <div className="border-b border-white w-full" />
-                <div className="border-b border-white w-full" />
+              <div className="absolute inset-0 flex flex-col justify-between p-4 py-8 pointer-events-none opacity-20">
+                <div className="border-b-2 border-black w-full dashed" />
+                <div className="border-b-2 border-black w-full dashed" />
+                <div className="border-b-2 border-black w-full dashed" />
               </div>
 
               {/* SVG vector */}
               <svg className="flex-1 w-full h-full overflow-visible z-10">
-                <defs>
-                  <linearGradient id="chart-glow" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.4"/>
-                    <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.0"/>
-                  </linearGradient>
-                </defs>
-
                 {/* Area path fill */}
                 <path
                   d="M 50 180 Q 120 140 190 160 T 330 110 T 470 170 T 610 80 T 750 150 L 750 200 L 50 200 Z"
-                  fill="url(#chart-glow)"
-                  className="transition-all duration-1000"
+                  fill="#FF00FF"
+                  className="transition-all duration-1000 opacity-20"
                 />
 
-                {/* Glowing line path */}
+                {/* Solid line path */}
                 <path
                   d="M 50 180 Q 120 140 190 160 T 330 110 T 470 170 T 610 80 T 750 150"
                   fill="transparent"
-                  stroke="#8b5cf6"
-                  strokeWidth="3.5"
+                  stroke="#000"
+                  strokeWidth="6"
                   className="transition-all duration-1000"
-                  strokeLinecap="round"
                 />
 
                 {/* Interactive Data points */}
@@ -144,18 +136,18 @@ export default function AnalyticsWorkspace() {
                     <circle
                       cx={pt.x}
                       cy={pt.y}
-                      r={hoveredChartBar === pt.idx ? 7 : 4}
-                      fill={hoveredChartBar === pt.idx ? '#06b6d4' : '#8b5cf6'}
-                      stroke="#fff"
-                      strokeWidth="2"
+                      r={hoveredChartBar === pt.idx ? 10 : 6}
+                      fill={hoveredChartBar === pt.idx ? '#00FFFF' : '#FFE600'}
+                      stroke="#000"
+                      strokeWidth="3"
                       className="cursor-pointer transition-all duration-200"
                       onMouseEnter={() => setHoveredChartBar(pt.idx)}
                       onMouseLeave={() => setHoveredChartBar(null)}
                     />
                     {hoveredChartBar === pt.idx && (
                       <g>
-                        <rect x={pt.x - 30} y={pt.y - 35} width="60" height="24" rx="6" fill="#0B1120" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
-                        <text x={pt.x} y={pt.y - 19} fill="#fff" fontSize="10" fontWeight="bold" textAnchor="middle">
+                        <rect x={pt.x - 35} y={pt.y - 45} width="70" height="30" fill="#fff" stroke="#000" strokeWidth="2" />
+                        <text x={pt.x} y={pt.y - 25} fill="#000" fontSize="12" fontWeight="900" textAnchor="middle">
                           {pt.hrs} hrs
                         </text>
                       </g>
@@ -165,35 +157,37 @@ export default function AnalyticsWorkspace() {
               </svg>
 
               {/* X Axis labels */}
-              <div className="flex justify-between text-[10px] text-white/40 font-bold px-2 pt-2 z-10">
+              <div className="flex justify-between text-xs font-black uppercase px-2 pt-2 z-10 border-t-4 border-black mt-2">
                 {studyTrend.map((t, i) => (
-                  <span key={i} className="w-12 text-center">{t.day}</span>
+                  <span key={i} className="w-12 text-center pt-2">{t.day}</span>
                 ))}
               </div>
             </div>
           </div>
 
           {/* Subject Performance proficiency lists */}
-          <div className="glass-card p-6 rounded-3xl space-y-4">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Award size={18} className="text-cyan-400" />
-              Subject Performance Velocity
+          <div className="neo-box bg-neo-magenta p-6 space-y-6">
+            <h3 className="text-2xl font-black flex items-center gap-2 border-b-4 border-black pb-4">
+              <div className="bg-white border-2 border-black p-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <Award size={24} />
+              </div>
+              Subject Performance
             </h3>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {subjectsData.map((sub) => (
-                <div key={sub.name} className="space-y-1.5">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-white/90">{sub.name}</span>
-                    <span className="font-mono text-cyan-400 font-bold">{sub.score}% Proficiency</span>
+                <div key={sub.name} className="space-y-2 bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="flex justify-between items-center">
+                    <span className="font-black uppercase">{sub.name}</span>
+                    <span className="font-black bg-black text-white px-2 py-1">{sub.score}%</span>
                   </div>
 
-                  <div className="h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                  <div className="h-4 bg-white border-2 border-black w-full">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${sub.score}%` }}
                       transition={{ duration: 1, ease: "easeOut" }}
-                      className={`h-full bg-gradient-to-r ${sub.color}`}
+                      className={`h-full border-r-2 border-black ${sub.color}`}
                     />
                   </div>
                 </div>
@@ -207,15 +201,17 @@ export default function AnalyticsWorkspace() {
         <div className="space-y-8">
           
           {/* Daily study Tasks list */}
-          <div className="glass-card p-6 rounded-3xl flex flex-col justify-between min-h-[500px]">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                <h3 className="text-md font-bold text-white flex items-center gap-1.5">
-                  <CheckSquare size={16} className="text-indigo-400" />
-                  Study Tasks checklist
+          <div className="neo-box bg-neo-yellow p-6 flex flex-col justify-between min-h-[500px]">
+            <div className="space-y-6">
+              <div className="flex justify-between items-center border-b-4 border-black pb-4">
+                <h3 className="text-xl font-black flex items-center gap-2">
+                  <div className="bg-white border-2 border-black p-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <CheckSquare size={20} />
+                  </div>
+                  Study Tasks
                 </h3>
-                <span className="text-[10px] text-white/40 font-mono">
-                  {completedTasks}/{totalTasks} done
+                <span className="font-black bg-white border-2 border-black px-2 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  {completedTasks}/{totalTasks}
                 </span>
               </div>
 
@@ -225,25 +221,25 @@ export default function AnalyticsWorkspace() {
                   type="text" 
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
-                  placeholder="Create new study goal..."
-                  className="flex-1 glass-input px-3 py-2 rounded-xl text-xs"
+                  placeholder="New task..."
+                  className="flex-1 neo-input text-sm"
                 />
                 <button 
                   type="submit"
                   disabled={!taskTitle.trim()}
-                  className="bg-indigo-600 hover:bg-indigo-500 p-2 rounded-xl text-white cursor-pointer transition-all disabled:opacity-50"
+                  className="neo-button px-4 py-2 bg-neo-cyan hover:bg-white flex items-center justify-center disabled:opacity-50"
                 >
-                  <Plus size={14} />
+                  <Plus size={20} strokeWidth={3} />
                 </button>
               </form>
 
               {/* List log container */}
-              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 pt-1">
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1 pt-1 custom-scrollbar">
                 {tasks.length === 0 ? (
-                  <div className="text-center py-10 border border-white/5 rounded-2xl bg-white/3">
-                    <CheckSquare className="mx-auto text-white/10 h-8 w-8 mb-2" />
-                    <p className="text-white/40 text-xs font-semibold">No daily goals yet</p>
-                    <p className="text-[10px] text-white/25 mt-1">List goals like &apos;Revise Physics&apos; or &apos;Practice MCQ&apos;.</p>
+                  <div className="text-center py-10 bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
+                    <CheckSquare className="mx-auto h-12 w-12 mb-2" strokeWidth={1.5} />
+                    <p className="font-black uppercase">No tasks yet</p>
+                    <p className="font-bold text-sm mt-2">Add goals like 'Revise Physics' or 'Practice MCQ'.</p>
                   </div>
                 ) : (
                   <AnimatePresence>
@@ -254,10 +250,10 @@ export default function AnalyticsWorkspace() {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 10 }}
                         className={`
-                          p-3 rounded-xl border flex items-center justify-between group transition-all duration-200
+                          p-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between transition-all duration-200
                           ${tsk.is_completed 
-                            ? 'bg-emerald-500/5 border-emerald-500/10 text-white/40 line-through' 
-                            : 'bg-white/3 border-white/5 text-white/80'
+                            ? 'bg-gray-300 opacity-60 line-through' 
+                            : 'bg-white hover:bg-neo-cyan'
                           }
                         `}
                       >
@@ -265,23 +261,23 @@ export default function AnalyticsWorkspace() {
                           <button
                             onClick={() => toggleTask(tsk.id, !tsk.is_completed)}
                             className={`
-                              h-4.5 w-4.5 rounded border flex items-center justify-center transition-all cursor-pointer
+                              h-6 w-6 border-2 border-black flex items-center justify-center cursor-pointer
                               ${tsk.is_completed 
-                                ? 'bg-emerald-500 border-emerald-400 text-white shadow-lg' 
-                                : 'border-white/15 bg-white/3 hover:border-white/25'
+                                ? 'bg-black text-white' 
+                                : 'bg-white hover:bg-gray-200'
                               }
                             `}
                           >
-                            {tsk.is_completed && <Check size={10} />}
+                            {tsk.is_completed && <Check size={16} strokeWidth={4} />}
                           </button>
-                          <span className="text-xs truncate max-w-[150px] font-semibold">{tsk.title}</span>
+                          <span className="font-bold truncate max-w-[140px] text-sm">{tsk.title}</span>
                         </div>
 
                         <button
                           onClick={() => deleteTask(tsk.id)}
-                          className="p-1 rounded bg-transparent opacity-0 group-hover:opacity-100 hover:bg-rose-500/20 text-white/40 hover:text-rose-400 transition-all cursor-pointer"
+                          className="p-1 bg-red-500 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-white text-black transition-colors"
                         >
-                          <Trash2 size={12} />
+                          <Trash2 size={16} strokeWidth={2} />
                         </button>
                       </motion.div>
                     ))}
@@ -291,8 +287,10 @@ export default function AnalyticsWorkspace() {
             </div>
 
             {/* Target hours widget block */}
-            <div className="border-t border-white/5 pt-4 mt-4 bg-white/2 p-3 rounded-xl border border-white/5 text-[10px] text-white/50 leading-relaxed flex items-center gap-2">
-              <Zap size={14} className="text-amber-500 fill-amber-500/10 animate-pulse" />
+            <div className="mt-6 bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 font-bold text-sm flex items-start gap-3">
+              <div className="bg-neo-green border-2 border-black p-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] shrink-0">
+                <Zap size={20} strokeWidth={3} />
+              </div>
               <span>Completing daily check-list items increases your learning velocity stats in real-time.</span>
             </div>
 

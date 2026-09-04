@@ -99,73 +99,72 @@ export default function FileUploader({ onSuccess }: FileUploaderProps) {
           }
         }}
         className={`
-          border-[1.5px] rounded-xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer transition-all duration-300 min-h-[220px]
+          border-4 border-black border-dashed p-10 flex flex-col items-center justify-center gap-4 cursor-pointer transition-colors min-h-[220px]
           ${dragActive 
-            ? 'border-[#C9956A] border-solid bg-[rgba(201,149,106,0.08)]' 
-            : 'border-dashed border-[rgba(201,149,106,0.3)] bg-transparent hover:border-solid hover:border-[#C9956A] hover:bg-[rgba(201,149,106,0.04)]'
+            ? 'bg-neo-yellow border-solid' 
+            : 'bg-white hover:bg-gray-100 hover:border-solid'
           }
         `}
       >
         {status === "idle" && (
           <>
-            <div className="h-14 w-14 rounded-full flex items-center justify-center text-[#C9956A] shadow-[0_0_20px_rgba(201,149,106,0.2)] bg-[#1D2235]">
-              <Upload size={24} />
+            <div className="h-16 w-16 bg-white border-4 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <Upload size={32} strokeWidth={3} />
             </div>
-            <div className="text-center space-y-1">
-              <p className="text-[15px] font-medium text-[#8A8F9E]">Drag & drop your study PDF here or click to browse</p>
-              <p className="text-[13px] text-[#4A4F5E]">Supports PDF up to 20MB</p>
+            <div className="text-center space-y-2 mt-4">
+              <p className="text-xl font-black uppercase">Drag & Drop PDF</p>
+              <p className="font-bold">Max file size: 20MB</p>
             </div>
-            <button className="shimmer-button mt-2 bg-gradient-primary text-[#0F1117] font-medium text-[14px] px-6 py-2.5 rounded-lg shadow-[0_4px_15px_rgba(201,149,106,0.3)] hover:shadow-[0_6px_20px_rgba(201,149,106,0.4)] transition-all cursor-pointer">
-              Upload Document
+            <button className="neo-button mt-4">
+              Browse Files
             </button>
           </>
         )}
 
         {status === "waking" && (
-          <div className="w-full max-w-xs text-center space-y-3">
-            <div className="h-8 w-8 border-4 border-[#C9956A]/20 border-t-[#C9956A] rounded-full animate-spin mx-auto" />
-            <p className="text-[14px] font-medium text-[#F5F0EB]">Connecting to server...</p>
-            <p className="text-[12px] text-[#8A8F9E]">Waking up Hugging Face Space (may take 10-20s)</p>
+          <div className="w-full max-w-xs text-center space-y-4">
+            <div className="h-12 w-12 border-4 border-black border-t-white bg-neo-magenta rounded-full animate-spin mx-auto shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" />
+            <p className="font-black uppercase">Connecting...</p>
           </div>
         )}
 
         {status === "uploading" && (
-          <div className="w-full max-w-xs text-center space-y-3">
-            <div className="h-8 w-8 border-4 border-[#C9956A]/20 border-t-[#C9956A] rounded-full animate-spin mx-auto" />
-            <p className="text-[14px] font-medium text-[#F5F0EB]">Uploading Document... {progress}%</p>
-            <div className="w-full bg-[#1D2235] h-1.5 rounded-full overflow-hidden">
+          <div className="w-full max-w-xs text-center space-y-4">
+            <div className="h-12 w-12 border-4 border-black border-t-white bg-neo-cyan rounded-full animate-spin mx-auto shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" />
+            <p className="font-black uppercase">Uploading... {progress}%</p>
+            <div className="w-full bg-white border-2 border-black h-4 rounded-none overflow-hidden shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
-                className="bg-[#C9956A] h-full"
+                className="bg-black h-full"
               />
             </div>
           </div>
         )}
 
         {status === "done" && (
-          <div className="text-center space-y-3">
-            <div className="h-14 w-14 rounded-full flex items-center justify-center text-[#6EBF8B] shadow-[0_0_20px_rgba(110,191,139,0.2)] bg-[#1D2235] mx-auto">
-              <CheckCircle2 size={24} />
+          <div className="text-center space-y-4">
+            <div className="h-16 w-16 bg-neo-green border-4 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-auto">
+              <CheckCircle2 size={32} strokeWidth={3} />
             </div>
-            <p className="text-[15px] font-medium text-[#6EBF8B]">Upload complete!</p>
-            <p className="text-[13px] text-[#8A8F9E]">Redirecting to AI tutor...</p>
+            <p className="text-xl font-black uppercase">Upload Complete</p>
+            <p className="font-bold">Redirecting...</p>
           </div>
         )}
 
         {status === "error" && (
-          <div className="text-center space-y-3">
-            <div className="h-14 w-14 rounded-full flex items-center justify-center text-[#BF6E6E] shadow-[0_0_20px_rgba(191,110,110,0.2)] bg-[#1D2235] mx-auto">
-              <AlertCircle size={24} />
+          <div className="text-center space-y-4">
+            <div className="h-16 w-16 bg-red-500 border-4 border-black flex items-center justify-center text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-auto">
+              <AlertCircle size={32} strokeWidth={3} />
             </div>
-            <p className="text-[15px] font-medium text-[#BF6E6E]">Upload Failed</p>
-            <p className="text-[13px] text-[#8A8F9E] max-w-md mx-auto">{error}</p>
+            <p className="text-xl font-black uppercase text-red-600">Upload Failed</p>
+            <p className="font-bold max-w-md mx-auto">{error}</p>
             <button 
               onClick={(e) => {
                 e.stopPropagation();
                 setStatus("idle");
               }}
-              className="mt-2 text-[13px] text-[#C9956A] underline hover:text-[#D4A853]"
+              className="neo-button mt-4"
             >
               Try Again
             </button>

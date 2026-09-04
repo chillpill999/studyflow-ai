@@ -186,28 +186,28 @@ export const useStudyStore = create<StudyFlowState>()(
       },
 
       fetchDocuments: async () => {
-        // Sync document list from FastAPI backend (Supabase) if available
         try {
-          const origin = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
-          const res = await fetch(`${origin}/api/documents`);
-          if (res.ok) {
-            const backendDocs = await res.json();
-            const documents: DocumentInfo[] = backendDocs.map((doc: any) => ({
-              id: doc.id,
-              filename: doc.filename,
-              file_type: doc.file_type || 'pdf',
-              created_at: doc.created_at || new Date().toISOString()
-            }));
-            set({ documents });
+          const { createClient } = await import('@/lib/supabase');
+          const supabase = createClient();
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (!user) return;
+
+          const { data, error } = await supabase
+            .from('documents')
+            .select('id, filename, file_type, created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+          if (!error && data) {
+            set({ documents: data as DocumentInfo[] });
           }
         } catch (e) {
-          console.error("Failed to sync documents list from backend:", e);
-          // Keep local documents state as fallback
+          console.error("Failed to sync documents list from Supabase:", e);
         }
       },
 
       uploadDocument: async (file: File, extractedText?: string) => {
-        // Obsolete local upload path replaced by src/lib/api.ts uploadDocument
         return null;
       },
 
@@ -215,32 +215,36 @@ export const useStudyStore = create<StudyFlowState>()(
         if (get().activeDocContent?.id === docId) {
           return get().activeDocContent;
         }
-        const doc = await documentDB?.getDocument(docId);
-        if (doc) {
+        
+        const { createClient } = await import('@/lib/supabase');
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('documents')
+          .select('*')
+          .eq('id', docId)
+          .single();
+
+        if (data && !error) {
           return {
-            id: doc.id,
-            summary: doc.summary,
-            text_content: doc.textContent,
-            chunks: doc.chunks ? doc.chunks.map((text: string, idx: number) => ({ id: idx, text })) : [],
-            filename: doc.filename
+            id: data.id,
+            summary: data.summary,
+            text_content: data.text_content,
+            chunks: data.chunks || [],
+            filename: data.filename
           };
         }
         return null;
       },
 
       deleteDocument: async (docId: string) => {
-        // 1. Delete from remote FastAPI backend (Supabase)
         try {
-          const origin = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
-          await fetch(`${origin}/api/documents/${docId}`, { method: 'DELETE' });
+          const { createClient } = await import('@/lib/supabase');
+          const supabase = createClient();
+          await supabase.from('documents').delete().eq('id', docId);
         } catch (e) {
-          console.error("Failed to delete document from backend:", e);
+          console.error("Failed to delete document from Supabase:", e);
         }
 
-        // 2. Delete from local IndexedDB
-        await documentDB?.deleteDocument(docId);
-
-        // 3. Update state
         set(state => ({
           documents: state.documents.filter(d => d.id !== docId),
           flashcards: state.flashcards.filter(f => f.doc_id !== docId),
@@ -255,50 +259,16 @@ export const useStudyStore = create<StudyFlowState>()(
         if (docId) {
           set({ loading: true });
           try {
-            // Check if document is cached in local IndexedDB
-            let doc = await documentDB?.getDocument(docId);
-
-            if (!doc) {
-              // If not cached, fetch details from backend
-              const origin = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
-              const res = await fetch(`${origin}/api/documents/${docId}`);
-              if (!res.ok) throw new Error("Failed to fetch document details from backend");
-              
-              const backendDoc = await res.json();
-
-              // Trigger AI summarization and chunking on the serverless Vercel function
-              const processRes = await fetch('/api/process', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  text: backendDoc.text_content || "",
-                  filename: backendDoc.filename || "document.pdf"
-                })
-              });
-
-              if (!processRes.ok) throw new Error("Failed to summarize document content");
-              const processData = await processRes.json();
-
-              // Cache document content, chunks, and summary locally in IndexedDB
-              await documentDB?.saveDocument(
-                docId,
-                processData.text_content,
-                processData.chunks,
-                processData.summary,
-                backendDoc.filename
-              );
-
-              doc = await documentDB?.getDocument(docId);
-            }
-
+            const doc = await get().fetchDocumentDetails(docId);
+            
             if (doc) {
               set({
                 activeDocContent: {
-                  id: doc.id,
-                  summary: doc.summary,
-                  text_content: doc.textContent,
-                  chunks: doc.chunks ? doc.chunks.map((text: string, idx: number) => ({ id: idx, text })) : [],
-                  filename: doc.filename
+                  id: (doc as any).id,
+                  summary: (doc as any).summary,
+                  text_content: (doc as any).text_content,
+                  chunks: (doc as any).chunks || [],
+                  filename: (doc as any).filename
                 }
               });
             } else {

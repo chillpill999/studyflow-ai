@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Brain, ArrowRight, X } from 'lucide-react';
+import { Brain, ArrowRight, X } from 'lucide-react';
 import { useStudyStore } from '../store/studyStore';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -84,15 +84,9 @@ export default function AITutorBubble() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 h-16 w-16 rounded-full flex items-center justify-center z-50 cursor-grab active:cursor-grabbing"
-          style={{
-            background: 'radial-gradient(circle at 30% 30%, #818cf8, #4f46e5)',
-            boxShadow: 'inset -4px -4px 8px rgba(0,0,0,0.3), inset 4px 4px 8px rgba(255,255,255,0.4), 0 10px 20px rgba(79,70,229,0.5)',
-            border: '1px solid rgba(255,255,255,0.2)'
-          }}
+          className="fixed bottom-6 right-6 h-16 w-16 bg-neo-magenta border-4 border-black flex items-center justify-center z-50 cursor-grab active:cursor-grabbing shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
         >
-          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/20 to-white/40 pointer-events-none" />
-          <Sparkles className="text-white drop-shadow-md z-10" size={24} />
+          <Brain className="text-white" size={32} strokeWidth={3} />
         </motion.button>
       )}
 
@@ -106,7 +100,7 @@ export default function AITutorBubble() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 sm:bg-transparent sm:backdrop-blur-none"
+              className="fixed inset-0 bg-black/80 z-40 sm:bg-transparent sm:backdrop-blur-none"
             />
             
             {/* Chat Window */}
@@ -115,68 +109,68 @@ export default function AITutorBubble() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] h-full w-full bg-[#0A0A0F] sm:border border-white/10 sm:rounded-3xl shadow-2xl shadow-black/50 z-50 flex flex-col overflow-hidden"
+              className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] h-full w-full bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] z-50 flex flex-col overflow-hidden"
             >
               {/* Header */}
-              <div className="bg-[#13111E] border-b border-white/10 px-5 py-4 flex items-center justify-between z-10 shrink-0">
+              <div className="bg-neo-yellow border-b-4 border-black px-5 py-4 flex items-center justify-between z-10 shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 bg-indigo-600/20 border border-indigo-500/30 rounded-full flex items-center justify-center">
-                    <Brain className="text-indigo-400" size={16} />
+                  <div className="h-10 w-10 bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <Brain className="text-black" size={24} strokeWidth={3} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-sm">AI Sikshak</h3>
-                    <p className="text-[10px] text-white/50">Always here to explain.</p>
+                    <h3 className="font-black text-black text-lg uppercase">Tutor</h3>
+                    <p className="font-bold text-xs">Explanation Engine</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <select 
                     value={tutorDiff}
                     onChange={(e) => setTutorDiff(e.target.value)}
-                    className="bg-white/5 border border-white/10 text-white/70 text-[10px] px-2 py-1.5 rounded-lg focus:outline-none cursor-pointer"
+                    className="bg-white border-2 border-black text-black font-bold uppercase text-xs px-2 py-1 focus:outline-none cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   >
                     <option value="easy">Beginner</option>
                     <option value="medium">Intermediate</option>
-                    <option value="hard">Elite</option>
+                    <option value="hard">Advanced</option>
                   </select>
                   <button 
                     onClick={() => setIsOpen(false)}
-                    className="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-white/50 hover:text-white transition-colors border border-white/5"
+                    className="h-8 w-8 bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none transition-all"
                   >
-                    <X size={16} />
+                    <X size={20} strokeWidth={3} />
                   </button>
                 </div>
               </div>
 
               {/* Chat Area */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-5 flex flex-col">
+              <div className="flex-1 overflow-y-auto p-5 space-y-6 flex flex-col bg-[#f4f4f0]">
                 {tutorMessages.length === 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50">
-                    <Brain size={40} className="text-indigo-400 mb-3" />
-                    <h4 className="text-white font-bold mb-1 text-sm">What do you want to learn?</h4>
-                    <p className="text-xs text-white/60 max-w-[200px]">Type a concept below, and I&apos;ll break it down using analogies.</p>
+                  <div className="flex-1 flex flex-col items-center justify-center text-center">
+                    <Brain size={48} strokeWidth={2} className="mb-4" />
+                    <h4 className="font-black mb-2 text-xl uppercase text-black">Query Concepts</h4>
+                    <p className="font-bold text-sm text-black">Enter a topic to receive a structured breakdown.</p>
                   </div>
                 ) : (
                   tutorMessages.map((msg, idx) => (
                     <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-lg ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-[#1E1E2E] text-white/90 border border-white/5 rounded-tl-sm'}`}>
+                      <div className={`max-w-[85%] px-4 py-3 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${msg.role === 'user' ? 'bg-neo-cyan text-black' : 'bg-white text-black'}`}>
                         {msg.role === 'assistant' && (
-                          <div className="flex items-center gap-1.5 mb-1.5 text-indigo-400 font-bold text-[10px] uppercase tracking-wider">
-                            <Sparkles size={10} /> AI Tutor
+                          <div className="flex items-center gap-2 mb-2 font-black text-xs uppercase border-b-2 border-black pb-2">
+                            <Brain size={14} strokeWidth={3} /> System
                           </div>
                         )}
-                        <div className="text-xs leading-relaxed overflow-hidden markdown-body">
+                        <div className="text-sm font-semibold leading-relaxed overflow-hidden markdown-body">
                           <ReactMarkdown 
                             remarkPlugins={[remarkGfm, remarkMath]} 
                             rehypePlugins={[rehypeKatex]}
                             components={{
                               p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
-                              pre: ({node, ...props}) => <pre className="bg-black/50 p-2 rounded-lg my-2 overflow-x-auto text-[10px]" {...props} />,
-                              code: ({node, inline, ...props}: any) => inline ? <code className="bg-black/30 px-1 py-0.5 rounded text-indigo-200" {...props} /> : <code {...props} />,
-                              ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-2 space-y-1" {...props} />,
-                              ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-2 space-y-1" {...props} />,
-                              h1: ({node, ...props}) => <h1 className="text-sm font-bold text-indigo-300 mt-3 mb-1" {...props} />,
-                              h2: ({node, ...props}) => <h2 className="text-sm font-bold text-indigo-300 mt-3 mb-1" {...props} />,
-                              h3: ({node, ...props}) => <h3 className="text-xs font-bold text-indigo-300 mt-2 mb-1" {...props} />,
+                              pre: ({node, ...props}) => <pre className="bg-gray-100 border-2 border-black p-2 my-2 overflow-x-auto text-xs" {...props} />,
+                              code: ({node, inline, ...props}: any) => inline ? <code className="bg-neo-yellow px-1 py-0.5 border border-black text-black font-black" {...props} /> : <code {...props} />,
+                              ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-2 space-y-1 font-bold" {...props} />,
+                              ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-2 space-y-1 font-bold" {...props} />,
+                              h1: ({node, ...props}) => <h1 className="text-base font-black uppercase mt-3 mb-1" {...props} />,
+                              h2: ({node, ...props}) => <h2 className="text-base font-black uppercase mt-3 mb-1" {...props} />,
+                              h3: ({node, ...props}) => <h3 className="text-sm font-black uppercase mt-2 mb-1" {...props} />,
                             }}
                           >
                             {msg.content + (isStreaming && idx === tutorMessages.length - 1 ? ' ▋' : '')}
@@ -189,23 +183,23 @@ export default function AITutorBubble() {
               </div>
 
               {/* Input Area */}
-              <div className="p-3 bg-[#13111E] border-t border-white/10 shrink-0">
-                <div className="flex items-center gap-2 bg-[#0A0A0F] border border-white/10 rounded-xl px-2.5 py-2 focus-within:border-indigo-500 transition-colors shadow-inner">
+              <div className="p-4 bg-white border-t-4 border-black shrink-0">
+                <div className="flex items-center gap-3">
                   <input
                     type="text"
                     value={tutorTopic}
                     onChange={(e) => setTutorTopic(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleTutorExplain()}
-                    placeholder="Message AI Tutor..."
+                    placeholder="Enter concept..."
                     disabled={loadingTutor || isStreaming}
-                    className="flex-1 bg-transparent border-none px-1.5 text-xs text-white focus:outline-none disabled:opacity-50"
+                    className="flex-1 neo-input text-sm"
                   />
                   <button
                     onClick={handleTutorExplain}
                     disabled={!tutorTopic.trim() || loadingTutor || isStreaming}
-                    className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/30 disabled:text-white/30 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors shadow-md"
+                    className="neo-button neo-button-cyan p-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center h-[46px] w-[46px]"
                   >
-                    <ArrowRight size={14} />
+                    <ArrowRight size={20} strokeWidth={3} />
                   </button>
                 </div>
               </div>

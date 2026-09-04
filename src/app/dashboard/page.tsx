@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { 
   Zap, 
   Clock, 
@@ -10,8 +9,6 @@ import {
   Award, 
   Trash2, 
   MessageSquare,
-  Sparkles,
-  CheckCircle,
   AlertTriangle
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
@@ -41,13 +38,12 @@ export default function Dashboard() {
   const [aiInsights, setAiInsights] = useState<Insight[]>([]);
 
   const loadInsights = React.useCallback(async () => {
-    // Mock insights fallback
     setAiInsights([
       {
         id: "1",
         type: "action",
-        subject: "Welcome",
-        text: "Upload your first document to begin generating personalized insights.",
+        subject: "Action Required",
+        text: "Upload your first document to begin processing.",
         status: "info"
       }
     ]);
@@ -76,123 +72,81 @@ export default function Dashboard() {
     return { id: i, level: 0, isToday };
   });
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 }
-    }
-  };
-
-  const itemVariants: import('framer-motion').Variants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { type: "spring", stiffness: 300, damping: 24 }
-    }
-  };
-
   return (
-    <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-8 max-w-7xl mx-auto pb-12"
-    >
+    <div className="space-y-8 max-w-7xl mx-auto pb-12 w-full">
       {/* Top Welcome Title */}
-      <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-[30px] font-playfair font-bold text-[#F5F0EB] tracking-tight flex items-center gap-2">
-            Welcome back, {user?.username || 'Scholar'}
-            <motion.span 
-              animate={{ rotate: [0, 20, 0] }}
-              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-            >
-              👋
-            </motion.span>
+          <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">
+            Workspace: {user?.username || 'Student'}
           </h1>
-          <p className="text-[#8A8F9E] text-[14px] mt-1">Here is your study velocity analytics and workspace breakdown.</p>
+          <p className="text-lg font-bold border-l-4 border-black pl-3">Overview of your documents and study intensity.</p>
         </div>
 
         {/* Top Right Controls */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-transparent border border-[#C9956A] rounded-full px-3 py-1.5 text-xs font-medium text-[#C9956A]">
-            <span className="h-2 w-2 rounded-full bg-[#D4A853] animate-pulse" />
-            Mock Mode
+          <div className="flex items-center gap-2 bg-neo-yellow border-2 border-black px-4 py-2 text-sm font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <span className="h-3 w-3 bg-black" />
+            Active Mode
           </div>
-          {/* Notification bell mock */}
-          <button className="h-9 w-9 rounded-full bg-[#1D2235] border border-white/5 flex items-center justify-center text-[#8A8F9E] hover:text-[#F5F0EB] transition-colors cursor-pointer relative">
-            <div className="absolute top-2 right-2 h-1.5 w-1.5 bg-[#C9956A] rounded-full" />
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-          </button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Key Metrics Widgets */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        {/* Streak card */}
-        <motion.div variants={itemVariants} className="glass-card relative p-5 flex items-center justify-between overflow-hidden">
-          <div className="space-y-1 z-10">
-            <span className="text-[13px] text-[#8A8F9E] font-medium tracking-wider uppercase">Active Streak</span>
-            <h3 className="text-[34px] font-bold text-[#F5F0EB] font-mono-numbers leading-none">{totalStreak}</h3>
+        <div className="neo-box p-5 flex items-center justify-between bg-neo-cyan">
+          <div className="space-y-1">
+            <span className="text-sm font-black uppercase">Active Streak</span>
+            <h3 className="text-4xl font-black font-mono-numbers">{totalStreak}</h3>
           </div>
-          <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-white z-10 shadow-[0_0_15px_rgba(201,149,106,0.3)]">
-            <Zap size={18} />
+          <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <Zap size={24} strokeWidth={3} />
           </div>
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-[40%] bg-[#C9956A]" />
-        </motion.div>
+        </div>
 
-        {/* Study Hours Widget */}
-        <motion.div variants={itemVariants} className="glass-card relative p-5 flex items-center justify-between overflow-hidden">
-          <div className="space-y-1 z-10">
-            <span className="text-[13px] text-[#8A8F9E] font-medium tracking-wider uppercase">Study Hours</span>
-            <h3 className="text-[34px] font-bold text-[#F5F0EB] font-mono-numbers leading-none">{studyHours}</h3>
+        <div className="neo-box p-5 flex items-center justify-between bg-neo-magenta text-white">
+          <div className="space-y-1">
+            <span className="text-sm font-black uppercase">Study Hours</span>
+            <h3 className="text-4xl font-black font-mono-numbers">{studyHours}</h3>
           </div>
-          <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-white z-10 shadow-[0_0_15px_rgba(201,149,106,0.3)]">
-            <Clock size={18} />
+          <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <Clock size={24} strokeWidth={3} />
           </div>
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-[40%] bg-[#C9956A]" />
-        </motion.div>
+        </div>
 
-        {/* Total Documents Card */}
-        <motion.div variants={itemVariants} className="glass-card relative p-5 flex items-center justify-between overflow-hidden">
-          <div className="space-y-1 z-10">
-            <span className="text-[13px] text-[#8A8F9E] font-medium tracking-wider uppercase">Total Documents</span>
-            <h3 className="text-[34px] font-bold text-[#F5F0EB] font-mono-numbers leading-none">{totalDocs}</h3>
+        <div className="neo-box p-5 flex items-center justify-between bg-neo-yellow">
+          <div className="space-y-1">
+            <span className="text-sm font-black uppercase">Total Documents</span>
+            <h3 className="text-4xl font-black font-mono-numbers">{totalDocs}</h3>
           </div>
-          <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-white z-10 shadow-[0_0_15px_rgba(201,149,106,0.3)]">
-            <FileText size={18} />
+          <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <FileText size={24} strokeWidth={3} />
           </div>
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-[40%] bg-[#C9956A]" />
-        </motion.div>
+        </div>
 
-        {/* Quizzes Completed Card */}
-        <motion.div variants={itemVariants} className="glass-card relative p-5 flex items-center justify-between overflow-hidden">
-          <div className="space-y-1 z-10">
-            <span className="text-[13px] text-[#8A8F9E] font-medium tracking-wider uppercase">Quizzes Done</span>
-            <h3 className="text-[34px] font-bold text-[#F5F0EB] font-mono-numbers leading-none">{completedQuizzes}</h3>
+        <div className="neo-box p-5 flex items-center justify-between bg-neo-green">
+          <div className="space-y-1">
+            <span className="text-sm font-black uppercase">Quizzes Done</span>
+            <h3 className="text-4xl font-black font-mono-numbers">{completedQuizzes}</h3>
           </div>
-          <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-white z-10 shadow-[0_0_15px_rgba(201,149,106,0.3)]">
-            <Award size={18} />
+          <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <Award size={24} strokeWidth={3} />
           </div>
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-[40%] bg-[#C9956A]" />
-        </motion.div>
+        </div>
 
       </div>
 
       {/* Main Split Section: Upload/Docs vs Heatmap/AI Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         
         {/* Left Side: Upload Dropzone & Document Lists */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           
-          {/* Uploader Widget */}
-          <motion.div variants={itemVariants} className="glass-card p-6 relative">
+          <div className="neo-box p-6 bg-white">
+            <h3 className="text-2xl font-black uppercase mb-4 border-b-4 border-black pb-2">Upload Document</h3>
             <FileUploader 
               onSuccess={async (docId, filename) => {
-                // Construct metadata for Zustand
                 const newDoc = {
                   id: docId,
                   filename: filename,
@@ -200,161 +154,146 @@ export default function Dashboard() {
                   created_at: new Date().toISOString()
                 };
 
-                // Add to Zustand document list
                 useStudyStore.setState((state) => ({
                   documents: [newDoc, ...state.documents]
                 }));
 
-                // Set active doc ID
                 setActiveDocId(docId);
-
-                // Redirect to chat
                 router.push('/chat');
               }}
             />
-          </motion.div>
+          </div>
 
-          {/* Uploaded Documents List */}
-          <motion.div variants={itemVariants} className="glass-card p-6 space-y-4">
-            <h3 className="text-[16px] font-playfair font-bold text-[#F5F0EB]">Indexed Documents</h3>
+          <div className="neo-box p-6 space-y-4 bg-white">
+            <h3 className="text-2xl font-black uppercase border-b-4 border-black pb-2">Indexed Documents</h3>
 
             {documents.length === 0 ? (
-              <div className="text-center py-12 border border-white/5 rounded-xl bg-transparent flex flex-col items-center">
-                <div className="h-12 w-12 bg-[#1D2235] rounded-full flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(201,149,106,0.1)]">
-                  <FileText className="text-[#C9956A] h-5 w-5 animate-float-1" />
-                </div>
-                <p className="text-[#8A8F9E] font-medium text-[14px]">No documents yet</p>
+              <div className="text-center py-12 border-4 border-black bg-gray-100 flex flex-col items-center">
+                <FileText className="h-12 w-12 mb-3" strokeWidth={2} />
+                <p className="font-bold uppercase">No documents uploaded.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 gap-4">
                 {documents.map((doc) => (
                   <div 
                     key={doc.id} 
-                    className="group p-3 rounded-xl flex items-center justify-between border border-white/5 bg-[#1D2235] hover:border-[rgba(201,149,106,0.3)] transition-colors"
+                    className="group p-4 flex items-center justify-between border-2 border-black bg-white hover:bg-neo-yellow transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-9 w-9 rounded-lg bg-[rgba(201,149,106,0.1)] flex items-center justify-center text-[#C9956A] font-bold text-[10px] uppercase">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="h-12 w-12 border-2 border-black bg-white flex items-center justify-center font-black text-xs uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                         {doc.file_type}
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-[14px] font-medium text-[#F5F0EB] truncate max-w-[200px]">{doc.filename}</h4>
-                        <span className="text-[12px] text-[#8A8F9E]">Uploaded {new Date(doc.created_at).toLocaleDateString()}</span>
+                        <h4 className="text-lg font-bold truncate max-w-[200px] leading-tight">{doc.filename}</h4>
+                        <span className="text-sm font-semibold text-gray-700">{new Date(doc.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="flex items-center gap-2 opacity-100">
                       <button 
                         onClick={() => triggerChatWithDoc(doc.id)}
-                        className="p-1.5 rounded-md hover:bg-[rgba(201,149,106,0.1)] text-[#8A8F9E] hover:text-[#C9956A] transition-colors cursor-pointer"
+                        className="p-2 border-2 border-black bg-neo-cyan hover:bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px]"
                       >
-                        <MessageSquare size={14} />
+                        <MessageSquare size={18} strokeWidth={3} />
                       </button>
                       <button 
                         onClick={() => deleteDocument(doc.id)}
-                        className="p-1.5 rounded-md hover:bg-[#BF6E6E]/10 text-[#8A8F9E] hover:text-[#BF6E6E] transition-colors cursor-pointer"
+                        className="p-2 border-2 border-black bg-red-500 hover:bg-white text-white hover:text-red-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px]"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={18} strokeWidth={3} />
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
             )}
-          </motion.div>
+          </div>
 
         </div>
 
         {/* Right Side: Heatmap Calendar & AI Insights */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           
-          {/* Heatmap Contribution Grid */}
-          <motion.div variants={itemVariants} className="glass-card p-6 space-y-5">
-            <h3 className="text-[16px] font-playfair font-bold text-[#F5F0EB] flex items-center gap-2">
-              <Clock size={16} className="text-[#8A8F9E]" />
-              Study Intensity Map
+          <div className="neo-box p-6 bg-white">
+            <h3 className="text-2xl font-black uppercase border-b-4 border-black pb-2 mb-6 flex items-center gap-3">
+              <Clock size={24} strokeWidth={3} />
+              Study Intensity
             </h3>
 
-            <div className="grid grid-cols-7 gap-1.5">
+            <div className="grid grid-cols-7 gap-2">
               {heatmapData.map((day) => (
                 <div 
                   key={day.id}
                   className={`
-                    aspect-square rounded-[4px] transition-all duration-300 relative group heatmap-level-${day.level}
-                    ${day.level === 0 ? 'hover:bg-[rgba(255,255,255,0.06)]' : 'shadow-[0_0_8px_rgba(201,149,106,0.2)]'}
+                    aspect-square heatmap-level-${day.level} relative group cursor-pointer
                   `}
                 >
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 bg-[#0F1117] border border-[#C9956A]/20 text-[10px] text-[#F5F0EB] rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-30 font-mono-numbers">
-                    {day.level * 2} hrs study session
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black text-white text-xs font-bold uppercase rounded-none px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-30">
+                    {day.level * 2} hrs
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="flex items-center justify-start gap-2 text-[11px] text-[#8A8F9E] pt-1">
+            <div className="flex items-center justify-start gap-3 mt-6 text-xs font-bold uppercase">
               <span>Less</span>
-              <div className="flex gap-1">
-                <div className="h-2.5 w-2.5 rounded-[2px] heatmap-level-0" />
-                <div className="h-2.5 w-2.5 rounded-[2px] heatmap-level-1" />
-                <div className="h-2.5 w-2.5 rounded-[2px] heatmap-level-2" />
-                <div className="h-2.5 w-2.5 rounded-[2px] heatmap-level-3" />
-                <div className="h-2.5 w-2.5 rounded-[2px] heatmap-level-4" />
+              <div className="flex gap-2">
+                <div className="h-4 w-4 heatmap-level-0" />
+                <div className="h-4 w-4 heatmap-level-1" />
+                <div className="h-4 w-4 heatmap-level-2" />
+                <div className="h-4 w-4 heatmap-level-3" />
+                <div className="h-4 w-4 heatmap-level-4" />
               </div>
               <span>More</span>
             </div>
-          </motion.div>
+          </div>
 
-          {/* AI Insights panel */}
-          <motion.div variants={itemVariants} className="glass-card p-6 space-y-4">
-            <h3 className="text-[16px] font-playfair font-bold text-[#F5F0EB] flex items-center gap-2">
-              <Sparkles size={16} className="text-[#8A8F9E]" />
-              AI Studio Insights
+          <div className="neo-box p-6 bg-white">
+            <h3 className="text-2xl font-black uppercase border-b-4 border-black pb-2 mb-6 flex items-center gap-3">
+              <FileText size={24} strokeWidth={3} />
+              System Status
             </h3>
 
             {aiInsights.length === 1 && aiInsights[0].id === "1" ? (
-              <div className="text-center py-8 border border-white/5 rounded-xl bg-transparent flex flex-col items-center">
-                <div className="h-10 w-10 bg-[#1D2235] rounded-full flex items-center justify-center mb-3">
-                  <Sparkles className="text-[#C9956A] h-5 w-5" />
+              <div className="text-center py-8 border-4 border-black bg-gray-100 flex flex-col items-center">
+                <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center mb-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <AlertTriangle className="text-black h-6 w-6" strokeWidth={3} />
                 </div>
-                <p className="text-gradient-primary font-medium text-[14px]">Your insights will appear here</p>
-                <button className="mt-4 px-4 py-2 border border-[#C9956A] rounded-lg text-[13px] font-medium text-[#C9956A] hover:bg-[rgba(201,149,106,0.05)] transition-colors cursor-pointer">
-                  Open AI Studio
+                <p className="font-bold text-lg mb-4">No data to process.</p>
+                <button className="neo-button">
+                  Upload a file
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {aiInsights.map((insight) => (
                   <div 
                     key={insight.id} 
-                    className="p-3.5 rounded-xl border border-white/5 bg-[#1D2235] flex items-start gap-3 text-[14px]"
+                    className="p-4 border-4 border-black bg-neo-yellow flex items-start gap-4"
                   >
-                    <div className="mt-0.5">
-                      {insight.status === 'success' && <CheckCircle size={16} className="text-[#6EBF8B]" />}
-                      {insight.status === 'warning' && <AlertTriangle size={16} className="text-[#D4A853]" />}
-                      {insight.status === 'info' && <Sparkles size={16} className="text-[#C9956A]" />}
+                    <div className="mt-1">
+                      <AlertTriangle size={24} strokeWidth={3} />
                     </div>
                     <div>
-                      <h5 className="font-semibold text-[#F5F0EB] text-[13px]">{insight.subject}</h5>
-                      <p className="text-[#8A8F9E] text-[13px] mt-0.5 leading-relaxed">{insight.text}</p>
+                      <h5 className="font-black text-lg uppercase">{insight.subject}</h5>
+                      <p className="font-semibold">{insight.text}</p>
                     </div>
                   </div>
                 ))}
               </div>
             )}
-          </motion.div>
+          </div>
 
         </div>
 
       </div>
 
       {/* Footer Credits */}
-      <div className="pt-12 pb-4 text-center">
-        <p className="text-[#8A8F9E] text-[13px] tracking-wide">
-          Made with Love of Hothlali Members ❤️
-        </p>
-        <p className="text-[#4A4F5E] text-[11px] mt-1 font-mono uppercase tracking-widest">
-          developed by Civil Boys
+      <div className="pt-12 pb-4 text-center border-t-4 border-black mt-12">
+        <p className="font-black uppercase text-sm">
+          Developed by Civil Boys
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 }

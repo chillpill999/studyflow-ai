@@ -101,26 +101,26 @@ export default function NotesSystem() {
     return lines.map((line, idx) => {
       // Headers
       if (line.startsWith('# ')) {
-        return <h1 key={idx} className="text-xl font-extrabold text-white border-b border-white/5 pb-2 mb-3 mt-4">{line.substring(2)}</h1>;
+        return <h1 key={idx} className="text-3xl font-black uppercase text-black border-b-4 border-black pb-2 mb-4 mt-6">{line.substring(2)}</h1>;
       }
       if (line.startsWith('## ')) {
-        return <h2 key={idx} className="text-md font-bold text-white mb-2 mt-3">{line.substring(3)}</h2>;
+        return <h2 key={idx} className="text-xl font-black uppercase text-black mb-3 mt-4">{line.substring(3)}</h2>;
       }
       // Bullets
       if (line.startsWith('- ') || line.startsWith('* ')) {
         return (
-          <div key={idx} className="flex items-start gap-2 pl-2 text-xs leading-relaxed text-white/70 mb-1.5">
-            <span className="mt-1.5 h-1 w-1 rounded-full bg-indigo-400 flex-shrink-0" />
+          <div key={idx} className="flex items-start gap-3 pl-4 text-base font-bold text-black mb-2">
+            <span className="mt-2 h-2 w-2 bg-black flex-shrink-0" />
             <span>{line.substring(2)}</span>
           </div>
         );
       }
       // Empty line
       if (line.trim() === '') {
-        return <div key={idx} className="h-2" />;
+        return <div key={idx} className="h-4" />;
       }
       // Default paragraphs
-      return <p key={idx} className="text-xs text-white/60 leading-relaxed mb-1.5">{line}</p>;
+      return <p key={idx} className="text-base font-bold text-black leading-relaxed mb-3">{line}</p>;
     });
   };
 
@@ -136,50 +136,50 @@ export default function NotesSystem() {
   });
 
   return (
-    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col md:flex-row gap-6 max-w-7xl mx-auto md:overflow-hidden">
+    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col md:flex-row gap-8 max-w-7xl mx-auto md:overflow-hidden text-black pb-6 md:pb-0">
       
       {/* LEFT SIDEBAR: Notes Directory list */}
-      <div className="w-full md:w-80 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-4 flex flex-col justify-between overflow-hidden min-h-[350px] md:min-h-0">
+      <div className="w-full md:w-96 neo-box bg-neo-yellow p-6 flex flex-col justify-between overflow-hidden min-h-[400px] md:min-h-0">
         
-        <div className="space-y-4 flex-1 flex flex-col min-h-0">
+        <div className="space-y-6 flex-1 flex flex-col min-h-0">
           
           {/* New note trigger and title */}
-          <div className="flex justify-between items-center">
-            <h3 className="text-md font-bold text-white flex items-center gap-1.5">
-              <FileText size={16} className="text-indigo-400" />
-              Notes Workspace
+          <div className="flex justify-between items-center bg-white border-4 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <h3 className="text-lg font-black uppercase flex items-center gap-2">
+              <FileText size={24} strokeWidth={3} />
+              Workspace
             </h3>
             <button 
               onClick={handleCreateNewNote}
-              className="p-1.5 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/25 border border-indigo-500/30 text-indigo-400 cursor-pointer transition-all"
+              className="p-2 bg-neo-cyan border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-all"
             >
-              <Plus size={14} />
+              <Plus size={20} strokeWidth={3} />
             </button>
           </div>
 
           {/* Search bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={14} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black" size={20} strokeWidth={3} />
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search note contents..."
-              className="w-full glass-input pl-9 pr-3 py-2 rounded-xl text-xs"
+              placeholder="Search notes..."
+              className="w-full neo-input pl-12 py-3"
             />
           </div>
 
           {/* Folders List selection tab row */}
-          <div className="flex gap-1 overflow-x-auto pb-1.5 border-b border-white/5">
+          <div className="flex gap-2 overflow-x-auto pb-2 border-b-4 border-black custom-scrollbar">
             {folders.map(fld => (
               <button
                 key={fld}
                 onClick={() => setSelectedFolder(fld)}
                 className={`
-                  px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all cursor-pointer whitespace-nowrap
+                  px-4 py-2 text-sm font-black uppercase border-4 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer whitespace-nowrap
                   ${selectedFolder === fld 
-                    ? 'bg-indigo-600/10 border-indigo-500/50 text-white' 
-                    : 'bg-white/3 border-white/5 text-white/50 hover:text-white'
+                    ? 'bg-black text-white' 
+                    : 'bg-white text-black hover:bg-neo-cyan'
                   }
                 `}
               >
@@ -189,11 +189,11 @@ export default function NotesSystem() {
           </div>
 
           {/* Notes items log list */}
-          <div className="flex-1 overflow-y-auto space-y-2 pr-1 pt-1 min-h-0">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2 pt-2 min-h-0 custom-scrollbar">
             {filteredNotes.length === 0 ? (
-              <div className="text-center py-10 border border-white/5 rounded-xl bg-white/3">
-                <FileText className="mx-auto text-white/20 h-8 w-8 mb-2" />
-                <p className="text-white/40 text-xs font-semibold">No notes found</p>
+              <div className="text-center py-10 bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <FileText className="mx-auto h-12 w-12 mb-4" strokeWidth={2} />
+                <p className="font-black uppercase text-lg">No notes found</p>
               </div>
             ) : (
               filteredNotes.map((note) => (
@@ -201,26 +201,26 @@ export default function NotesSystem() {
                   key={note.id}
                   onClick={() => handleSelectNote(note)}
                   className={`
-                    p-3 rounded-xl border text-left cursor-pointer transition-all duration-200 flex items-center justify-between group
+                    p-4 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-left cursor-pointer transition-all duration-200 flex items-center justify-between group
                     ${activeNote?.id === note.id 
-                      ? 'bg-indigo-600/10 border-indigo-500/50 text-white shadow-lg shadow-indigo-600/5' 
-                      : 'bg-white/3 border-white/5 hover:bg-white/5 hover:border-white/8 text-white/70'
+                      ? 'bg-neo-magenta shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] scale-[1.02]' 
+                      : 'bg-white hover:bg-neo-cyan'
                     }
                   `}
                 >
                   <div className="min-w-0 pr-2">
-                    <h4 className="font-bold text-xs truncate">{note.title}</h4>
-                    <span className="text-[10px] text-white/30 flex items-center gap-1 mt-1">
-                      <Folder size={10} className="text-indigo-400" />
+                    <h4 className="font-black uppercase text-base truncate">{note.title}</h4>
+                    <span className="text-xs font-bold bg-white border-2 border-black px-2 py-0.5 mt-2 flex items-center gap-2 w-max shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      <Folder size={14} strokeWidth={3} />
                       {note.folder}
                     </span>
                   </div>
 
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}
-                    className="p-1 rounded bg-transparent opacity-0 group-hover:opacity-100 hover:bg-rose-500/20 text-white/40 hover:text-rose-400 transition-all cursor-pointer"
+                    className="p-2 bg-red-500 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 hover:bg-white text-black transition-all cursor-pointer"
                   >
-                    <Trash2 size={12} />
+                    <Trash2 size={16} strokeWidth={3} />
                   </button>
                 </div>
               ))
@@ -232,39 +232,39 @@ export default function NotesSystem() {
       </div>
 
       {/* RIGHT EDITOR PANEL */}
-      <div className="flex-1 bg-[#0B1120]/75 backdrop-blur-xl border border-white/8 rounded-2xl p-5 flex flex-col justify-between overflow-hidden min-h-[500px] md:min-h-0">
+      <div className="flex-1 neo-box bg-white p-6 flex flex-col justify-between overflow-hidden min-h-[600px] md:min-h-0">
         {activeNote ? (
           <div className="h-full flex flex-col justify-between min-h-0">
             
             {/* Note Meta inputs (Title, Folder Selector) */}
-            <div className="border-b border-white/5 pb-4 space-y-3">
-              <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
+            <div className="border-b-4 border-black pb-6 space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                 <input 
                   type="text" 
                   value={noteTitle}
                   onChange={(e) => setNoteTitle(e.target.value)}
                   placeholder="Note Title"
-                  className="bg-transparent text-lg font-extrabold text-white focus:outline-none flex-1 border-b border-transparent focus:border-white/10 pb-0.5"
+                  className="bg-neo-yellow border-4 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-2xl font-black uppercase flex-1 focus:outline-none w-full sm:w-auto"
                 />
 
                 {/* Editor action shortcuts */}
-                <div className="flex items-center gap-2 self-end sm:self-auto">
+                <div className="flex items-center gap-4 self-end sm:self-auto">
                   
                   {/* Mode Toggles */}
-                  <div className="flex bg-white/5 rounded-lg p-0.5 border border-white/8">
+                  <div className="flex bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-1">
                     <button
                       onClick={() => setEditorMode('edit')}
-                      className={`p-1.5 rounded-md text-xs cursor-pointer transition-all ${editorMode === 'edit' ? 'bg-indigo-600 text-white' : 'text-white/50 hover:text-white'}`}
+                      className={`p-2 font-black uppercase text-sm transition-all border-2 border-transparent ${editorMode === 'edit' ? 'bg-black text-white' : 'hover:bg-neo-cyan text-black'}`}
                       title="Edit Mode"
                     >
-                      <Edit3 size={13} />
+                      <Edit3 size={20} strokeWidth={3} />
                     </button>
                     <button
                       onClick={() => setEditorMode('preview')}
-                      className={`p-1.5 rounded-md text-xs cursor-pointer transition-all ${editorMode === 'preview' ? 'bg-indigo-600 text-white' : 'text-white/50 hover:text-white'}`}
+                      className={`p-2 font-black uppercase text-sm transition-all border-2 border-transparent ${editorMode === 'preview' ? 'bg-black text-white' : 'hover:bg-neo-magenta text-black'}`}
                       title="Preview Mode"
                     >
-                      <Eye size={13} />
+                      <Eye size={20} strokeWidth={3} />
                     </button>
                   </div>
 
@@ -272,62 +272,68 @@ export default function NotesSystem() {
                   <button
                     onClick={handleSaveNote}
                     disabled={saveStatus === 'saving'}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="neo-button bg-neo-green hover:bg-white flex items-center gap-2 py-3 px-6 disabled:opacity-50"
                   >
                     {saveStatus === 'saving' ? (
-                      <span className="h-3 w-3 border border-white/20 border-t-white rounded-full animate-spin" />
+                      <span className="h-5 w-5 border-4 border-black border-t-white bg-neo-cyan rounded-full animate-spin shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" />
                     ) : saveStatus === 'saved' ? (
-                      <Check size={13} className="text-emerald-400" />
+                      <Check size={20} strokeWidth={4} />
                     ) : (
-                      <Save size={13} />
+                      <Save size={20} strokeWidth={3} />
                     )}
-                    {saveStatus === 'saved' ? 'Saved' : 'Save'}
+                    <span className="text-lg">
+                      {saveStatus === 'saved' ? 'Saved' : 'Save'}
+                    </span>
                   </button>
 
                 </div>
               </div>
 
               {/* Folder selection row */}
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Folder:</span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-black uppercase">Folder:</span>
                 <input 
                   type="text" 
                   value={noteFolder}
                   onChange={(e) => setNoteFolder(e.target.value)}
                   placeholder="e.g. Physics"
-                  className="bg-white/5 border border-white/8 rounded px-2.5 py-1 text-[11px] text-indigo-300 font-semibold focus:outline-none focus:border-indigo-500 max-w-[120px]"
+                  className="neo-input py-2 text-sm w-48"
                 />
               </div>
             </div>
 
             {/* Note Editor area */}
-            <div className="flex-1 my-4 overflow-y-auto min-h-0">
+            <div className="flex-1 my-6 overflow-y-auto min-h-0 bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 custom-scrollbar">
               {editorMode === 'edit' ? (
                 <textarea
                   value={noteContent}
                   onChange={(e) => setNoteContent(e.target.value)}
                   placeholder="# Outline Note content using markdown headers (#) and bullets (-)"
-                  className="w-full h-full bg-transparent border-0 resize-none focus:outline-none text-xs leading-relaxed text-white/80 font-mono"
+                  className="w-full h-full bg-transparent border-0 resize-none focus:outline-none text-base font-bold leading-relaxed font-mono custom-scrollbar"
                 />
               ) : (
-                <div className="prose prose-invert max-w-none px-2 py-1 select-text">
+                <div className="prose prose-lg max-w-none select-text">
                   {parseMarkdown(noteContent)}
                 </div>
               )}
             </div>
 
             {/* Editor Footer tips */}
-            <div className="text-[10px] text-white/30 border-t border-white/5 pt-2 flex items-center gap-1">
-              <BookOpen size={10} className="text-indigo-400" />
+            <div className="font-bold text-sm border-t-4 border-black pt-4 flex items-center gap-3">
+              <div className="bg-neo-cyan border-2 border-black p-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <BookOpen size={20} strokeWidth={3} />
+              </div>
               <span>Supports basic markdown: `#` headers, `##` subheaders, and `-` bullets.</span>
             </div>
 
           </div>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2">
-            <FileText className="text-white/10 h-12 w-12" />
-            <p className="text-sm font-bold text-white/60">No Active Note Selected</p>
-            <p className="text-xs text-white/30 max-w-[200px]">Create a new notebook entry or select one from the explorer sidebar.</p>
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-6">
+            <div className="bg-neo-yellow border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <FileText className="text-black h-20 w-20 mx-auto mb-6" strokeWidth={2} />
+              <p className="text-3xl font-black uppercase mb-4">No Note Selected</p>
+              <p className="text-lg font-bold max-w-sm mx-auto">Create a new notebook entry or select one from the explorer sidebar.</p>
+            </div>
           </div>
         )}
       </div>

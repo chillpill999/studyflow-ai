@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { createClient } from '@/lib/supabaseServer';
 
 export async function POST(req: Request) {
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const groqKey = process.env.GROQ_API_KEY;
   const openRouterKey = process.env.OPENROUTER_API_KEY;
   const geminiKey = process.env.GEMINI_API_KEY;
@@ -16,7 +24,25 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { documentId, doc_id, summary, text_content, concept, question, difficulty, chat_history } = body;
+    const { documentId, doc_id, concept, question, difficulty, chat_history } = body;
+    const targetDocId = documentId || doc_id;
+
+    let text_content = null;
+    let summary = null;
+
+    if (targetDocId) {
+      const { data: docData, error: docError } = await supabase
+        .from('documents')
+        .select('text_content, summary')
+        .eq('id', targetDocId)
+        .eq('user_id', user.id)
+        .single();
+        
+      if (!docError && docData) {
+        text_content = docData.text_content;
+        summary = docData.summary;
+      }
+    }
 
     // The user's query
     const userQuery = question || concept || 'Explain the core concepts.';

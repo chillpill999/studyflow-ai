@@ -66,16 +66,16 @@ export default function ImageStudio() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto min-h-[calc(100vh-4rem)]">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="h-10 w-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg shadow-[#C9956A]/20">
-          <ImagePlus className="h-5 w-5 text-[#0A0A0F]" />
+    <div className="p-6 md:p-8 max-w-6xl mx-auto min-h-[calc(100vh-4rem)] text-black">
+      <div className="flex items-center gap-4 mb-8 bg-neo-yellow border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div className="h-16 w-16 bg-white border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <ImagePlus className="h-8 w-8 text-black" strokeWidth={2.5} />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-[#F0EEF6]" style={{ fontFamily: 'var(--font-playfair)' }}>
-            AI Image Studio
+          <h1 className="text-4xl font-black uppercase tracking-tight">
+            Image Studio
           </h1>
-          <p className="text-[#8A8F9E] text-sm mt-1">
+          <p className="font-bold mt-2">
             Generate visual aids, diagrams, and illustrations for your study notes instantly.
           </p>
         </div>
@@ -83,25 +83,25 @@ export default function ImageStudio() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Controls Section */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="glass-card p-6">
-            <h3 className="text-lg font-semibold mb-4 text-[#F0EEF6]">Settings</h3>
+        <div className="lg:col-span-1 space-y-8">
+          <div className="neo-box bg-white p-6">
+            <h3 className="text-xl font-black uppercase mb-4 border-b-4 border-black pb-2">Settings</h3>
             
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-[#8A8F9E] mb-2">Select Model</label>
+            <div className="mb-6">
+              <label className="block font-bold mb-2">Select Model</label>
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value as 'nanobanana' | 'basic')}
-                className="w-full glass-input p-3 rounded-xl focus:ring-2 focus:ring-[#C9956A] outline-none text-[#F0EEF6] bg-[#1E1E2E]/50"
+                className="w-full neo-input"
               >
                 <option value="nanobanana">NanoBanana Pro (3/day)</option>
                 <option value="basic">Basic AI (Unlimited)</option>
               </select>
             </div>
 
-            <h3 className="text-lg font-semibold mb-4 mt-6 text-[#F0EEF6]">Prompt Engineering</h3>
+            <h3 className="text-xl font-black uppercase mb-4 border-b-4 border-black pb-2">Prompt Engineering</h3>
             <textarea
-              className="w-full glass-input p-4 rounded-xl resize-none h-40 focus:ring-2 focus:ring-[#C9956A] outline-none"
+              className="w-full neo-input h-40 resize-none"
               placeholder="E.g. A highly detailed, realistic watercolor diagram of the human heart, white background, textbook style."
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -109,43 +109,54 @@ export default function ImageStudio() {
             <button
               onClick={generateImage}
               disabled={loading || !prompt.trim()}
-              className="w-full mt-4 bg-gradient-primary text-[#0A0A0F] font-semibold py-3 rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(201,149,106,0.15)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="neo-button w-full mt-6 py-4 flex items-center justify-center gap-2 text-lg disabled:opacity-50"
             >
               {loading ? (
-                <><Loader2 className="w-5 h-5 animate-spin" /> Generating...</>
+                <><Loader2 className="w-6 h-6 animate-spin" strokeWidth={3} /> Generating...</>
               ) : (
-                <><Sparkles className="w-5 h-5" /> Generate Image</>
+                <><Sparkles className="w-6 h-6" strokeWidth={3} /> Generate Image</>
               )}
             </button>
           </div>
 
-          <div className="glass-card p-6">
-            <h3 className="text-sm font-semibold text-[#8A8F9E] uppercase tracking-wider mb-3">Pro Tips</h3>
-            <ul className="space-y-3 text-sm text-[#F0EEF6]/80">
-              <li>✨ Mention a specific style like &quot;watercolor&quot;, &quot;3d render&quot;, or &quot;textbook diagram&quot;.</li>
-              <li>🎨 Specify a background color like &quot;white background&quot; to make it easier to embed in notes.</li>
-              <li>🔍 Be descriptive about the subject (e.g., &quot;cross-section&quot;, &quot;top-down view&quot;).</li>
+          <div className="neo-box bg-neo-cyan p-6">
+            <h3 className="text-xl font-black uppercase mb-4 border-b-4 border-black pb-2">Pro Tips</h3>
+            <ul className="space-y-4 font-bold text-sm">
+              <li className="flex gap-2 bg-white border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <span className="text-lg">✨</span>
+                Mention a specific style like "watercolor", "3d render", or "textbook diagram".
+              </li>
+              <li className="flex gap-2 bg-white border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <span className="text-lg">🎨</span>
+                Specify a background color like "white background" to make it easier to embed in notes.
+              </li>
+              <li className="flex gap-2 bg-white border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <span className="text-lg">🔍</span>
+                Be descriptive about the subject (e.g., "cross-section", "top-down view").
+              </li>
             </ul>
           </div>
         </div>
 
         {/* Display Section */}
         <div className="lg:col-span-2">
-          <div className="glass-card p-4 h-full min-h-[500px] flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="neo-box bg-neo-magenta p-6 h-full min-h-[600px] flex flex-col items-center justify-center relative overflow-hidden">
             {loading && imageUrl && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-[#8A8F9E] bg-[#0A0A0F]/50 backdrop-blur-sm rounded-xl">
-                <Loader2 className="w-12 h-12 animate-spin text-[#C9956A] mb-4" />
-                <p>Synthesizing image...</p>
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm p-6 text-white">
+                <div className="bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 flex flex-col items-center">
+                  <Loader2 className="w-12 h-12 animate-spin text-black mb-4" strokeWidth={3} />
+                  <p className="font-black uppercase text-black">Synthesizing image...</p>
+                </div>
               </div>
             )}
             
             {loading && !imageUrl ? (
-              <div className="flex flex-col items-center justify-center text-[#8A8F9E]">
-                <Loader2 className="w-12 h-12 animate-spin text-[#C9956A] mb-4" />
-                <p>Preparing canvas...</p>
+              <div className="flex flex-col items-center justify-center bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-8">
+                <Loader2 className="w-16 h-16 animate-spin text-black mb-4" strokeWidth={3} />
+                <p className="font-black uppercase text-xl">Preparing Canvas...</p>
               </div>
             ) : imageUrl ? (
-              <div className="relative w-full h-full flex flex-col items-center">
+              <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
                   src={imageUrl} 
@@ -156,24 +167,25 @@ export default function ImageStudio() {
                     setImageUrl(null);
                     alert("Failed to load image. Please try again.");
                   }}
-                  className={`rounded-xl max-h-[600px] w-auto object-contain shadow-2xl transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
+                  className={`border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-h-[600px] w-auto object-contain bg-white transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
                 />
                 {!loading && (
                   <button
                     onClick={handleDownload}
-                    className="absolute bottom-4 right-4 bg-[#1E1E2E]/90 backdrop-blur border border-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2"
+                    className="neo-button absolute bottom-8 right-8 bg-neo-green hover:bg-white flex items-center gap-2 px-6 py-3"
                   >
-                    <Download className="w-4 h-4" /> Download
+                    <Download className="w-6 h-6" strokeWidth={3} />
+                    <span className="text-lg">Download</span>
                   </button>
                 )}
               </div>
             ) : (
-              <div className="text-center text-[#8A8F9E] flex flex-col items-center max-w-sm">
-                <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6">
-                  <ImagePlus className="w-10 h-10 text-[#C9956A]/50" />
+              <div className="text-center flex flex-col items-center max-w-md bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-10">
+                <div className="w-24 h-24 bg-neo-yellow border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center mb-8">
+                  <ImagePlus className="w-12 h-12 text-black" strokeWidth={2.5} />
                 </div>
-                <h3 className="text-xl font-semibold text-[#F0EEF6] mb-2">No Image Generated</h3>
-                <p className="text-sm">Enter a prompt on the left and click Generate to create a custom study illustration.</p>
+                <h3 className="text-2xl font-black uppercase mb-4">No Image Generated</h3>
+                <p className="font-bold">Enter a prompt on the left and click Generate to create a custom study illustration.</p>
               </div>
             )}
           </div>
