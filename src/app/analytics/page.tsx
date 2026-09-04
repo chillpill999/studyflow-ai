@@ -7,7 +7,6 @@ import {
   Trash2, 
   Plus, 
   Zap, 
-  Award, 
   Check
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
@@ -15,7 +14,6 @@ import { useStudyStore } from '../../store/studyStore';
 export default function AnalyticsWorkspace() {
   const {
     tasks,
-    user,
     fetchTasks,
     addTask,
     toggleTask,
@@ -24,7 +22,6 @@ export default function AnalyticsWorkspace() {
   } = useStudyStore();
 
   const [taskTitle, setTaskTitle] = useState('');
-  const [hoveredChartBar, setHoveredChartBar] = useState<number | null>(null);
 
   useEffect(() => {
     fetchTasks();
@@ -39,29 +36,10 @@ export default function AnalyticsWorkspace() {
     setTaskTitle('');
   };
 
-  // Stats Calculations
-
+  // Stats Calculations — real data only
   const completedTasks = tasks.filter(t => t.is_completed).length;
   const totalTasks = tasks.length;
-  
-  // Weekly hours study trend (custom chart coordinates)
-  const studyTrend = [
-    { day: 'Mon', hours: 1.5 },
-    { day: 'Tue', hours: 2.5 },
-    { day: 'Wed', hours: 0.8 },
-    { day: 'Thu', hours: 3.2 },
-    { day: 'Fri', hours: 1.0 },
-    { day: 'Sat', hours: 4.5 },
-    { day: 'Sun', hours: 2.0 }
-  ];
-
-  // Subject proficiency bars
-  const subjectsData = [
-    { name: 'Computer Science', score: 92, color: 'bg-neo-cyan' },
-    { name: 'Mathematics', score: 78, color: 'bg-neo-magenta' },
-    { name: 'Physics', score: 85, color: 'bg-neo-yellow' },
-    { name: 'Organic Chemistry', score: 62, color: 'bg-neo-green' }
-  ];
+  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12 text-black">
@@ -78,121 +56,59 @@ export default function AnalyticsWorkspace() {
       {/* Grid: SVG Performance Trend Chart vs Checklist Task Manager */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Left/Middle Column: Charts & Analytics (takes 2/3 cols) */}
+        {/* Left/Middle Column: Real Stats (takes 2/3 cols) */}
         <div className="lg:col-span-2 space-y-8">
           
-          {/* Custom SVG Study Trend Chart */}
+          {/* Task Completion Summary */}
           <div className="neo-box bg-white p-6 space-y-6">
             <div className="flex justify-between items-center border-b-4 border-black pb-4">
               <div>
-                <span className="font-black uppercase block">Daily Study Velocity</span>
-                <h3 className="text-2xl font-black mt-1">Study Duration Trend</h3>
+                <span className="font-black uppercase block">Task Progress</span>
+                <h3 className="text-2xl font-black mt-1">Completion Summary</h3>
               </div>
               <div className="text-right bg-neo-cyan border-2 border-black p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                <span className="font-black uppercase block text-xs">Average Session</span>
-                <span className="font-bold text-lg">2.1 Hours/day</span>
+                <span className="font-black uppercase block text-xs">Completion Rate</span>
+                <span className="font-bold text-lg">{completionRate}%</span>
               </div>
             </div>
 
-            {/* Custom SVG Path Line Chart */}
-            <div className="relative h-64 w-full bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 flex flex-col justify-between overflow-hidden">
-              
-              {/* Background horizontal guide lines */}
-              <div className="absolute inset-0 flex flex-col justify-between p-4 py-8 pointer-events-none opacity-20">
-                <div className="border-b-2 border-black w-full dashed" />
-                <div className="border-b-2 border-black w-full dashed" />
-                <div className="border-b-2 border-black w-full dashed" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="border-4 border-black p-4 bg-neo-yellow shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center">
+                <span className="text-4xl font-black">{totalTasks}</span>
+                <p className="font-black uppercase text-sm mt-1">Total Tasks</p>
               </div>
-
-              {/* SVG vector */}
-              <svg className="flex-1 w-full h-full overflow-visible z-10">
-                {/* Area path fill */}
-                <path
-                  d="M 50 180 Q 120 140 190 160 T 330 110 T 470 170 T 610 80 T 750 150 L 750 200 L 50 200 Z"
-                  fill="#FF00FF"
-                  className="transition-all duration-1000 opacity-20"
-                />
-
-                {/* Solid line path */}
-                <path
-                  d="M 50 180 Q 120 140 190 160 T 330 110 T 470 170 T 610 80 T 750 150"
-                  fill="transparent"
-                  stroke="#000"
-                  strokeWidth="6"
-                  className="transition-all duration-1000"
-                />
-
-                {/* Interactive Data points */}
-                {[
-                  { x: 50, y: 180, hrs: 1.5, idx: 0 },
-                  { x: 140, y: 148, hrs: 2.5, idx: 1 },
-                  { x: 230, y: 160, hrs: 0.8, idx: 2 },
-                  { x: 340, y: 110, hrs: 3.2, idx: 3 },
-                  { x: 470, y: 170, hrs: 1.0, idx: 4 },
-                  { x: 600, y: 80, hrs: 4.5, idx: 5 },
-                  { x: 730, y: 150, hrs: 2.0, idx: 6 }
-                ].map((pt) => (
-                  <g key={pt.idx}>
-                    <circle
-                      cx={pt.x}
-                      cy={pt.y}
-                      r={hoveredChartBar === pt.idx ? 10 : 6}
-                      fill={hoveredChartBar === pt.idx ? '#00FFFF' : '#FFE600'}
-                      stroke="#000"
-                      strokeWidth="3"
-                      className="cursor-pointer transition-all duration-200"
-                      onMouseEnter={() => setHoveredChartBar(pt.idx)}
-                      onMouseLeave={() => setHoveredChartBar(null)}
-                    />
-                    {hoveredChartBar === pt.idx && (
-                      <g>
-                        <rect x={pt.x - 35} y={pt.y - 45} width="70" height="30" fill="#fff" stroke="#000" strokeWidth="2" />
-                        <text x={pt.x} y={pt.y - 25} fill="#000" fontSize="12" fontWeight="900" textAnchor="middle">
-                          {pt.hrs} hrs
-                        </text>
-                      </g>
-                    )}
-                  </g>
-                ))}
-              </svg>
-
-              {/* X Axis labels */}
-              <div className="flex justify-between text-xs font-black uppercase px-2 pt-2 z-10 border-t-4 border-black mt-2">
-                {studyTrend.map((t, i) => (
-                  <span key={i} className="w-12 text-center pt-2">{t.day}</span>
-                ))}
+              <div className="border-4 border-black p-4 bg-neo-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center">
+                <span className="text-4xl font-black">{completedTasks}</span>
+                <p className="font-black uppercase text-sm mt-1">Completed</p>
+              </div>
+              <div className="border-4 border-black p-4 bg-neo-magenta text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center">
+                <span className="text-4xl font-black">{totalTasks - completedTasks}</span>
+                <p className="font-black uppercase text-sm mt-1">Remaining</p>
               </div>
             </div>
-          </div>
 
-          {/* Subject Performance proficiency lists */}
-          <div className="neo-box bg-neo-magenta p-6 space-y-6">
-            <h3 className="text-2xl font-black flex items-center gap-2 border-b-4 border-black pb-4">
-              <div className="bg-white border-2 border-black p-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                <Award size={24} />
-              </div>
-              Subject Performance
-            </h3>
-
-            <div className="space-y-6">
-              {subjectsData.map((sub) => (
-                <div key={sub.name} className="space-y-2 bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex justify-between items-center">
-                    <span className="font-black uppercase">{sub.name}</span>
-                    <span className="font-black bg-black text-white px-2 py-1">{sub.score}%</span>
-                  </div>
-
-                  <div className="h-4 bg-white border-2 border-black w-full">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: `${sub.score}%` }}
-                      transition={{ duration: 1, ease: "easeOut" }}
-                      className={`h-full border-r-2 border-black ${sub.color}`}
-                    />
-                  </div>
+            {/* Progress bar */}
+            {totalTasks > 0 && (
+              <div className="space-y-2">
+                <div className="h-6 bg-white border-4 border-black w-full">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${completionRate}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="h-full bg-neo-green border-r-2 border-black"
+                  />
                 </div>
-              ))}
-            </div>
+                <p className="text-sm font-bold text-center">{completedTasks} of {totalTasks} tasks completed</p>
+              </div>
+            )}
+
+            {totalTasks === 0 && (
+              <div className="text-center py-8 border-4 border-black bg-gray-100">
+                <CheckSquare className="mx-auto h-12 w-12 mb-3" strokeWidth={2} />
+                <p className="font-black uppercase">No tasks created yet</p>
+                <p className="font-bold text-sm mt-2">Add tasks in the panel on the right to track your progress.</p>
+              </div>
+            )}
           </div>
 
         </div>

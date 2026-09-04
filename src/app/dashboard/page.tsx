@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Zap, 
-  Clock, 
   FileText, 
   Award, 
   Trash2, 
@@ -60,17 +58,9 @@ export default function Dashboard() {
     router.push('/chat');
   };
 
-  // Quick stats calculation
+  // Quick stats calculation — real data only
   const totalDocs = documents.length;
   const completedQuizzes = quizzes.length;
-  const totalStreak = user?.streak || 0;
-  const studyHours = user?.study_hours || 0;
-
-  // Generate empty heatmap grid data (5 weeks, 7 days)
-  const heatmapData = Array.from({ length: 35 }, (_, i) => {
-    const isToday = i === 32;
-    return { id: i, level: 0, isToday };
-  });
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12 w-full">
@@ -92,28 +82,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Key Metrics Widgets */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        <div className="neo-box p-5 flex items-center justify-between bg-neo-cyan">
-          <div className="space-y-1">
-            <span className="text-sm font-black uppercase">Active Streak</span>
-            <h3 className="text-4xl font-black font-mono-numbers">{totalStreak}</h3>
-          </div>
-          <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <Zap size={24} strokeWidth={3} />
-          </div>
-        </div>
-
-        <div className="neo-box p-5 flex items-center justify-between bg-neo-magenta text-white">
-          <div className="space-y-1">
-            <span className="text-sm font-black uppercase">Study Hours</span>
-            <h3 className="text-4xl font-black font-mono-numbers">{studyHours}</h3>
-          </div>
-          <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <Clock size={24} strokeWidth={3} />
-          </div>
-        </div>
+      {/* Key Metrics Widgets — Real Data Only */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
         <div className="neo-box p-5 flex items-center justify-between bg-neo-yellow">
           <div className="space-y-1">
@@ -216,36 +186,35 @@ export default function Dashboard() {
           
           <div className="neo-box p-6 bg-white">
             <h3 className="text-2xl font-black uppercase border-b-4 border-black pb-2 mb-6 flex items-center gap-3">
-              <Clock size={24} strokeWidth={3} />
-              Study Intensity
+              <FileText size={24} strokeWidth={3} />
+              Recent Activity
             </h3>
 
-            <div className="grid grid-cols-7 gap-2">
-              {heatmapData.map((day) => (
-                <div 
-                  key={day.id}
-                  className={`
-                    aspect-square heatmap-level-${day.level} relative group cursor-pointer
-                  `}
-                >
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black text-white text-xs font-bold uppercase rounded-none px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-30">
-                    {day.level * 2} hrs
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex items-center justify-start gap-3 mt-6 text-xs font-bold uppercase">
-              <span>Less</span>
-              <div className="flex gap-2">
-                <div className="h-4 w-4 heatmap-level-0" />
-                <div className="h-4 w-4 heatmap-level-1" />
-                <div className="h-4 w-4 heatmap-level-2" />
-                <div className="h-4 w-4 heatmap-level-3" />
-                <div className="h-4 w-4 heatmap-level-4" />
+            {documents.length === 0 ? (
+              <div className="text-center py-8 border-4 border-black bg-gray-100 flex flex-col items-center">
+                <FileText className="h-12 w-12 mb-3" strokeWidth={2} />
+                <p className="font-bold uppercase">No activity yet.</p>
+                <p className="font-semibold text-sm mt-1">Upload a document to get started.</p>
               </div>
-              <span>More</span>
-            </div>
+            ) : (
+              <div className="space-y-3">
+                {documents.slice(0, 5).map((doc) => (
+                  <div
+                    key={doc.id}
+                    className="p-3 border-2 border-black bg-white hover:bg-neo-cyan transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between cursor-pointer"
+                    onClick={() => triggerChatWithDoc(doc.id)}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-8 w-8 border-2 border-black bg-neo-yellow flex items-center justify-center font-black text-xs uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        {doc.file_type}
+                      </div>
+                      <span className="font-bold truncate max-w-[180px]">{doc.filename}</span>
+                    </div>
+                    <span className="text-xs font-semibold text-gray-600 shrink-0">{new Date(doc.created_at).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="neo-box p-6 bg-white">
