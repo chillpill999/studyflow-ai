@@ -156,17 +156,18 @@ export const useStudyStore = create<StudyFlowState>()(
 
       initUser: async (userId = 'user_demo_123', username = 'Scholar', email = 'scholar@studyflow.ai', image?: string) => {
         set({ loading: true });
-        if (!get().user) {
+        const currentUser = get().user;
+        if (!currentUser || (userId !== 'user_demo_123' && currentUser.id !== userId)) {
           set({
             user: {
               id: userId,
-              username,
-              email,
-              streak: 0,
-              study_hours: 0,
-              preference_subject: 'General',
-              onboarding_completed: false,
-              image
+              username: username || currentUser?.username || 'Scholar',
+              email: email || currentUser?.email || 'scholar@studyflow.ai',
+              streak: currentUser?.streak || 0,
+              study_hours: currentUser?.study_hours || 0,
+              preference_subject: currentUser?.preference_subject || 'General',
+              onboarding_completed: currentUser?.onboarding_completed || false,
+              image: image || currentUser?.image
             }
           });
         }

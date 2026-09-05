@@ -44,13 +44,13 @@ export default function FileUploader({ onSuccess }: FileUploaderProps) {
   };
 
   const processFile = async (file: File) => {
-    if (!file.name.endsWith(".pdf")) {
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
       setError("Only PDF files are supported");
       setStatus("error");
       return;
     }
-    if (file.size > 20 * 1024 * 1024) {
-      setError("File must be under 20MB");
+    if (file.size > 4.5 * 1024 * 1024) {
+      setError("File exceeds 4.5MB limit for direct processing. Please upload a smaller PDF or compress it.");
       setStatus("error");
       return;
     }
@@ -69,11 +69,16 @@ export default function FileUploader({ onSuccess }: FileUploaderProps) {
       if (result.success && result.data?.document_id) {
         onSuccess(result.data.document_id, file.name);
       } else {
-        throw new Error("Invalid response structure from backend");
+        throw new Error(result.error || "Invalid response structure from backend");
       }
     } catch (err: any) {
       setStatus("error");
-      setError(err?.response?.data?.detail || err?.message || "Upload failed. Please try again.");
+      const errorMsg =
+        err?.response?.data?.error ||
+        err?.response?.data?.detail ||
+        err?.message ||
+        "Upload failed. Please try again.";
+      setError(errorMsg);
     }
   };
 
@@ -113,7 +118,7 @@ export default function FileUploader({ onSuccess }: FileUploaderProps) {
             </div>
             <div className="text-center space-y-2 mt-4">
               <p className="text-xl font-black uppercase">Drag & Drop PDF</p>
-              <p className="font-bold">Max file size: 20MB</p>
+              <p className="font-bold">Max file size: 4.5MB</p>
             </div>
             <button className="neo-button mt-4">
               Browse Files
@@ -131,7 +136,7 @@ export default function FileUploader({ onSuccess }: FileUploaderProps) {
         {status === "uploading" && (
           <div className="w-full max-w-xs text-center space-y-4">
             <div className="h-12 w-12 border-4 border-black border-t-white bg-neo-cyan rounded-full animate-spin mx-auto shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" />
-            <p className="font-black uppercase">Uploading... {progress}%</p>
+            <p className="font-black uppercase">Uploading & Processing... {progress}%</p>
             <div className="w-full bg-white border-2 border-black h-4 rounded-none overflow-hidden shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               <motion.div 
                 initial={{ width: 0 }}
@@ -159,15 +164,28 @@ export default function FileUploader({ onSuccess }: FileUploaderProps) {
             </div>
             <p className="text-xl font-black uppercase text-red-600">Upload Failed</p>
             <p className="font-bold max-w-md mx-auto">{error}</p>
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                setStatus("idle");
-              }}
-              className="neo-button mt-4"
-            >
-              Try Again
-            </button>
+            <div className="flex gap-3 justify-center">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setStatus("idle");
+                }}
+                className="neo-button mt-4"
+              >
+                Try Again
+              </button>
+              {(error.toLowerCase().includes("unauthorized") || error.toLowerCase().includes("sign in") || error.toLowerCase().includes("log in")) && (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.location.href = "/";
+                  }}
+                  className="neo-button neo-button-cyan mt-4"
+                >
+                  Sign In
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>

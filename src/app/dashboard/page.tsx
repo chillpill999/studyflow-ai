@@ -75,12 +75,37 @@ export default function Dashboard() {
 
         {/* Top Right Controls */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-neo-yellow border-2 border-black px-4 py-2 text-sm font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <span className="h-3 w-3 bg-black" />
-            Active Mode
-          </div>
+          {(!user || user.id === 'user_demo_123') ? (
+            <button 
+              onClick={() => router.push('/')}
+              className="neo-button neo-button-magenta text-sm flex items-center gap-2"
+            >
+              Sign In to Save
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 bg-neo-yellow border-2 border-black px-4 py-2 text-sm font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <span className="h-3 w-3 bg-black" />
+              Connected
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Guest Warning Banner */}
+      {(!user || user.id === 'user_demo_123') && (
+        <div className="bg-neo-cyan border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="font-bold text-sm">
+            <span className="bg-black text-white px-2 py-0.5 uppercase text-xs mr-2 font-black">Guest Mode</span>
+            You are currently exploring as a guest. Please sign in to save your documents and study data.
+          </div>
+          <button 
+            onClick={() => router.push('/')}
+            className="neo-button text-xs whitespace-nowrap py-1 px-3 bg-white"
+          >
+            Sign In / Sign Up
+          </button>
+        </div>
+      )}
 
       {/* Key Metrics Widgets — Real Data Only */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

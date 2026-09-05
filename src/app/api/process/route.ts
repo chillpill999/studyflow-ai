@@ -85,7 +85,10 @@ export async function POST(req: Request) {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized. Please log in.' }, { status: 401 });
+    return NextResponse.json(
+      { error: 'Unauthorized: Please sign in or create an account to upload documents.' },
+      { status: 401 }
+    );
   }
 
   const groqKey = process.env.GROQ_API_KEY;
@@ -175,13 +178,13 @@ export async function POST(req: Request) {
           rawText = buffer.toString('utf-8');
         }
 
-        if (!rawText.trim()) {
-          throw new Error('Extracted text is empty.');
+        if (!rawText || !rawText.trim()) {
+          throw new Error('No readable text found in document. If this is a scanned PDF, please use a PDF with selectable text.');
         }
       } catch (extractErr: any) {
         console.error('Extraction Error:', extractErr);
         return NextResponse.json(
-          { error: 'Failed to extract text from document. Please ensure the file is readable.' },
+          { error: extractErr?.message || 'Failed to extract text from document. Please ensure the file is readable.' },
           { status: 400 }
         );
       }
@@ -266,6 +269,17 @@ Summary: ${s.summary}`).join('\n\n')}`;
     const chunks = chunkText(rawText);
     const fileExtension = filename.includes('.') ? filename.split('.').pop() || 'pdf' : 'pdf';
 
+    // Ensure profile row exists in public.profiles to satisfy foreign key constraint
+    const { error: profileError } = await supabase.from('profiles').upsert({
+      id: user.id,
+      email: user.email || 'student@studyflow.ai',
+      username: user.user_metadata?.name || user.email?.split('@')[0] || 'Student',
+    }, { onConflict: 'id' });
+
+    if (profileError) {
+      console.warn('[WARN] Profile upsert warning:', profileError);
+    }
+
     // INSERT into Supabase
     const { data: insertedDoc, error: dbError } = await supabase.from('documents').insert({
       user_id: user.id,
@@ -278,7 +292,10 @@ Summary: ${s.summary}`).join('\n\n')}`;
 
     if (dbError) {
       console.error('Database Error:', dbError);
-      return NextResponse.json({ error: 'Failed to save document to database.' }, { status: 500 });
+      return NextResponse.json(
+        { error: `Database Error: ${dbError.message || 'Failed to save document to database.'}` },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
