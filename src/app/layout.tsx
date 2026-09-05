@@ -41,9 +41,6 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-white font-sans text-black">
         <WebMCPProvider />
-        <div className="bg-neo-magenta border-b-4 border-black text-black text-sm font-black uppercase p-3 text-center sticky top-0 z-[100]">
-          ⚠️ <strong>Maintenance Notice:</strong> We sincerely apologize to our users, but StudyFlow AI is currently undergoing emergency maintenance to address system issues. We are actively working on a fix and will be fully operational shortly!
-        </div>
         <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
