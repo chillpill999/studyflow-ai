@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Zap,
   Edit2,
-  ImagePlus
+  ImagePlus,
+  X
 } from 'lucide-react';
 import { useStudyStore } from '../store/studyStore';
 import ProfileModal from './ProfileModal';
@@ -63,33 +64,44 @@ export default function Sidebar({ isMobileOpen = false, setIsMobileOpen }: Sideb
       </AnimatePresence>
 
       <motion.div 
-        animate={{ width: isCollapsed ? 68 : 220 }}
+        animate={{ width: isMobileOpen ? 260 : (isCollapsed ? 68 : 220) }}
         transition={{ duration: 0.15 }}
         className={`
           fixed inset-y-0 left-0 z-50 h-screen md:sticky md:top-0
           bg-white border-r-2 border-black 
           flex flex-col justify-between p-3.5 shrink-0
           transition-transform duration-300 md:translate-x-0
-          ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+          ${isMobileOpen ? 'translate-x-0 shadow-[4px_0px_0px_0px_rgba(0,0,0,1)]' : '-translate-x-full'}
         `}
       >
         <div>
           <div className="flex items-center justify-between mb-5 pb-3 border-b-2 border-black">
-            {!isCollapsed && (
+            {(!isCollapsed || isMobileOpen) && (
               <div className="flex items-center gap-2 font-black text-lg tracking-tight uppercase relative">
                 <div className="h-5 w-5 bg-neo-magenta border-2 border-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]"></div>
                 <span>StudyFlow</span>
               </div>
             )}
-            {isCollapsed && (
+            {(isCollapsed && !isMobileOpen) && (
               <div className="h-6 w-6 bg-neo-magenta border-2 border-black mx-auto shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]"></div>
             )}
 
+            {/* Desktop Collapse Toggle */}
             <button 
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="hidden md:flex items-center justify-center h-7 w-7 bg-neo-yellow border-2 border-black hover:bg-neo-cyan transition-colors shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px]"
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {isCollapsed ? <ChevronRight size={15} strokeWidth={3} /> : <ChevronLeft size={15} strokeWidth={3} />}
+            </button>
+
+            {/* Mobile Close Button */}
+            <button
+              onClick={() => setIsMobileOpen?.(false)}
+              className="flex md:hidden items-center justify-center h-7 w-7 bg-white border-2 border-black hover:bg-neo-magenta hover:text-white transition-colors shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px]"
+              aria-label="Close menu"
+            >
+              <X size={16} strokeWidth={2.5} />
             </button>
           </div>
 

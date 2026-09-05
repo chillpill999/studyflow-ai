@@ -19,14 +19,19 @@
   --shadow-color: #000000;
 }
 
-body {
+html, body {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  width: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 0.9375rem; /* 15px */
+}
+
+button, a, select, input, textarea {
+  touch-action: manipulation;
 }
 
 /* Headings - Crisp, Modern & Balanced */

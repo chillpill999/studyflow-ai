@@ -37,6 +37,7 @@ export default function DocumentChat() {
   const [inputValue, setInputValue] = useState('');
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [highlightedChunkId, setHighlightedChunkId] = useState<number | null>(null);
+  const [mobileTab, setMobileTab] = useState<'workspace' | 'chat'>('chat');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -144,6 +145,7 @@ export default function DocumentChat() {
 
   const handleCitationClick = (chunkId: number) => {
     setHighlightedChunkId(chunkId);
+    setMobileTab('workspace');
     // Auto clear after 4 seconds
     setTimeout(() => {
       setHighlightedChunkId(null);
@@ -151,10 +153,39 @@ export default function DocumentChat() {
   };
 
   return (
-    <div className="h-auto lg:h-[calc(100vh-80px)] flex flex-col lg:flex-row gap-4 max-w-7xl mx-auto w-full lg:overflow-hidden pb-6 lg:pb-0">
+    <div className="h-[calc(100vh-85px)] md:h-[calc(100vh-80px)] flex flex-col lg:flex-row gap-3 sm:gap-4 max-w-7xl mx-auto w-full overflow-hidden">
       
+      {/* Mobile Tab Switcher (Visible only on < lg screens) */}
+      <div className="flex lg:hidden w-full bg-white border-2 border-black p-1 gap-1 shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        <button
+          onClick={() => setMobileTab('workspace')}
+          className={`flex-1 py-1.5 px-2 text-xs font-black uppercase flex items-center justify-center gap-1.5 border-2 transition-all ${
+            mobileTab === 'workspace'
+              ? 'bg-neo-yellow border-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]'
+              : 'border-transparent text-gray-700 hover:bg-gray-100'
+          }`}
+        >
+          <BookOpen size={14} strokeWidth={2.5} />
+          Workspace
+        </button>
+        <button
+          onClick={() => setMobileTab('chat')}
+          className={`flex-1 py-1.5 px-2 text-xs font-black uppercase flex items-center justify-center gap-1.5 border-2 transition-all ${
+            mobileTab === 'chat'
+              ? 'bg-neo-cyan border-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]'
+              : 'border-transparent text-gray-700 hover:bg-gray-100'
+          }`}
+        >
+          <MessageSquare size={14} strokeWidth={2.5} />
+          Chat & Query
+        </button>
+      </div>
+
       {/* LEFT PANEL: Document Viewer & Selector */}
-      <div className="w-full lg:w-5/12 neo-box bg-neo-yellow p-4 flex flex-col justify-between overflow-hidden min-h-[400px] lg:min-h-0">
+      <div className={`
+        w-full lg:w-5/12 neo-box bg-neo-yellow p-3 sm:p-4 flex-col justify-between overflow-hidden
+        ${mobileTab === 'workspace' ? 'flex flex-1' : 'hidden lg:flex'}
+      `}>
         
         {/* Document Header & Picker */}
         <div className="space-y-3">
@@ -245,7 +276,10 @@ export default function DocumentChat() {
       </div>
 
       {/* RIGHT PANEL: Chat Workspace Console */}
-      <div className="w-full lg:w-7/12 neo-box bg-white p-4 flex flex-col justify-between overflow-hidden min-h-[450px] lg:min-h-0">
+      <div className={`
+        w-full lg:w-7/12 neo-box bg-white p-3 sm:p-4 flex-col justify-between overflow-hidden
+        ${mobileTab === 'chat' ? 'flex flex-1' : 'hidden lg:flex'}
+      `}>
         
         {/* Chat Header */}
         <div className="border-b-2 border-black pb-2.5 mb-2.5">

@@ -130,6 +130,24 @@ export default function MindMap() {
     setIsDragging(false);
   };
 
+  // Touch Handlers for mobile & tablet
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX - panX, y: e.touches[0].clientY - panY });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    setPanX(e.touches[0].clientX - dragStart.x);
+    setPanY(e.touches[0].clientY - dragStart.y);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
   const handleZoom = (factor: number) => {
     setZoom(prev => Math.max(0.4, Math.min(2.5, prev * factor)));
   };
@@ -233,26 +251,26 @@ export default function MindMap() {
   const { nodes: renderNodes, links: renderLinks } = buildRenderCoordinates();
 
   return (
-    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col gap-4 max-w-7xl mx-auto md:overflow-hidden pb-4 md:pb-0 text-black">
+    <div className="h-[calc(100vh-85px)] flex flex-col gap-3 sm:gap-4 max-w-7xl mx-auto overflow-hidden pb-2 md:pb-0 text-black">
       
       {/* Top Workspace settings */}
-      <div className="neo-box bg-neo-yellow p-4 flex flex-col md:flex-row items-center justify-between gap-4 z-20">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <BrainCircuit size={20} strokeWidth={2.5} />
+      <div className="neo-box bg-neo-yellow p-3.5 sm:p-4 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 z-20 shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 bg-white border-2 border-black flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] shrink-0">
+            <BrainCircuit size={18} strokeWidth={2.5} />
           </div>
           <div>
             <h2 className="text-base sm:text-lg font-black uppercase tracking-tight">Mind Map Synthesizer</h2>
-            <p className="font-medium text-xs text-gray-800">Convert studies into interactive concept maps.</p>
+            <p className="font-medium text-[11px] sm:text-xs text-gray-800">Convert studies into interactive concept maps.</p>
           </div>
         </div>
 
         {/* Source selector form */}
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
           <select 
             value={selectedSourceType} 
             onChange={(e) => { setSelectedSourceType(e.target.value as 'document' | 'note'); setSelectedSourceId(''); }}
-            className="neo-input bg-white w-auto text-xs py-1.5 px-2.5"
+            className="neo-input bg-white w-full sm:w-auto text-xs py-1.5 px-2.5"
           >
             <option value="document">Documents</option>
             <option value="note">Notes Workspace</option>
@@ -261,7 +279,7 @@ export default function MindMap() {
           <select 
             value={selectedSourceId} 
             onChange={(e) => setSelectedSourceId(e.target.value)}
-            className="neo-input bg-white max-w-[200px] truncate text-xs py-1.5 px-2.5"
+            className="neo-input bg-white w-full sm:max-w-[200px] truncate text-xs py-1.5 px-2.5"
           >
             <option value="">-- Select Source --</option>
             {selectedSourceType === 'document' ? (
@@ -274,7 +292,7 @@ export default function MindMap() {
           <button
             onClick={handleGenerateMindMap}
             disabled={loading || !selectedSourceId}
-            className="neo-button bg-neo-green hover:bg-white flex items-center gap-1.5 py-1.5 px-3.5 disabled:opacity-50 text-xs font-black"
+            className="neo-button bg-neo-green hover:bg-white flex items-center justify-center gap-1.5 py-1.5 px-3.5 disabled:opacity-50 text-xs font-black whitespace-nowrap"
           >
             <Sparkles size={14} strokeWidth={2.5} />
             <span>Generate Map</span>
@@ -320,7 +338,10 @@ export default function MindMap() {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            className={`absolute inset-0 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} z-10`}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            className={`absolute inset-0 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} z-10 touch-none`}
           >
             <div 
               style={{

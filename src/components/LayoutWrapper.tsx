@@ -58,17 +58,17 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     <div className="flex flex-col md:flex-row min-h-screen bg-white text-black overflow-x-hidden relative">
       {/* Mobile Top Navigation Bar */}
       {!isLandingPage && (
-        <div className="md:hidden sticky top-0 z-40 flex items-center justify-between p-4 bg-neo-yellow border-b-[4px] border-black shadow-[0_4px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex items-center gap-2 font-black text-xl uppercase tracking-tighter">
-            <div className="h-6 w-6 bg-neo-magenta border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"></div>
+        <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-3.5 py-2.5 bg-neo-yellow border-b-2 border-black shadow-[0_2px_0px_0px_rgba(0,0,0,1)]">
+          <div className="flex items-center gap-2 font-black text-lg uppercase tracking-tight">
+            <div className="h-5 w-5 bg-neo-magenta border-2 border-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]"></div>
             <span>StudyFlow</span>
           </div>
           <button 
             onClick={() => setIsMobileSidebarOpen(true)}
-            className="p-2 border-2 border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+            className="p-1.5 border-2 border-black bg-white shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]"
             aria-label="Open Menu"
           >
-            <Menu size={20} strokeWidth={3} />
+            <Menu size={18} strokeWidth={2.5} />
           </button>
         </div>
       )}
@@ -80,7 +80,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         />
       )}
 
-      <main className={`flex-1 min-w-0 z-10 relative flex flex-col ${isLandingPage ? 'w-full bg-neo-yellow' : 'p-4 md:p-8 bg-[#f4f4f0]'}`}>
+      <main className={`flex-1 min-w-0 z-10 relative flex flex-col ${isLandingPage ? 'w-full bg-neo-yellow' : 'p-3 sm:p-4 md:p-6 lg:p-8 bg-[#f4f4f0]'}`}>
         {children}
       </main>
 

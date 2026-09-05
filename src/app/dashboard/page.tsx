@@ -138,8 +138,8 @@ export default function Dashboard() {
         {/* Left Side: Upload Dropzone & Document Lists */}
         <div className="space-y-8">
           
-          <div className="neo-box p-6 bg-white">
-            <h3 className="text-2xl font-black uppercase mb-4 border-b-4 border-black pb-2">Upload Document</h3>
+          <div className="neo-box p-4 sm:p-5 bg-white">
+            <h3 className="text-base sm:text-lg font-black uppercase mb-3 border-b-2 border-black pb-2">Upload Document</h3>
             <FileUploader 
               onSuccess={async (docId, filename) => {
                 const newDoc = {
@@ -174,12 +174,12 @@ export default function Dashboard() {
                     key={doc.id} 
                     className="group p-2.5 flex items-center justify-between border-2 border-black bg-white hover:bg-neo-yellow transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-8 w-8 border-2 border-black bg-white flex items-center justify-center font-black text-[10px] uppercase shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
+                      <div className="h-8 w-8 border-2 border-black bg-white flex items-center justify-center font-black text-[10px] uppercase shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] shrink-0">
                         {doc.file_type}
                       </div>
-                      <div className="min-w-0">
-                        <h4 className="text-xs sm:text-sm font-bold truncate max-w-[200px] leading-tight">{doc.filename}</h4>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-xs sm:text-sm font-bold truncate leading-tight">{doc.filename}</h4>
                         <span className="text-[11px] font-semibold text-gray-600">{new Date(doc.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
@@ -229,11 +229,11 @@ export default function Dashboard() {
                     className="p-2 border-2 border-black bg-white hover:bg-neo-cyan transition-colors shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between cursor-pointer"
                     onClick={() => triggerChatWithDoc(doc.id)}
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-6 w-6 border-2 border-black bg-neo-yellow flex items-center justify-center font-black text-[9px] uppercase shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
+                      <div className="h-6 w-6 border-2 border-black bg-neo-yellow flex items-center justify-center font-black text-[9px] uppercase shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] shrink-0">
                         {doc.file_type}
                       </div>
-                      <span className="font-bold truncate max-w-[160px] text-xs">{doc.filename}</span>
+                      <span className="font-bold truncate text-xs flex-1">{doc.filename}</span>
                     </div>
                     <span className="text-[10px] font-semibold text-gray-600 shrink-0">{new Date(doc.created_at).toLocaleDateString()}</span>
                   </div>

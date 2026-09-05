@@ -31,18 +31,18 @@ export default function LandingPage() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8 md:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 md:py-14 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
         
         {/* Left Side: Hero Text */}
         <div className="flex flex-col items-start text-left">
-          <div className="bg-neo-cyan border-2 border-black px-3 py-0.5 text-xs font-black uppercase mb-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] inline-block transform -rotate-1">
+          <div className="bg-neo-cyan border-2 border-black px-3 py-0.5 text-xs font-black uppercase mb-3 sm:mb-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] inline-block transform -rotate-1">
             Document Intelligence Platform
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black uppercase leading-tight mb-4 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase leading-tight mb-3 sm:mb-4 tracking-tight">
             Understand<br/>
             <span className="text-white text-shadow-neo">Your Data.</span>
           </h1>
-          <p className="text-sm font-semibold mb-6 max-w-md bg-white p-3.5 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] leading-relaxed">
+          <p className="text-xs sm:text-sm font-semibold mb-6 max-w-md bg-white p-3 sm:p-3.5 border-2 border-black shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)] leading-relaxed">
             Turn raw documents into searchable insights. Chat with your PDFs, generate structural mind maps, and create flashcards based on actual text.
           </p>
         </div>
@@ -50,7 +50,7 @@ export default function LandingPage() {
         {/* Right Side: Login Form */}
         <div className="relative w-full max-w-sm mx-auto">
           {/* Decorative block behind form */}
-          <div className="absolute inset-0 bg-neo-magenta border-2 border-black translate-x-2.5 translate-y-2.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"></div>
+          <div className="absolute inset-0 bg-neo-magenta border-2 border-black translate-x-2 translate-y-2 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"></div>
           <div className="relative">
             <LoginForm />
           </div>
@@ -59,7 +59,7 @@ export default function LandingPage() {
 
       {/* Feature Cards Row */}
       <section className="bg-white border-y-2 border-black">
-        <div className="max-w-6xl mx-auto px-6 py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           <h2 className="text-2xl font-black uppercase text-center mb-8 tracking-tight">Core Capabilities</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             
@@ -98,7 +98,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-neo-yellow py-5 text-center border-t-2 border-black px-6">
+      <footer className="bg-neo-yellow py-4 sm:py-5 text-center border-t-2 border-black px-4 sm:px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="font-bold uppercase text-xs">
             © 2026 StudyFlow. Developed by Civil Boys.

@@ -84,9 +84,9 @@ export default function AITutorBubble() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-5 right-5 h-12 w-12 bg-neo-magenta border-2 border-black flex items-center justify-center z-50 cursor-grab active:cursor-grabbing shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)]"
+          className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 h-11 w-11 sm:h-12 sm:w-12 bg-neo-magenta border-2 border-black flex items-center justify-center z-50 cursor-grab active:cursor-grabbing shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
         >
-          <Brain className="text-white" size={22} strokeWidth={2.5} />
+          <Brain className="text-white" size={20} strokeWidth={2.5} />
         </motion.button>
       )}
 
@@ -109,7 +109,7 @@ export default function AITutorBubble() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 right-0 sm:bottom-5 sm:right-5 sm:h-[520px] sm:w-[360px] h-full w-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 flex flex-col overflow-hidden"
+              className="fixed bottom-0 right-0 sm:bottom-5 sm:right-5 h-[88dvh] sm:h-[520px] w-full sm:w-[360px] bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 flex flex-col overflow-hidden rounded-t-lg sm:rounded-none"
             >
               {/* Header */}
               <div className="bg-neo-yellow border-b-2 border-black px-3.5 py-2.5 flex items-center justify-between z-10 shrink-0">

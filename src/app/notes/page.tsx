@@ -12,7 +12,8 @@ import {
   Eye, 
   Edit3, 
   Check, 
-  BookOpen
+  BookOpen,
+  ChevronLeft
 } from 'lucide-react';
 import { useStudyStore, NoteInfo } from '../../store/studyStore';
 
@@ -28,6 +29,7 @@ export default function NotesSystem() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFolder, setSelectedFolder] = useState<string>('All');
   const [activeNote, setActiveNote] = useState<NoteInfo | null>(null);
+  const [mobileView, setMobileView] = useState<'list' | 'editor'>('list');
   
   // Editor values
   const [noteTitle, setNoteTitle] = useState('');
@@ -47,6 +49,7 @@ export default function NotesSystem() {
     setNoteFolder(note.folder);
     setEditorMode('edit');
     setSaveStatus('idle');
+    setMobileView('editor');
   };
 
   // Load first note into editor on load
@@ -136,10 +139,13 @@ export default function NotesSystem() {
   });
 
   return (
-    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col md:flex-row gap-4 max-w-7xl mx-auto md:overflow-hidden text-black pb-4 md:pb-0">
+    <div className="h-[calc(100vh-85px)] flex flex-col md:flex-row gap-3 sm:gap-4 max-w-7xl mx-auto overflow-hidden text-black">
       
       {/* LEFT SIDEBAR: Notes Directory list */}
-      <div className="w-full md:w-80 neo-box bg-neo-yellow p-4 flex flex-col justify-between overflow-hidden min-h-[400px] md:min-h-0">
+      <div className={`
+        w-full md:w-80 neo-box bg-neo-yellow p-3.5 sm:p-4 flex-col justify-between overflow-hidden
+        ${mobileView === 'list' ? 'flex flex-1' : 'hidden md:flex'}
+      `}>
         
         <div className="space-y-4 flex-1 flex flex-col min-h-0">
           
@@ -232,10 +238,22 @@ export default function NotesSystem() {
       </div>
 
       {/* RIGHT EDITOR PANEL */}
-      <div className="flex-1 neo-box bg-white p-4 flex flex-col justify-between overflow-hidden min-h-[500px] md:min-h-0">
+      <div className={`
+        flex-1 neo-box bg-white p-3.5 sm:p-4 flex-col justify-between overflow-hidden
+        ${mobileView === 'editor' ? 'flex flex-1' : 'hidden md:flex'}
+      `}>
         {activeNote ? (
           <div className="h-full flex flex-col justify-between min-h-0">
             
+            {/* Mobile Back to Notes button */}
+            <button
+              onClick={() => setMobileView('list')}
+              className="flex md:hidden items-center gap-1.5 py-1 px-2.5 bg-neo-yellow border-2 border-black text-xs font-black uppercase shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] mb-2.5 self-start"
+            >
+              <ChevronLeft size={14} strokeWidth={3} />
+              Back to Notes
+            </button>
+
             {/* Note Meta inputs (Title, Folder Selector) */}
             <div className="border-b-2 border-black pb-3 space-y-3">
               <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">

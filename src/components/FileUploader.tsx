@@ -104,7 +104,7 @@ export default function FileUploader({ onSuccess }: FileUploaderProps) {
           }
         }}
         className={`
-          border-2 border-black border-dashed p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors min-h-[140px]
+          border-2 border-black border-dashed p-4 sm:p-6 flex flex-col items-center justify-center gap-2.5 sm:gap-3 cursor-pointer transition-colors min-h-[130px]
           ${dragActive 
             ? 'bg-neo-yellow border-solid' 
             : 'bg-white hover:bg-gray-50 hover:border-solid'
@@ -113,12 +113,12 @@ export default function FileUploader({ onSuccess }: FileUploaderProps) {
       >
         {status === "idle" && (
           <>
-            <div className="h-10 w-10 bg-white border-2 border-black flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <Upload size={20} strokeWidth={2.5} />
+            <div className="h-9 w-9 sm:h-10 sm:w-10 bg-white border-2 border-black flex items-center justify-center text-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
+              <Upload size={18} strokeWidth={2.5} />
             </div>
-            <div className="text-center space-y-1 mt-1">
-              <p className="text-sm font-black uppercase">Drag & Drop PDF</p>
-              <p className="font-bold text-xs text-gray-600">Max size 4.5MB • Selectable text only</p>
+            <div className="text-center space-y-0.5 mt-0.5">
+              <p className="text-xs sm:text-sm font-black uppercase">Tap or Drag & Drop PDF</p>
+              <p className="font-bold text-[11px] sm:text-xs text-gray-600">Max size 4.5MB • Selectable text only</p>
             </div>
             <button className="neo-button mt-1 py-1 px-3 text-xs">
               Browse File

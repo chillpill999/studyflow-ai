@@ -43,36 +43,36 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="w-full max-w-sm neo-box bg-white p-6 relative"
+          className="w-full max-w-sm neo-box bg-white p-4 sm:p-5 relative"
         >
-          <div className="flex justify-between items-center mb-6 pb-4 border-b-4 border-black">
-            <h3 className="text-xl font-black uppercase">Edit Profile</h3>
+          <div className="flex justify-between items-center mb-4 pb-2.5 border-b-2 border-black">
+            <h3 className="text-base font-black uppercase">Edit Profile</h3>
             <button onClick={onClose} className="hover:bg-neo-yellow border-2 border-transparent hover:border-black p-1 transition-colors">
-              <X size={24} strokeWidth={3} />
+              <X size={18} strokeWidth={2.5} />
             </button>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold uppercase mb-2 flex items-center gap-2">
-                <User size={16} strokeWidth={3} /> Display Name
+              <label className="block text-xs font-bold uppercase mb-1 flex items-center gap-1.5">
+                <User size={14} strokeWidth={2.5} /> Display Name
               </label>
               <input 
                 type="text" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full neo-input"
+                className="w-full neo-input text-xs py-1.5 px-2.5"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold uppercase mb-2 flex items-center gap-2">
-                <Target size={16} strokeWidth={3} /> Primary Subject
+              <label className="block text-xs font-bold uppercase mb-1 flex items-center gap-1.5">
+                <Target size={14} strokeWidth={2.5} /> Primary Subject
               </label>
               <select
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full neo-input appearance-none bg-white"
+                className="w-full neo-input appearance-none bg-white text-xs py-1.5 px-2.5"
               >
                 {subjects.map(s => (
                   <option key={s} value={s}>{s}</option>
@@ -83,9 +83,9 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             <button 
               onClick={handleSave}
               disabled={isSaving || !username.trim()}
-              className="w-full mt-4 neo-button neo-button-magenta justify-center"
+              className="w-full mt-3 neo-button neo-button-magenta justify-center py-2 text-xs font-black"
             >
-              {isSaving ? 'Saving...' : <><Check size={20} strokeWidth={3} /> Save Changes</>}
+              {isSaving ? 'Saving...' : <><Check size={16} strokeWidth={2.5} /> Save Changes</>}
             </button>
             <button 
               onClick={async () => {
@@ -94,7 +94,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                 await supabase.auth.signOut();
                 window.location.href = '/';
               }}
-              className="w-full bg-white text-black font-bold border-2 border-black py-3 uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-red-500 hover:text-white transition-colors"
+              className="w-full bg-white text-black font-black border-2 border-black py-2 uppercase text-xs shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-red-500 hover:text-white transition-colors"
             >
               Sign Out
             </button>

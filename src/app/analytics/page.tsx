@@ -72,18 +72,18 @@ export default function AnalyticsWorkspace() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="border-2 border-black p-3 bg-neo-yellow shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-center">
-                <span className="text-2xl font-black">{totalTasks}</span>
-                <p className="font-black uppercase text-xs mt-0.5">Total Tasks</p>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="border-2 border-black p-2 sm:p-3 bg-neo-yellow shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] sm:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-center">
+                <span className="text-xl sm:text-2xl font-black">{totalTasks}</span>
+                <p className="font-black uppercase text-[10px] sm:text-xs mt-0.5">Total</p>
               </div>
-              <div className="border-2 border-black p-3 bg-neo-green shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-center">
-                <span className="text-2xl font-black">{completedTasks}</span>
-                <p className="font-black uppercase text-xs mt-0.5">Completed</p>
+              <div className="border-2 border-black p-2 sm:p-3 bg-neo-green shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] sm:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-center">
+                <span className="text-xl sm:text-2xl font-black">{completedTasks}</span>
+                <p className="font-black uppercase text-[10px] sm:text-xs mt-0.5">Done</p>
               </div>
-              <div className="border-2 border-black p-3 bg-neo-magenta text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-center">
-                <span className="text-2xl font-black">{totalTasks - completedTasks}</span>
-                <p className="font-black uppercase text-xs mt-0.5">Remaining</p>
+              <div className="border-2 border-black p-2 sm:p-3 bg-neo-magenta text-white shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] sm:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-center">
+                <span className="text-xl sm:text-2xl font-black">{totalTasks - completedTasks}</span>
+                <p className="font-black uppercase text-[10px] sm:text-xs mt-0.5">Left</p>
               </div>
             </div>
 
@@ -173,7 +173,7 @@ export default function AnalyticsWorkspace() {
                           }
                         `}
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
                           <button
                             onClick={() => toggleTask(tsk.id, !tsk.is_completed)}
                             className={`
@@ -186,7 +186,7 @@ export default function AnalyticsWorkspace() {
                           >
                             {tsk.is_completed && <Check size={12} strokeWidth={3} />}
                           </button>
-                          <span className="font-bold truncate max-w-[140px] text-xs">{tsk.title}</span>
+                          <span className="font-bold truncate text-xs flex-1">{tsk.title}</span>
                         </div>
 
                         <button

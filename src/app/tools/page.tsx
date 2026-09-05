@@ -133,24 +133,24 @@ export default function StudyTools() {
   };
 
   return (
-    <div className="space-y-5 max-w-7xl mx-auto pb-8 px-4 sm:px-6 lg:px-8 text-black">
+    <div className="space-y-4 sm:space-y-5 max-w-7xl mx-auto pb-8 text-black">
       
       {/* Title */}
-      <div className="bg-neo-magenta border-2 border-black p-4 shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)]">
-        <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight flex items-center gap-3">
+      <div className="bg-neo-magenta border-2 border-black p-3.5 sm:p-4 shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)]">
+        <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight flex items-center gap-2 sm:gap-3">
           Workspace Suite
-          <span className="text-xs bg-white border-2 border-black px-2 py-0.5 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] font-bold">AI Tools</span>
+          <span className="text-[11px] sm:text-xs bg-white border-2 border-black px-2 py-0.5 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] font-bold">AI Tools</span>
         </h1>
         <p className="font-medium mt-1 text-xs sm:text-sm">Select from flashcards, quizzes, custom tutoring, or visual study planning models.</p>
       </div>
 
       {/* Tabs Menu */}
-      <div className="flex border-b-2 border-black pb-0 mb-5 bg-white border-2 shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)]">
+      <div className="flex border-b-2 border-black pb-0 mb-4 sm:mb-5 bg-white border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
         <div className="flex w-full overflow-x-auto custom-scrollbar">
           {[
-            { id: 'flashcards', name: 'Flashcard Decks', icon: Layers, color: 'bg-neo-cyan' },
-            { id: 'quiz', name: 'Practice Quizzes', icon: HelpCircle, color: 'bg-neo-yellow' },
-            { id: 'planner', name: 'Study Planner', icon: Calendar, color: 'bg-neo-green' },
+            { id: 'flashcards', name: 'Flashcards', full: 'Flashcard Decks', icon: Layers, color: 'bg-neo-cyan' },
+            { id: 'quiz', name: 'Quizzes', full: 'Practice Quizzes', icon: HelpCircle, color: 'bg-neo-yellow' },
+            { id: 'planner', name: 'Planner', full: 'Study Planner', icon: Calendar, color: 'bg-neo-green' },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -159,15 +159,16 @@ export default function StudyTools() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as 'flashcards' | 'quiz' | 'planner')}
                 className={`
-                  flex-1 flex items-center justify-center gap-2 px-4 py-2.5 font-black uppercase text-xs sm:text-sm border-r-2 border-black last:border-r-0 cursor-pointer transition-colors
+                  flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-2.5 font-black uppercase text-xs sm:text-sm border-r-2 border-black last:border-r-0 cursor-pointer transition-colors whitespace-nowrap
                   ${isActive 
                     ? `${tab.color} border-b-2 border-b-black shadow-[inset_0_-2px_0_0_rgba(0,0,0,1)]` 
                     : 'bg-white hover:bg-gray-100'
                   }
                 `}
               >
-                <Icon size={16} strokeWidth={2.5} />
-                {tab.name}
+                <Icon size={15} strokeWidth={2.5} />
+                <span className="sm:hidden">{tab.name}</span>
+                <span className="hidden sm:inline">{tab.full}</span>
               </button>
             );
           })}
@@ -239,7 +240,7 @@ export default function StudyTools() {
                     {/* Card container */}
                     <div 
                       onClick={() => setIsFlipped(!isFlipped)}
-                      className="w-full max-w-xl min-h-[320px] cursor-pointer perspective-1000 group relative"
+                      className="w-full max-w-xl min-h-[260px] sm:min-h-[320px] cursor-pointer perspective-1000 group relative"
                     >
                       <motion.div 
                         animate={{ rotateY: isFlipped ? 180 : 0 }}
@@ -247,43 +248,43 @@ export default function StudyTools() {
                         className="w-full h-full relative preserve-3d transition-transform duration-500"
                       >
                         {/* Front Side */}
-                        <div className="absolute inset-0 w-full h-full neo-box bg-white p-6 flex flex-col justify-between backface-hidden shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                        <div className="absolute inset-0 w-full h-full neo-box bg-white p-4 sm:p-6 flex flex-col justify-between backface-hidden shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                           
                           <div className="flex justify-between items-center font-black uppercase border-b-2 border-black pb-2.5">
                             <span className="flex items-center gap-1.5 bg-neo-cyan border-2 border-black px-2 py-0.5 text-xs shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
                               <Layers size={14} strokeWidth={2.5} /> Concept
                             </span>
-                            <span className="bg-neo-magenta border-2 border-black px-2 py-0.5 text-xs text-white shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
+                            <span className="bg-neo-magenta border-2 border-black px-2 py-0.5 text-[11px] sm:text-xs text-white shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
                               Box {activeCards[currentCardIdx]?.box}
                             </span>
                           </div>
                           
-                          <div className="flex-1 flex items-center justify-center overflow-y-auto my-4 custom-scrollbar">
-                            <p className="text-center text-lg sm:text-xl font-black uppercase leading-tight">
+                          <div className="flex-1 flex items-center justify-center overflow-y-auto my-3 sm:my-4 custom-scrollbar">
+                            <p className="text-center text-base sm:text-xl font-black uppercase leading-tight">
                               {activeCards[currentCardIdx]?.question}
                             </p>
                           </div>
                           
-                          <div className="text-center font-bold uppercase flex items-center justify-center gap-2 border-t-2 border-black pt-2.5 bg-neo-yellow border-2 p-1.5 text-xs shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-colors">
+                          <div className="text-center font-bold uppercase flex items-center justify-center gap-2 border-t-2 border-black pt-2 sm:pt-2.5 bg-neo-yellow border-2 p-1.5 text-xs shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-colors">
                             <RefreshCw size={14} strokeWidth={2.5} /> Click to reveal answer
                           </div>
                         </div>
 
                         {/* Back Side */}
                         <div 
-                          className="absolute inset-0 w-full h-full neo-box bg-neo-green p-6 flex flex-col justify-between backface-hidden rotateY-180 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                          className="absolute inset-0 w-full h-full neo-box bg-neo-green p-4 sm:p-6 flex flex-col justify-between backface-hidden rotateY-180 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
                         >
                           
                           <div className="flex justify-between items-center font-black uppercase border-b-2 border-black pb-2.5">
                             <span className="flex items-center gap-1.5 bg-white border-2 border-black px-2 py-0.5 text-xs shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
                               <Sparkles size={14} strokeWidth={2.5} /> Answer
                             </span>
-                            <span className="bg-white border-2 border-black px-2 py-0.5 text-xs shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
+                            <span className="bg-white border-2 border-black px-2 py-0.5 text-[11px] sm:text-xs shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
                               Spaced Repetition
                             </span>
                           </div>
                           
-                          <div className="flex-1 overflow-y-auto my-4 text-left text-sm font-medium leading-relaxed whitespace-pre-wrap custom-scrollbar bg-white border-2 border-black p-3.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                          <div className="flex-1 overflow-y-auto my-3 sm:my-4 text-left text-xs sm:text-sm font-medium leading-relaxed whitespace-pre-wrap custom-scrollbar bg-white border-2 border-black p-3 sm:p-3.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                             {activeCards[currentCardIdx]?.answer}
                           </div>
                           

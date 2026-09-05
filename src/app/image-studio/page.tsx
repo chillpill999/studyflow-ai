@@ -66,9 +66,9 @@ export default function ImageStudio() {
   };
 
   return (
-    <div className="p-4 md:p-6 max-w-5xl mx-auto min-h-[calc(100vh-4rem)] text-black">
-      <div className="flex items-center gap-3 mb-5 bg-neo-yellow border-2 border-black p-4 shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)]">
-        <div className="h-10 w-10 bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+    <div className="max-w-5xl mx-auto min-h-[calc(100vh-4rem)] text-black pb-8">
+      <div className="flex items-center gap-3 mb-4 sm:mb-5 bg-neo-yellow border-2 border-black p-3.5 sm:p-4 shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)]">
+        <div className="h-9 w-9 sm:h-10 sm:w-10 bg-white border-2 border-black flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] shrink-0">
           <ImagePlus className="h-5 w-5 text-black" strokeWidth={2.5} />
         </div>
         <div>
@@ -140,7 +140,7 @@ export default function ImageStudio() {
 
         {/* Display Section */}
         <div className="lg:col-span-2">
-          <div className="neo-box bg-neo-magenta p-4 h-full min-h-[450px] flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="neo-box bg-neo-magenta p-3.5 sm:p-4 h-full min-h-[300px] sm:min-h-[450px] flex flex-col items-center justify-center relative overflow-hidden">
             {loading && imageUrl && (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm p-4 text-white">
                 <div className="bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-4 flex flex-col items-center">
@@ -151,12 +151,12 @@ export default function ImageStudio() {
             )}
             
             {loading && !imageUrl ? (
-              <div className="flex flex-col items-center justify-center bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-6">
-                <Loader2 className="w-10 h-10 animate-spin text-black mb-3" strokeWidth={2.5} />
-                <p className="font-black uppercase text-sm">Preparing Canvas...</p>
+              <div className="flex flex-col items-center justify-center bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-5 sm:p-6">
+                <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-black mb-2.5" strokeWidth={2.5} />
+                <p className="font-black uppercase text-xs sm:text-sm">Preparing Canvas...</p>
               </div>
             ) : imageUrl ? (
-              <div className="relative w-full h-full flex flex-col items-center justify-center p-2">
+              <div className="relative w-full h-full flex flex-col items-center justify-center p-1 sm:p-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
                   src={imageUrl} 
@@ -167,12 +167,12 @@ export default function ImageStudio() {
                     setImageUrl(null);
                     alert("Failed to load image. Please try again.");
                   }}
-                  className={`border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-h-[480px] w-auto object-contain bg-white transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
+                  className={`border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] max-h-[320px] sm:max-h-[480px] w-full sm:w-auto object-contain bg-white transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
                 />
                 {!loading && (
                   <button
                     onClick={handleDownload}
-                    className="neo-button absolute bottom-4 right-4 bg-neo-green hover:bg-white flex items-center gap-1.5 px-4 py-2 text-xs font-black"
+                    className="neo-button mt-3 sm:mt-0 sm:absolute sm:bottom-4 sm:right-4 bg-neo-green hover:bg-white flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   >
                     <Download className="w-4 h-4" strokeWidth={2.5} />
                     <span>Download</span>
