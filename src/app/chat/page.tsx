@@ -12,6 +12,11 @@ import {
   FileTextIcon
 } from 'lucide-react';
 import { useStudyStore } from '../../store/studyStore';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -73,14 +78,17 @@ export default function DocumentChat() {
           question: userText,
           chat_history: history,
           doc_id: activeDocId,
-          summary: activeDocContent?.summary || "No document loaded"
+          summary: activeDocContent?.summary || null,
+          text_content: activeDocContent?.text_content || "",
+          chunks: activeDocContent?.chunks || [],
+          filename: activeDocContent?.filename || "Document"
         })
       });
       const data = await res.json();
       
-      streamResponse(data.response || "No response received");
+      streamResponse(data.response || data.error || "No response received", data.sources);
     } catch {
-      streamResponse("Failed to connect to the backend server. Please verify your Vercel API keys are set.");
+      streamResponse("Failed to connect to the backend server. Please check your network or try again.");
     }
   };
 
@@ -189,24 +197,28 @@ export default function DocumentChat() {
                   <FileTextIcon size={20} strokeWidth={3} />
                   <span className="font-black text-sm uppercase">{activeDocContent.filename as string}</span>
                 </div>
-                {activeDocContent.chunks ? (
-                  (activeDocContent.chunks as Array<{ id: number, text: string }>).map((chunk) => (
-                    <motion.div 
-                      key={chunk.id} 
-                      animate={{ 
-                        backgroundColor: highlightedChunkId === chunk.id ? '#FF00FF' : 'transparent',
-                        color: highlightedChunkId === chunk.id ? '#FFFFFF' : '#000000'
-                      }}
-                      className="p-3 border-2 border-transparent transition-colors duration-300"
-                    >
-                      <span className="inline-flex items-center justify-center border-2 border-black bg-neo-cyan text-black font-black text-xs h-5 w-6 mr-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                        {chunk.id + 1}
-                      </span>
-                      {chunk.text}
-                    </motion.div>
-                  ))
+                {activeDocContent.chunks && activeDocContent.chunks.length > 0 ? (
+                  activeDocContent.chunks.map((rawChunk: any, idx: number) => {
+                    const chunkId = typeof rawChunk === 'object' && rawChunk !== null && 'id' in rawChunk ? rawChunk.id : idx;
+                    const chunkText = typeof rawChunk === 'object' && rawChunk !== null && 'text' in rawChunk ? rawChunk.text : String(rawChunk);
+                    return (
+                      <motion.div 
+                        key={chunkId} 
+                        animate={{ 
+                          backgroundColor: highlightedChunkId === chunkId ? '#FF00FF' : 'transparent',
+                          color: highlightedChunkId === chunkId ? '#FFFFFF' : '#000000'
+                        }}
+                        className="p-3 border-2 border-black/15 transition-colors duration-300 mb-2"
+                      >
+                        <span className="inline-flex items-center justify-center border-2 border-black bg-neo-cyan text-black font-black text-xs h-5 w-7 mr-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                          {chunkId + 1}
+                        </span>
+                        {chunkText}
+                      </motion.div>
+                    );
+                  })
                 ) : (
-                  <div>{activeDocContent.text_content as string}</div>
+                  <div className="whitespace-pre-wrap">{activeDocContent.text_content as string}</div>
                 )}
               </div>
             ) : (
@@ -271,7 +283,32 @@ export default function DocumentChat() {
                       : 'bg-white text-black'
                     }
                   `}>
-                    <p className="whitespace-pre-line">{msg.content}</p>
+                    {msg.role === 'user' ? (
+                      <p className="whitespace-pre-line">{msg.content}</p>
+                    ) : (
+                      <div className="text-base font-semibold leading-relaxed overflow-hidden markdown-body">
+                        <ReactMarkdown 
+                          remarkPlugins={[remarkGfm, remarkMath]} 
+                          rehypePlugins={[rehypeKatex]}
+                          components={{
+                            p: ({node, ...props}) => <p className="mb-3 last:mb-0" {...props} />,
+                            pre: ({node, ...props}) => <pre className="bg-gray-100 border-2 border-black p-3 my-2 overflow-x-auto text-xs font-mono" {...props} />,
+                            code: ({node, inline, ...props}: any) => inline ? <code className="bg-neo-yellow px-1 py-0.5 border border-black text-black font-mono font-black text-sm" {...props} /> : <code {...props} />,
+                            ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-3 space-y-1 font-bold" {...props} />,
+                            ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-3 space-y-1 font-bold" {...props} />,
+                            h1: ({node, ...props}) => <h1 className="text-xl font-black uppercase mt-4 mb-2 border-b-2 border-black pb-1" {...props} />,
+                            h2: ({node, ...props}) => <h2 className="text-lg font-black uppercase mt-3 mb-1" {...props} />,
+                            h3: ({node, ...props}) => <h3 className="text-base font-black uppercase mt-2 mb-1" {...props} />,
+                            blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-black pl-3 my-2 italic bg-neo-yellow/30 p-2" {...props} />,
+                            table: ({node, ...props}) => <div className="overflow-x-auto my-3"><table className="border-2 border-black border-collapse text-sm w-full" {...props} /></div>,
+                            th: ({node, ...props}) => <th className="border-2 border-black bg-neo-yellow p-2 font-black text-left" {...props} />,
+                            td: ({node, ...props}) => <td className="border-2 border-black p-2" {...props} />,
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      </div>
+                    )}
 
                     {/* Sources citation list */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (

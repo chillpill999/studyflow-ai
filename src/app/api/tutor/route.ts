@@ -2,20 +2,44 @@ import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { createClient } from '@/lib/supabaseServer';
 
+export const runtime = 'nodejs';
+
+function extractMatchingSources(userQuery: string, chunks: any[]): { id: number; text?: string }[] {
+  if (!Array.isArray(chunks) || chunks.length === 0) return [];
+  
+  const queryTokens = userQuery
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !['what', 'when', 'where', 'which', 'explain', 'tell', 'show', 'please', 'about'].includes(w));
+
+  if (queryTokens.length === 0) return [];
+
+  const scored = chunks.map((c, idx) => {
+    const chunkId = typeof c === 'object' && c !== null && 'id' in c ? c.id : idx;
+    const chunkText = typeof c === 'object' && c !== null && 'text' in c ? c.text : String(c);
+    const lower = chunkText.toLowerCase();
+
+    let score = 0;
+    for (const token of queryTokens) {
+      if (lower.includes(token)) score += 1;
+    }
+    return { id: chunkId, text: chunkText.slice(0, 150) + '...', score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.filter(s => s.score > 0).slice(0, 3).map(s => ({ id: s.id, text: s.text }));
+}
+
 export async function POST(req: Request) {
   const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const { data: { user } } = await supabase.auth.getUser();
 
   const groqKey = process.env.GROQ_API_KEY;
-  const openRouterKey = process.env.OPENROUTER_API_KEY;
   const geminiKey = process.env.GEMINI_API_KEY;
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
 
-  if (!groqKey && !openRouterKey && !geminiKey) {
-    console.error('[CRITICAL] Missing all AI keys (GEMINI_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY)');
+  if (!geminiKey && !groqKey && !openRouterKey) {
     return NextResponse.json(
       { error: 'Server configuration missing: No AI API key configured.' },
       { status: 500 }
@@ -27,67 +51,68 @@ export async function POST(req: Request) {
     const { documentId, doc_id, concept, question, difficulty, chat_history } = body;
     const targetDocId = documentId || doc_id;
 
-    let text_content = null;
-    let summary = null;
+    let text_content = body.text_content || null;
+    let summary = body.summary || null;
+    let chunks = body.chunks || [];
+    let filename = body.filename || 'Document';
 
+    // If docId is provided and we have user/database access, fetch full document record
     if (targetDocId) {
-      const { data: docData, error: docError } = await supabase
-        .from('documents')
-        .select('text_content, summary')
-        .eq('id', targetDocId)
-        .eq('user_id', user.id)
-        .single();
-        
-      if (!docError && docData) {
-        text_content = docData.text_content;
-        summary = docData.summary;
+      try {
+        let query = supabase.from('documents').select('text_content, summary, chunks, filename').eq('id', targetDocId);
+        if (user?.id) {
+          query = query.eq('user_id', user.id);
+        }
+        const { data: docData } = await query.single();
+        if (docData) {
+          text_content = docData.text_content || text_content;
+          summary = docData.summary || summary;
+          chunks = docData.chunks || chunks;
+          filename = docData.filename || filename;
+        }
+      } catch (dbFetchErr) {
+        console.warn('Could not fetch doc from DB, falling back to body payload:', dbFetchErr);
       }
     }
 
-    // The user's query
-    const userQuery = question || concept || 'Explain the core concepts.';
+    const userQuery = question || concept || 'Provide an overview of the key concepts in this material.';
+    const diffLevel = difficulty || 'balanced';
 
-    let systemPrompt = `You are an expert AI Tutor for StudyFlow. Your goal is to help the student understand concepts deeply through conversational dialogue. Provide detailed, comprehensive answers. If the topic involves physics, mathematics, engineering, or any technical field, provide full step-by-step derivations.`;
+    // Extract relevant source citations
+    const sources = extractMatchingSources(userQuery, chunks);
 
-    // If full text context is provided, use it for exact answers
-    if (text_content) {
-      systemPrompt = `You are an expert AI Tutor for StudyFlow. You have been provided the full text content of the user's study material. Your ONLY job is to answer the user's questions based strictly on this provided content. Do not use outside knowledge. If the user asks a question that cannot be answered using the content, you must reply verbatim: 'I cannot answer that based on the uploaded document. Please check the material or ask about a different topic.' Do not guess.
+    // Build intelligent, pedagogically rich system prompt
+    const docContext = text_content 
+      ? text_content 
+      : (summary ? (typeof summary === 'object' ? JSON.stringify(summary, null, 2) : String(summary)) : null);
 
-Document Content:
-${text_content}`;
-    } else if (summary) {
-      const summaryStr = typeof summary === 'object' ? JSON.stringify(summary) : summary;
-      systemPrompt = `You are an expert AI Tutor for StudyFlow. You have been provided a structured summary of the user's study material. Your ONLY job is to answer the user's questions based strictly on this provided summary. Do not use outside knowledge. If the user asks a question that cannot be answered using the summary, you must reply verbatim: 'I cannot answer that based on the uploaded document. Please check the material or ask about a different topic.' Do not guess.
+    let systemPrompt = `You are the lead AI Study Tutor on StudyFlow, an advanced learning operating system.
+Your mission is to provide exceptionally smart, pedagogical, lucid, and comprehensive answers grounded in the student's study materials.
 
-Document Summary:
-${summaryStr}`;
-    } else {
-      // Apply difficulty preference if no document is enforcing strictness
-      if (difficulty) {
-        systemPrompt += `\nThe student's preferred explanation difficulty level is: ${difficulty}.`;
-      }
-    }
+DOCUMENT CONTEXT (${filename}):
+${docContext ? docContext : 'No specific document loaded. Help the student with general academic and conceptual study questions.'}
 
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...(Array.isArray(chat_history) ? chat_history : []),
-      { role: 'user', content: userQuery }
-    ];
+INSTRUCTION & TEACHING PROTOCOL:
+1. Deep Document Grounding: Use the document as your primary reference. Anchor your explanations in its exact definitions, theorems, formulas, examples, and terminology.
+2. Intelligent Explanations (Not Just Quoting): Do NOT simply regurgitate raw text. Synthesize and teach! Use clear mental models, step-by-step logic, intuitive analogies, and real-world applications to make dense concepts crystal clear.
+3. Math & Technical Rigor: If the question involves mathematics, physics, engineering, or coding:
+   - Provide complete, step-by-step derivations without skipping steps.
+   - Format all math equations in LaTeX: use $...$ for inline math (e.g. $E = mc^2$, $\\nabla \\cdot \\vec{B} = 0$) and $$...$$ on separate lines for display equations.
+4. Explanatory Depth & Difficulty: Tailor depth to: ${diffLevel}. Keep it clear, engaging, and intellectually rigorous.
+5. Versatile Study Assistance: If the user asks for practice problems, conceptual quizzes, exam prep tips, or mnemonics based on the document, generate high-yield, challenging questions directly derived from the material.
+6. Tone: Sharp, encouraging, academic, structured with clear Markdown headers, bold highlights, and bullet points. Absolutely no robotic disclaimers.`;
 
-    // Primary: Use Gemini if available (since it has a 1M token context window and high free limits)
+    // 1. Primary Model: Gemini 2.5 Flash
     if (geminiKey) {
       try {
         const ai = new GoogleGenAI({ apiKey: geminiKey });
-        
-        // Filter and format message history for Gemini API
         const contents = (Array.isArray(chat_history) ? chat_history : [])
           .filter(m => m.role === 'user' || m.role === 'assistant')
           .map(m => ({
             role: m.role === 'assistant' ? 'model' as const : 'user' as const,
-            parts: [{ text: m.content || '' }]
+            parts: [{ text: String(m.content || '') }]
           }));
 
-        // Append current user query if it's not already at the end of chat_history
         const lastMsg = chat_history?.[chat_history.length - 1];
         if (!lastMsg || lastMsg.content !== userQuery || lastMsg.role !== 'user') {
           contents.push({ role: 'user' as const, parts: [{ text: userQuery }] });
@@ -98,24 +123,29 @@ ${summaryStr}`;
           contents,
           config: {
             systemInstruction: systemPrompt,
-            temperature: 0.3,
-            maxOutputTokens: 2048
+            temperature: 0.35,
+            maxOutputTokens: 3500
           }
         });
 
         const reply = response.text;
         if (reply) {
-          return NextResponse.json({ response: reply });
+          return NextResponse.json({ response: reply, sources });
         }
       } catch (geminiErr: any) {
-        console.error('Gemini AI Tutor Error:', geminiErr);
-        // Fall back to Groq/OpenRouter
+        console.error('Gemini Tutor Error, falling back to Groq:', geminiErr?.message || geminiErr);
       }
     }
 
-    // Secondary: Use Groq
+    // 2. Secondary Model: Groq Llama 3.3 70B
     if (groqKey) {
       try {
+        const messages = [
+          { role: 'system', content: systemPrompt },
+          ...(Array.isArray(chat_history) ? chat_history.slice(-10) : []),
+          { role: 'user', content: userQuery }
+        ];
+
         const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -125,24 +155,29 @@ ${summaryStr}`;
           body: JSON.stringify({
             model: 'llama-3.3-70b-versatile',
             messages,
-            temperature: 0.3,
-            max_tokens: 2048
+            temperature: 0.35,
+            max_tokens: 3000
           })
         });
 
         const groqData = await groqRes.json();
-        if (!groqRes.ok) throw new Error(groqData.error?.message || 'Groq Error');
-
-        return NextResponse.json({ response: groqData.choices[0].message.content });
+        if (groqRes.ok && groqData.choices?.[0]?.message?.content) {
+          return NextResponse.json({ response: groqData.choices[0].message.content, sources });
+        }
       } catch (groqErr: any) {
-        console.error('Groq AI Error:', groqErr);
-        // Fall through to OpenRouter fallback
+        console.error('Groq Tutor Error, falling back to OpenRouter:', groqErr?.message || groqErr);
       }
     }
 
-    // Fallback: Use OpenRouter if available
+    // 3. Tertiary Model: OpenRouter
     if (openRouterKey) {
       try {
+        const messages = [
+          { role: 'system', content: systemPrompt },
+          ...(Array.isArray(chat_history) ? chat_history.slice(-10) : []),
+          { role: 'user', content: userQuery }
+        ];
+
         const openRouterRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -150,26 +185,25 @@ ${summaryStr}`;
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'meta-llama/llama-3.1-8b-instruct:free',
+            model: 'google/gemini-2.0-flash-001',
             messages,
-            temperature: 0.3,
-            max_tokens: 2048
+            temperature: 0.35,
+            max_tokens: 3000
           })
         });
 
         const aiData = await openRouterRes.json();
-        if (!openRouterRes.ok) throw new Error(aiData.error?.message || 'OpenRouter Error');
-
-        return NextResponse.json({ response: aiData.choices[0].message.content });
+        if (openRouterRes.ok && aiData.choices?.[0]?.message?.content) {
+          return NextResponse.json({ response: aiData.choices[0].message.content, sources });
+        }
       } catch (aiErr: any) {
-        console.error('OpenRouter AI Error:', aiErr);
-        return NextResponse.json({ error: 'AI processing failed. Please try again.' }, { status: 502 });
+        console.error('OpenRouter Tutor Error:', aiErr?.message || aiErr);
       }
     }
 
-    return NextResponse.json({ error: 'All AI providers failed.' }, { status: 502 });
+    return NextResponse.json({ error: 'AI processing failed across all providers.' }, { status: 502 });
   } catch (err: any) {
-    console.error('General Tutor Error:', err);
+    console.error('General Tutor Route Error:', err);
     return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
   }
 }
