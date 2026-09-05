@@ -233,26 +233,26 @@ export default function MindMap() {
   const { nodes: renderNodes, links: renderLinks } = buildRenderCoordinates();
 
   return (
-    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col gap-6 max-w-7xl mx-auto md:overflow-hidden pb-4 md:pb-0 text-black">
+    <div className="h-auto md:h-[calc(100vh-85px)] flex flex-col gap-4 max-w-7xl mx-auto md:overflow-hidden pb-4 md:pb-0 text-black">
       
       {/* Top Workspace settings */}
-      <div className="neo-box bg-neo-yellow p-6 flex flex-col md:flex-row items-center justify-between gap-6 z-20">
-        <div className="flex items-center gap-4">
-          <div className="h-16 w-16 bg-white border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <BrainCircuit size={32} strokeWidth={2.5} />
+      <div className="neo-box bg-neo-yellow p-4 flex flex-col md:flex-row items-center justify-between gap-4 z-20">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <BrainCircuit size={20} strokeWidth={2.5} />
           </div>
           <div>
-            <h2 className="text-2xl font-black uppercase tracking-tight">Mind Map Synthesizer</h2>
-            <p className="font-bold">Convert studies into interactive concept maps.</p>
+            <h2 className="text-base sm:text-lg font-black uppercase tracking-tight">Mind Map Synthesizer</h2>
+            <p className="font-medium text-xs text-gray-800">Convert studies into interactive concept maps.</p>
           </div>
         </div>
 
         {/* Source selector form */}
-        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <select 
             value={selectedSourceType} 
             onChange={(e) => { setSelectedSourceType(e.target.value as 'document' | 'note'); setSelectedSourceId(''); }}
-            className="neo-input bg-white w-auto"
+            className="neo-input bg-white w-auto text-xs py-1.5 px-2.5"
           >
             <option value="document">Documents</option>
             <option value="note">Notes Workspace</option>
@@ -261,7 +261,7 @@ export default function MindMap() {
           <select 
             value={selectedSourceId} 
             onChange={(e) => setSelectedSourceId(e.target.value)}
-            className="neo-input bg-white max-w-[220px] truncate"
+            className="neo-input bg-white max-w-[200px] truncate text-xs py-1.5 px-2.5"
           >
             <option value="">-- Select Source --</option>
             {selectedSourceType === 'document' ? (
@@ -274,41 +274,41 @@ export default function MindMap() {
           <button
             onClick={handleGenerateMindMap}
             disabled={loading || !selectedSourceId}
-            className="neo-button bg-neo-green hover:bg-white flex items-center gap-2 py-3 px-6 disabled:opacity-50"
+            className="neo-button bg-neo-green hover:bg-white flex items-center gap-1.5 py-1.5 px-3.5 disabled:opacity-50 text-xs font-black"
           >
-            <Sparkles size={20} strokeWidth={3} />
-            <span className="text-lg">Generate Map</span>
+            <Sparkles size={14} strokeWidth={2.5} />
+            <span>Generate Map</span>
           </button>
         </div>
       </div>
 
       {/* Main Canvas Workspace */}
-      <div className="flex-1 bg-white neo-box relative overflow-hidden select-none z-10 min-h-[500px] md:min-h-0">
+      <div className="flex-1 bg-white neo-box relative overflow-hidden select-none z-10 min-h-[450px] md:min-h-0">
         
         {/* Canvas Background Grid patterns */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-100" 
           style={{ 
-            backgroundImage: 'radial-gradient(rgba(0,0,0,1) 2px, transparent 0)', 
-            backgroundSize: '30px 30px' 
+            backgroundImage: 'radial-gradient(rgba(0,0,0,1) 1.5px, transparent 0)', 
+            backgroundSize: '24px 24px' 
           }} 
         />
 
         {/* Loading overlay spinner */}
         {loading && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4 z-30">
-            <RefreshCw size={48} strokeWidth={3} className="text-black animate-spin" />
-            <span className="text-xl font-black uppercase">Analyzing document node correlations...</span>
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-30">
+            <RefreshCw size={32} strokeWidth={2.5} className="text-black animate-spin" />
+            <span className="text-sm font-black uppercase">Analyzing document node correlations...</span>
           </div>
         )}
 
         {/* Empty Canvas state */}
         {!treeData && !loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 space-y-6 z-20 bg-white/80">
-            <div className="bg-neo-cyan border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <BrainCircuit size={64} strokeWidth={2} className="text-black mb-4 mx-auto" />
-              <h4 className="text-3xl font-black uppercase mb-2">Canvas Empty</h4>
-              <p className="font-bold max-w-sm mx-auto">Select a source at the top and generate the mind map to render nodes here.</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 space-y-4 z-20 bg-white/80">
+            <div className="bg-neo-cyan border-2 border-black p-5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <BrainCircuit size={36} strokeWidth={2} className="text-black mb-2 mx-auto" />
+              <h4 className="text-lg font-black uppercase mb-1">Canvas Empty</h4>
+              <p className="font-medium text-xs max-w-xs mx-auto text-gray-800">Select a source at the top and generate the mind map to render nodes here.</p>
             </div>
           </div>
         )}
@@ -340,8 +340,8 @@ export default function MindMap() {
                     x2={link.x2}
                     y2={link.y2}
                     stroke="#000"
-                    strokeWidth={link.level === 1 ? 6 : 4}
-                    strokeDasharray={link.level === 2 ? '10,10' : 'none'}
+                    strokeWidth={link.level === 1 ? 3 : 2}
+                    strokeDasharray={link.level === 2 ? '6,6' : 'none'}
                   />
                 ))}
               </svg>
@@ -363,9 +363,9 @@ export default function MindMap() {
                     <div 
                       onClick={() => node.hasChildren && toggleNodeCollapse(node.id)}
                       className={`
-                        px-6 py-3 border-4 border-black font-black text-sm tracking-tight shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all duration-300 whitespace-nowrap uppercase
+                        px-3.5 py-1.5 border-2 border-black font-black text-xs tracking-tight shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all duration-300 whitespace-nowrap uppercase
                         ${node.isRoot 
-                          ? 'bg-neo-magenta text-xl py-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]' 
+                          ? 'bg-neo-magenta text-white text-xs sm:text-sm py-2 px-4 shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)]' 
                           : node.level === 1 
                             ? 'bg-neo-cyan hover:bg-white' 
                             : 'bg-neo-yellow hover:bg-white'
@@ -374,7 +374,7 @@ export default function MindMap() {
                     >
                       {node.label}
                       {node.hasChildren && (
-                        <span className="ml-2 font-black bg-white border-2 border-black px-1 py-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="ml-1.5 font-black bg-white border border-black px-1 py-0 text-[10px] shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
                           {isCollapsed ? '+' : '−'}
                         </span>
                       )}
@@ -388,27 +388,27 @@ export default function MindMap() {
 
         {/* Floating Controls Overlay (Zoom In, Zoom Out, Reset View) */}
         {treeData && (
-          <div className="absolute bottom-6 right-6 z-20 flex items-center gap-3 bg-white border-4 border-black p-2 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-white border-2 border-black p-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
             <button 
               onClick={() => handleZoom(1.2)}
               title="Zoom In"
-              className="p-3 bg-neo-yellow border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-all cursor-pointer"
+              className="p-1.5 bg-neo-yellow border-2 border-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-all cursor-pointer"
             >
-              <ZoomIn size={24} strokeWidth={3} />
+              <ZoomIn size={16} strokeWidth={2.5} />
             </button>
             <button 
               onClick={() => handleZoom(0.8)}
               title="Zoom Out"
-              className="p-3 bg-neo-cyan border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-all cursor-pointer"
+              className="p-1.5 bg-neo-cyan border-2 border-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-all cursor-pointer"
             >
-              <ZoomOut size={24} strokeWidth={3} />
+              <ZoomOut size={16} strokeWidth={2.5} />
             </button>
             <button 
               onClick={resetView}
               title="Reset View"
-              className="p-3 bg-neo-magenta border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-white transition-all cursor-pointer"
+              className="p-1.5 bg-neo-magenta border-2 border-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] hover:bg-white text-white hover:text-black transition-all cursor-pointer"
             >
-              <Maximize size={24} strokeWidth={3} />
+              <Maximize size={16} strokeWidth={2.5} />
             </button>
           </div>
         )}

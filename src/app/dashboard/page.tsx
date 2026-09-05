@@ -63,28 +63,28 @@ export default function Dashboard() {
   const completedQuizzes = quizzes.length;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12 w-full">
+    <div className="space-y-5 max-w-6xl mx-auto pb-10 w-full">
       {/* Top Welcome Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">
+          <h1 className="text-2xl font-black uppercase tracking-tight mb-1">
             Workspace: {user?.username || 'Student'}
           </h1>
-          <p className="text-lg font-bold border-l-4 border-black pl-3">Overview of your documents and study intensity.</p>
+          <p className="text-xs font-semibold border-l-2 border-black pl-2 text-gray-700">Overview of your documents and study intensity.</p>
         </div>
 
         {/* Top Right Controls */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {(!user || user.id === 'user_demo_123') ? (
             <button 
               onClick={() => router.push('/')}
-              className="neo-button neo-button-magenta text-sm flex items-center gap-2"
+              className="neo-button neo-button-magenta text-xs py-1.5 px-3 flex items-center gap-1.5"
             >
               Sign In to Save
             </button>
           ) : (
-            <div className="flex items-center gap-2 bg-neo-yellow border-2 border-black px-4 py-2 text-sm font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <span className="h-3 w-3 bg-black" />
+            <div className="flex items-center gap-1.5 bg-neo-yellow border-2 border-black px-3 py-1 text-xs font-black uppercase shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
+              <span className="h-2 w-2 bg-black" />
               Connected
             </div>
           )}
@@ -93,14 +93,14 @@ export default function Dashboard() {
 
       {/* Guest Warning Banner */}
       {(!user || user.id === 'user_demo_123') && (
-        <div className="bg-neo-cyan border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="font-bold text-sm">
-            <span className="bg-black text-white px-2 py-0.5 uppercase text-xs mr-2 font-black">Guest Mode</span>
+        <div className="bg-neo-cyan border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="font-bold text-xs">
+            <span className="bg-black text-white px-1.5 py-0.5 uppercase text-[10px] mr-1.5 font-black">Guest Mode</span>
             You are currently exploring as a guest. Please sign in to save your documents and study data.
           </div>
           <button 
             onClick={() => router.push('/')}
-            className="neo-button text-xs whitespace-nowrap py-1 px-3 bg-white"
+            className="neo-button text-xs whitespace-nowrap py-1 px-2.5 bg-white"
           >
             Sign In / Sign Up
           </button>
@@ -108,32 +108,32 @@ export default function Dashboard() {
       )}
 
       {/* Key Metrics Widgets — Real Data Only */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-        <div className="neo-box p-5 flex items-center justify-between bg-neo-yellow">
-          <div className="space-y-1">
-            <span className="text-sm font-black uppercase">Total Documents</span>
-            <h3 className="text-4xl font-black font-mono-numbers">{totalDocs}</h3>
+        <div className="neo-box p-3.5 flex items-center justify-between bg-neo-yellow">
+          <div className="space-y-0.5">
+            <span className="text-xs font-black uppercase text-black/80">Total Documents</span>
+            <h3 className="text-2xl font-black font-mono-numbers">{totalDocs}</h3>
           </div>
-          <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <FileText size={24} strokeWidth={3} />
+          <div className="h-9 w-9 bg-white border-2 border-black flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <FileText size={18} strokeWidth={2.5} />
           </div>
         </div>
 
-        <div className="neo-box p-5 flex items-center justify-between bg-neo-green">
-          <div className="space-y-1">
-            <span className="text-sm font-black uppercase">Quizzes Done</span>
-            <h3 className="text-4xl font-black font-mono-numbers">{completedQuizzes}</h3>
+        <div className="neo-box p-3.5 flex items-center justify-between bg-neo-green">
+          <div className="space-y-0.5">
+            <span className="text-xs font-black uppercase text-black/80">Quizzes Done</span>
+            <h3 className="text-2xl font-black font-mono-numbers">{completedQuizzes}</h3>
           </div>
-          <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <Award size={24} strokeWidth={3} />
+          <div className="h-9 w-9 bg-white border-2 border-black flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <Award size={18} strokeWidth={2.5} />
           </div>
         </div>
 
       </div>
 
       {/* Main Split Section: Upload/Docs vs Heatmap/AI Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
         
         {/* Left Side: Upload Dropzone & Document Lists */}
         <div className="space-y-8">
@@ -159,43 +159,43 @@ export default function Dashboard() {
             />
           </div>
 
-          <div className="neo-box p-6 space-y-4 bg-white">
-            <h3 className="text-2xl font-black uppercase border-b-4 border-black pb-2">Indexed Documents</h3>
+          <div className="neo-box p-4 space-y-3 bg-white">
+            <h3 className="text-base font-black uppercase border-b-2 border-black pb-2">Indexed Documents</h3>
 
             {documents.length === 0 ? (
-              <div className="text-center py-12 border-4 border-black bg-gray-100 flex flex-col items-center">
-                <FileText className="h-12 w-12 mb-3" strokeWidth={2} />
-                <p className="font-bold uppercase">No documents uploaded.</p>
+              <div className="text-center py-6 border-2 border-black bg-gray-50 flex flex-col items-center p-4">
+                <FileText className="h-8 w-8 mb-2 text-gray-500" strokeWidth={1.5} />
+                <p className="font-black uppercase text-xs">No documents uploaded.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-2.5">
                 {documents.map((doc) => (
                   <div 
                     key={doc.id} 
-                    className="group p-4 flex items-center justify-between border-2 border-black bg-white hover:bg-neo-yellow transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    className="group p-2.5 flex items-center justify-between border-2 border-black bg-white hover:bg-neo-yellow transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   >
-                    <div className="flex items-center gap-4 min-w-0">
-                      <div className="h-12 w-12 border-2 border-black bg-white flex items-center justify-center font-black text-xs uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-8 w-8 border-2 border-black bg-white flex items-center justify-center font-black text-[10px] uppercase shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
                         {doc.file_type}
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-lg font-bold truncate max-w-[200px] leading-tight">{doc.filename}</h4>
-                        <span className="text-sm font-semibold text-gray-700">{new Date(doc.created_at).toLocaleDateString()}</span>
+                        <h4 className="text-xs sm:text-sm font-bold truncate max-w-[200px] leading-tight">{doc.filename}</h4>
+                        <span className="text-[11px] font-semibold text-gray-600">{new Date(doc.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 opacity-100">
+                    <div className="flex items-center gap-1.5 opacity-100">
                       <button 
                         onClick={() => triggerChatWithDoc(doc.id)}
-                        className="p-2 border-2 border-black bg-neo-cyan hover:bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px]"
+                        className="p-1.5 border-2 border-black bg-neo-cyan hover:bg-white shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[1px]"
                       >
-                        <MessageSquare size={18} strokeWidth={3} />
+                        <MessageSquare size={15} strokeWidth={2.5} />
                       </button>
                       <button 
                         onClick={() => deleteDocument(doc.id)}
-                        className="p-2 border-2 border-black bg-red-500 hover:bg-white text-white hover:text-red-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[2px]"
+                        className="p-1.5 border-2 border-black bg-red-500 hover:bg-white text-white hover:text-red-500 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[1px]"
                       >
-                        <Trash2 size={18} strokeWidth={3} />
+                        <Trash2 size={15} strokeWidth={2.5} />
                       </button>
                     </div>
                   </div>
@@ -207,70 +207,70 @@ export default function Dashboard() {
         </div>
 
         {/* Right Side: Heatmap Calendar & AI Insights */}
-        <div className="space-y-8">
+        <div className="space-y-4">
           
-          <div className="neo-box p-6 bg-white">
-            <h3 className="text-2xl font-black uppercase border-b-4 border-black pb-2 mb-6 flex items-center gap-3">
-              <FileText size={24} strokeWidth={3} />
+          <div className="neo-box p-4 bg-white">
+            <h3 className="text-base font-black uppercase border-b-2 border-black pb-2 mb-3 flex items-center gap-2">
+              <FileText size={18} strokeWidth={2.5} />
               Recent Activity
             </h3>
 
             {documents.length === 0 ? (
-              <div className="text-center py-8 border-4 border-black bg-gray-100 flex flex-col items-center">
-                <FileText className="h-12 w-12 mb-3" strokeWidth={2} />
-                <p className="font-bold uppercase">No activity yet.</p>
-                <p className="font-semibold text-sm mt-1">Upload a document to get started.</p>
+              <div className="text-center py-6 border-2 border-black bg-gray-50 flex flex-col items-center p-3">
+                <FileText className="h-8 w-8 mb-2 text-gray-500" strokeWidth={1.5} />
+                <p className="font-black uppercase text-xs">No activity yet.</p>
+                <p className="font-medium text-xs mt-0.5 text-gray-600">Upload a document to get started.</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {documents.slice(0, 5).map((doc) => (
                   <div
                     key={doc.id}
-                    className="p-3 border-2 border-black bg-white hover:bg-neo-cyan transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between cursor-pointer"
+                    className="p-2 border-2 border-black bg-white hover:bg-neo-cyan transition-colors shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between cursor-pointer"
                     onClick={() => triggerChatWithDoc(doc.id)}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-8 w-8 border-2 border-black bg-neo-yellow flex items-center justify-center font-black text-xs uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="h-6 w-6 border-2 border-black bg-neo-yellow flex items-center justify-center font-black text-[9px] uppercase shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
                         {doc.file_type}
                       </div>
-                      <span className="font-bold truncate max-w-[180px]">{doc.filename}</span>
+                      <span className="font-bold truncate max-w-[160px] text-xs">{doc.filename}</span>
                     </div>
-                    <span className="text-xs font-semibold text-gray-600 shrink-0">{new Date(doc.created_at).toLocaleDateString()}</span>
+                    <span className="text-[10px] font-semibold text-gray-600 shrink-0">{new Date(doc.created_at).toLocaleDateString()}</span>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="neo-box p-6 bg-white">
-            <h3 className="text-2xl font-black uppercase border-b-4 border-black pb-2 mb-6 flex items-center gap-3">
-              <FileText size={24} strokeWidth={3} />
+          <div className="neo-box p-4 bg-white">
+            <h3 className="text-base font-black uppercase border-b-2 border-black pb-2 mb-3 flex items-center gap-2">
+              <FileText size={18} strokeWidth={2.5} />
               System Status
             </h3>
 
             {aiInsights.length === 1 && aiInsights[0].id === "1" ? (
-              <div className="text-center py-8 border-4 border-black bg-gray-100 flex flex-col items-center">
-                <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center mb-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                  <AlertTriangle className="text-black h-6 w-6" strokeWidth={3} />
+              <div className="text-center py-6 border-2 border-black bg-gray-50 flex flex-col items-center p-3">
+                <div className="h-8 w-8 bg-white border-2 border-black flex items-center justify-center mb-2 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
+                  <AlertTriangle className="text-black h-4 w-4" strokeWidth={2.5} />
                 </div>
-                <p className="font-bold text-lg mb-4">No data to process.</p>
-                <button className="neo-button">
+                <p className="font-black text-xs uppercase mb-2">No data to process.</p>
+                <button className="neo-button text-xs py-1 px-3">
                   Upload a file
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-2.5">
                 {aiInsights.map((insight) => (
                   <div 
                     key={insight.id} 
-                    className="p-4 border-4 border-black bg-neo-yellow flex items-start gap-4"
+                    className="p-2.5 border-2 border-black bg-neo-yellow flex items-start gap-2.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   >
-                    <div className="mt-1">
-                      <AlertTriangle size={24} strokeWidth={3} />
+                    <div className="mt-0.5">
+                      <AlertTriangle size={16} strokeWidth={2.5} />
                     </div>
                     <div>
-                      <h5 className="font-black text-lg uppercase">{insight.subject}</h5>
-                      <p className="font-semibold">{insight.text}</p>
+                      <h5 className="font-black text-xs uppercase">{insight.subject}</h5>
+                      <p className="font-medium text-xs text-gray-800 leading-snug">{insight.text}</p>
                     </div>
                   </div>
                 ))}

@@ -151,24 +151,24 @@ export default function DocumentChat() {
   };
 
   return (
-    <div className="h-auto lg:h-[calc(100vh-80px)] flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto w-full lg:overflow-hidden pb-8 lg:pb-0">
+    <div className="h-auto lg:h-[calc(100vh-80px)] flex flex-col lg:flex-row gap-4 max-w-7xl mx-auto w-full lg:overflow-hidden pb-6 lg:pb-0">
       
       {/* LEFT PANEL: Document Viewer & Selector */}
-      <div className="w-full lg:w-5/12 neo-box bg-neo-yellow p-6 flex flex-col justify-between overflow-hidden min-h-[400px] lg:min-h-0">
+      <div className="w-full lg:w-5/12 neo-box bg-neo-yellow p-4 flex flex-col justify-between overflow-hidden min-h-[400px] lg:min-h-0">
         
         {/* Document Header & Picker */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center border-b-[4px] border-black pb-4">
-            <h3 className="text-xl font-black uppercase flex items-center gap-2">
-              <BookOpen size={24} strokeWidth={3} />
+        <div className="space-y-3">
+          <div className="flex justify-between items-center border-b-2 border-black pb-2.5">
+            <h3 className="text-base font-black uppercase flex items-center gap-2">
+              <BookOpen size={18} strokeWidth={2.5} />
               Workspace
             </h3>
             {activeDocId && (
               <button 
                 onClick={generateSummary}
-                className="neo-button neo-button-cyan py-1 px-3 text-sm flex items-center gap-2"
+                className="neo-button neo-button-cyan py-1 px-2.5 text-xs flex items-center gap-1.5"
               >
-                <Sparkles size={16} strokeWidth={3} />
+                <Sparkles size={14} strokeWidth={2.5} />
                 Summary
               </button>
             )}
@@ -178,7 +178,7 @@ export default function DocumentChat() {
             <select 
               value={activeDocId || ''} 
               onChange={(e) => setActiveDocId(e.target.value || null)}
-              className="w-full neo-input bg-white appearance-none"
+              className="w-full neo-input bg-white text-xs py-1.5 px-2.5 appearance-none"
             >
               <option value="">-- Select Indexed Document --</option>
               {documents.map((doc) => (
@@ -189,13 +189,13 @@ export default function DocumentChat() {
         </div>
 
         {/* Extracted Document Body Viewer */}
-        <div className="flex-1 overflow-y-auto my-4 pr-1 border-4 border-black bg-white p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto my-3 pr-1 border-2 border-black bg-white p-3 space-y-3 custom-scrollbar">
           {activeDocId ? (
             activeDocContent ? (
-              <div className="space-y-4 text-sm font-semibold text-black leading-relaxed">
-                <div className="flex items-center gap-2 border-b-[4px] border-black pb-2">
-                  <FileTextIcon size={20} strokeWidth={3} />
-                  <span className="font-black text-sm uppercase">{activeDocContent.filename as string}</span>
+              <div className="space-y-3 text-xs font-medium text-black leading-relaxed">
+                <div className="flex items-center gap-2 border-b-2 border-black pb-1.5">
+                  <FileTextIcon size={16} strokeWidth={2.5} />
+                  <span className="font-black text-xs uppercase">{activeDocContent.filename as string}</span>
                 </div>
                 {activeDocContent.chunks && activeDocContent.chunks.length > 0 ? (
                   activeDocContent.chunks.map((rawChunk: any, idx: number) => {
@@ -208,9 +208,9 @@ export default function DocumentChat() {
                           backgroundColor: highlightedChunkId === chunkId ? '#FF00FF' : 'transparent',
                           color: highlightedChunkId === chunkId ? '#FFFFFF' : '#000000'
                         }}
-                        className="p-3 border-2 border-black/15 transition-colors duration-300 mb-2"
+                        className="p-2.5 border-2 border-black/15 transition-colors duration-300 mb-1.5"
                       >
-                        <span className="inline-flex items-center justify-center border-2 border-black bg-neo-cyan text-black font-black text-xs h-5 w-7 mr-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="inline-flex items-center justify-center border-2 border-black bg-neo-cyan text-black font-black text-[10px] h-4 w-6 mr-1.5 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
                           {chunkId + 1}
                         </span>
                         {chunkText}
@@ -222,62 +222,62 @@ export default function DocumentChat() {
                 )}
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center flex-col gap-4">
-                <div className="h-10 w-10 border-[4px] border-black border-t-neo-magenta rounded-full animate-spin" />
-                <span className="text-sm font-black uppercase tracking-widest">Processing...</span>
+              <div className="h-full flex items-center justify-center flex-col gap-3">
+                <div className="h-8 w-8 border-2 border-black border-t-neo-magenta rounded-full animate-spin" />
+                <span className="text-xs font-black uppercase tracking-widest">Processing...</span>
               </div>
             )
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
-              <FileText size={48} strokeWidth={2} />
-              <p className="text-xl font-black uppercase">No Document</p>
-              <p className="font-bold">Select a document to begin analysis.</p>
+            <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-3">
+              <FileText size={32} strokeWidth={2} />
+              <p className="text-base font-black uppercase">No Document</p>
+              <p className="font-medium text-xs">Select a document to begin analysis.</p>
             </div>
           )}
         </div>
 
         {/* Workspace Quick Tip */}
-        <div className="border-4 border-black bg-neo-cyan p-3 flex items-start gap-3 font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-          <Info size={20} strokeWidth={3} className="shrink-0" />
+        <div className="border-2 border-black bg-neo-cyan p-2.5 flex items-start gap-2 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <Info size={16} strokeWidth={2.5} className="shrink-0 mt-0.5" />
           <p>Click citations in chat answers to highlight the source text here.</p>
         </div>
 
       </div>
 
       {/* RIGHT PANEL: Chat Workspace Console */}
-      <div className="w-full lg:w-7/12 neo-box bg-white p-6 flex flex-col justify-between overflow-hidden min-h-[500px] lg:min-h-0">
+      <div className="w-full lg:w-7/12 neo-box bg-white p-4 flex flex-col justify-between overflow-hidden min-h-[450px] lg:min-h-0">
         
         {/* Chat Header */}
-        <div className="border-b-[4px] border-black pb-4 mb-4">
-          <h3 className="text-xl font-black uppercase flex items-center gap-2">
-            <MessageSquare size={24} strokeWidth={3} />
+        <div className="border-b-2 border-black pb-2.5 mb-2.5">
+          <h3 className="text-base font-black uppercase flex items-center gap-2">
+            <MessageSquare size={18} strokeWidth={2.5} />
             Data Query
           </h3>
         </div>
 
         {/* Message Log */}
-        <div className="flex-1 overflow-y-auto space-y-6 my-4 pr-1">
+        <div className="flex-1 overflow-y-auto space-y-3 my-2 pr-1 custom-scrollbar">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-6">
-              <div className="h-16 w-16 bg-neo-magenta border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-white">
-                <MessageSquare size={32} strokeWidth={3} />
+            <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-4">
+              <div className="h-12 w-12 bg-neo-magenta border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-white">
+                <MessageSquare size={22} strokeWidth={2.5} />
               </div>
               <div>
-                <p className="text-2xl font-black uppercase">Start Querying</p>
-                <p className="font-bold mt-2 max-w-sm">
+                <p className="text-lg font-black uppercase">Start Querying</p>
+                <p className="font-medium text-xs mt-1 max-w-xs text-gray-700">
                   Our system extracts definitions, summaries, and exact citations directly from your document.
                 </p>
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-3">
               {messages.map((msg, i) => (
                 <div 
                   key={i} 
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div className={`
-                    max-w-[85%] p-4 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-base font-semibold leading-relaxed
+                    max-w-[85%] p-3 border-2 border-black shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)] text-xs sm:text-sm font-medium leading-relaxed
                     ${msg.role === 'user' 
                       ? 'bg-neo-cyan text-black' 
                       : 'bg-white text-black'
@@ -286,23 +286,23 @@ export default function DocumentChat() {
                     {msg.role === 'user' ? (
                       <p className="whitespace-pre-line">{msg.content}</p>
                     ) : (
-                      <div className="text-base font-semibold leading-relaxed overflow-hidden markdown-body">
+                      <div className="text-xs sm:text-sm font-medium leading-relaxed overflow-hidden markdown-body">
                         <ReactMarkdown 
                           remarkPlugins={[remarkGfm, remarkMath]} 
                           rehypePlugins={[rehypeKatex]}
                           components={{
-                            p: ({node, ...props}) => <p className="mb-3 last:mb-0" {...props} />,
-                            pre: ({node, ...props}) => <pre className="bg-gray-100 border-2 border-black p-3 my-2 overflow-x-auto text-xs font-mono" {...props} />,
-                            code: ({node, inline, ...props}: any) => inline ? <code className="bg-neo-yellow px-1 py-0.5 border border-black text-black font-mono font-black text-sm" {...props} /> : <code {...props} />,
-                            ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-3 space-y-1 font-bold" {...props} />,
-                            ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-3 space-y-1 font-bold" {...props} />,
-                            h1: ({node, ...props}) => <h1 className="text-xl font-black uppercase mt-4 mb-2 border-b-2 border-black pb-1" {...props} />,
-                            h2: ({node, ...props}) => <h2 className="text-lg font-black uppercase mt-3 mb-1" {...props} />,
-                            h3: ({node, ...props}) => <h3 className="text-base font-black uppercase mt-2 mb-1" {...props} />,
-                            blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-black pl-3 my-2 italic bg-neo-yellow/30 p-2" {...props} />,
-                            table: ({node, ...props}) => <div className="overflow-x-auto my-3"><table className="border-2 border-black border-collapse text-sm w-full" {...props} /></div>,
-                            th: ({node, ...props}) => <th className="border-2 border-black bg-neo-yellow p-2 font-black text-left" {...props} />,
-                            td: ({node, ...props}) => <td className="border-2 border-black p-2" {...props} />,
+                            p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                            pre: ({node, ...props}) => <pre className="bg-gray-100 border-2 border-black p-2.5 my-1.5 overflow-x-auto text-[11px] font-mono" {...props} />,
+                            code: ({node, inline, ...props}: any) => inline ? <code className="bg-neo-yellow px-1 py-0.5 border border-black text-black font-mono font-black text-xs" {...props} /> : <code {...props} />,
+                            ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-2 space-y-0.5 font-semibold" {...props} />,
+                            ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-2 space-y-0.5 font-semibold" {...props} />,
+                            h1: ({node, ...props}) => <h1 className="text-base font-black uppercase mt-3 mb-1.5 border-b-2 border-black pb-0.5" {...props} />,
+                            h2: ({node, ...props}) => <h2 className="text-sm font-black uppercase mt-2 mb-1" {...props} />,
+                            h3: ({node, ...props}) => <h3 className="text-xs font-black uppercase mt-1.5 mb-0.5" {...props} />,
+                            blockquote: ({node, ...props}) => <blockquote className="border-l-2 border-black pl-2.5 my-1.5 italic bg-neo-yellow/30 p-1.5 text-xs" {...props} />,
+                            table: ({node, ...props}) => <div className="overflow-x-auto my-2"><table className="border-2 border-black border-collapse text-xs w-full" {...props} /></div>,
+                            th: ({node, ...props}) => <th className="border-2 border-black bg-neo-yellow p-1.5 font-black text-left text-xs" {...props} />,
+                            td: ({node, ...props}) => <td className="border-2 border-black p-1.5 text-xs" {...props} />,
                           }}
                         >
                           {msg.content}
@@ -312,14 +312,14 @@ export default function DocumentChat() {
 
                     {/* Sources citation list */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                      <div className="mt-4 pt-4 border-t-4 border-black space-y-2">
-                        <span className="text-sm font-black uppercase tracking-wider block">Citations:</span>
-                        <div className="flex flex-wrap gap-2">
+                      <div className="mt-2.5 pt-2.5 border-t-2 border-black space-y-1.5">
+                        <span className="text-xs font-black uppercase tracking-wider block">Citations:</span>
+                        <div className="flex flex-wrap gap-1.5">
                           {msg.sources.map((src) => (
                             <button
                               key={src.id}
                               onClick={() => handleCitationClick(src.id)}
-                              className="px-2 py-1 bg-neo-yellow border-2 border-black font-black text-xs uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-neo-magenta hover:text-white transition-colors active:translate-y-[2px] active:shadow-none"
+                              className="px-2 py-0.5 bg-neo-yellow border-2 border-black font-black text-[10px] uppercase shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] hover:bg-neo-magenta hover:text-white transition-colors active:translate-y-[1px] active:shadow-none"
                             >
                               CHUNK {src.id + 1}
                             </button>
@@ -333,10 +333,10 @@ export default function DocumentChat() {
 
               {isAiTyping && (
                 <div className="flex justify-start">
-                  <div className="bg-white border-4 border-black p-4 flex gap-2 items-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                    <span className="h-3 w-3 bg-black rounded-none animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="h-3 w-3 bg-black rounded-none animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="h-3 w-3 bg-black rounded-none animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <div className="bg-white border-2 border-black p-2.5 flex gap-1.5 items-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <span className="h-2 w-2 bg-black rounded-none animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="h-2 w-2 bg-black rounded-none animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="h-2 w-2 bg-black rounded-none animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               )}
@@ -347,21 +347,21 @@ export default function DocumentChat() {
         </div>
 
         {/* Input Bar */}
-        <form onSubmit={handleSendMessage} className="flex gap-4 mt-4 border-t-[4px] border-black pt-6">
+        <form onSubmit={handleSendMessage} className="flex gap-2 mt-2 border-t-2 border-black pt-3">
           <input 
             type="text" 
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={activeDocId ? "Query data..." : "Select document first"}
             disabled={!activeDocId}
-            className="flex-1 neo-input text-base"
+            className="flex-1 neo-input text-xs sm:text-sm py-2 px-3"
           />
           <button 
             type="submit"
             disabled={!activeDocId || !inputValue.trim()}
-            className="neo-button neo-button-cyan p-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="neo-button neo-button-cyan px-3.5 py-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            <Send size={24} strokeWidth={3} />
+            <Send size={16} strokeWidth={2.5} />
           </button>
         </form>
 

@@ -84,9 +84,9 @@ export default function AITutorBubble() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 h-16 w-16 bg-neo-magenta border-4 border-black flex items-center justify-center z-50 cursor-grab active:cursor-grabbing shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+          className="fixed bottom-5 right-5 h-12 w-12 bg-neo-magenta border-2 border-black flex items-center justify-center z-50 cursor-grab active:cursor-grabbing shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)]"
         >
-          <Brain className="text-white" size={32} strokeWidth={3} />
+          <Brain className="text-white" size={22} strokeWidth={2.5} />
         </motion.button>
       )}
 
@@ -109,24 +109,24 @@ export default function AITutorBubble() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] h-full w-full bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] z-50 flex flex-col overflow-hidden"
+              className="fixed bottom-0 right-0 sm:bottom-5 sm:right-5 sm:h-[520px] sm:w-[360px] h-full w-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 flex flex-col overflow-hidden"
             >
               {/* Header */}
-              <div className="bg-neo-yellow border-b-4 border-black px-5 py-4 flex items-center justify-between z-10 shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                    <Brain className="text-black" size={24} strokeWidth={3} />
+              <div className="bg-neo-yellow border-b-2 border-black px-3.5 py-2.5 flex items-center justify-between z-10 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-7 w-7 bg-white border-2 border-black flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
+                    <Brain className="text-black" size={16} strokeWidth={2.5} />
                   </div>
                   <div>
-                    <h3 className="font-black text-black text-lg uppercase">Tutor</h3>
-                    <p className="font-bold text-xs">Explanation Engine</p>
+                    <h3 className="font-black text-black text-xs uppercase">Tutor</h3>
+                    <p className="font-bold text-[10px] text-gray-700">Explanation Engine</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <select 
                     value={tutorDiff}
                     onChange={(e) => setTutorDiff(e.target.value)}
-                    className="bg-white border-2 border-black text-black font-bold uppercase text-xs px-2 py-1 focus:outline-none cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    className="bg-white border-2 border-black text-black font-bold uppercase text-[10px] px-1.5 py-0.5 focus:outline-none cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]"
                   >
                     <option value="easy">Beginner</option>
                     <option value="medium">Intermediate</option>
@@ -134,43 +134,43 @@ export default function AITutorBubble() {
                   </select>
                   <button 
                     onClick={() => setIsOpen(false)}
-                    className="h-8 w-8 bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none transition-all"
+                    className="h-6 w-6 bg-white border-2 border-black flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none transition-all"
                   >
-                    <X size={20} strokeWidth={3} />
+                    <X size={14} strokeWidth={2.5} />
                   </button>
                 </div>
               </div>
 
               {/* Chat Area */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-6 flex flex-col bg-[#f4f4f0]">
+              <div className="flex-1 overflow-y-auto p-3.5 space-y-3 flex flex-col bg-[#f4f4f0] custom-scrollbar">
                 {tutorMessages.length === 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center text-center">
-                    <Brain size={48} strokeWidth={2} className="mb-4" />
-                    <h4 className="font-black mb-2 text-xl uppercase text-black">Query Concepts</h4>
-                    <p className="font-bold text-sm text-black">Enter a topic to receive a structured breakdown.</p>
+                  <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
+                    <Brain size={32} strokeWidth={2} className="mb-2 text-black" />
+                    <h4 className="font-black mb-1 text-sm uppercase text-black">Query Concepts</h4>
+                    <p className="font-medium text-xs text-gray-700">Enter a topic to receive a structured breakdown.</p>
                   </div>
                 ) : (
                   tutorMessages.map((msg, idx) => (
                     <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] px-4 py-3 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${msg.role === 'user' ? 'bg-neo-cyan text-black' : 'bg-white text-black'}`}>
+                      <div className={`max-w-[85%] px-3 py-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${msg.role === 'user' ? 'bg-neo-cyan text-black' : 'bg-white text-black'}`}>
                         {msg.role === 'assistant' && (
-                          <div className="flex items-center gap-2 mb-2 font-black text-xs uppercase border-b-2 border-black pb-2">
-                            <Brain size={14} strokeWidth={3} /> System
+                          <div className="flex items-center gap-1.5 mb-1.5 font-black text-[10px] uppercase border-b-2 border-black pb-1">
+                            <Brain size={12} strokeWidth={2.5} /> System
                           </div>
                         )}
-                        <div className="text-sm font-semibold leading-relaxed overflow-hidden markdown-body">
+                        <div className="text-xs font-medium leading-relaxed overflow-hidden markdown-body">
                           <ReactMarkdown 
                             remarkPlugins={[remarkGfm, remarkMath]} 
                             rehypePlugins={[rehypeKatex]}
                             components={{
-                              p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
-                              pre: ({node, ...props}) => <pre className="bg-gray-100 border-2 border-black p-2 my-2 overflow-x-auto text-xs" {...props} />,
-                              code: ({node, inline, ...props}: any) => inline ? <code className="bg-neo-yellow px-1 py-0.5 border border-black text-black font-black" {...props} /> : <code {...props} />,
-                              ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-2 space-y-1 font-bold" {...props} />,
-                              ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-2 space-y-1 font-bold" {...props} />,
-                              h1: ({node, ...props}) => <h1 className="text-base font-black uppercase mt-3 mb-1" {...props} />,
-                              h2: ({node, ...props}) => <h2 className="text-base font-black uppercase mt-3 mb-1" {...props} />,
-                              h3: ({node, ...props}) => <h3 className="text-sm font-black uppercase mt-2 mb-1" {...props} />,
+                              p: ({node, ...props}) => <p className="mb-1.5 last:mb-0" {...props} />,
+                              pre: ({node, ...props}) => <pre className="bg-gray-100 border-2 border-black p-2 my-1.5 overflow-x-auto text-[10px]" {...props} />,
+                              code: ({node, inline, ...props}: any) => inline ? <code className="bg-neo-yellow px-1 py-0.5 border border-black text-black font-black text-[10px]" {...props} /> : <code {...props} />,
+                              ul: ({node, ...props}) => <ul className="list-disc pl-3 mb-1.5 space-y-0.5 font-semibold" {...props} />,
+                              ol: ({node, ...props}) => <ol className="list-decimal pl-3 mb-1.5 space-y-0.5 font-semibold" {...props} />,
+                              h1: ({node, ...props}) => <h1 className="text-xs font-black uppercase mt-2 mb-1" {...props} />,
+                              h2: ({node, ...props}) => <h2 className="text-xs font-black uppercase mt-1.5 mb-0.5" {...props} />,
+                              h3: ({node, ...props}) => <h3 className="text-[11px] font-black uppercase mt-1 mb-0.5" {...props} />,
                             }}
                           >
                             {msg.content + (isStreaming && idx === tutorMessages.length - 1 ? ' ▋' : '')}
@@ -183,8 +183,8 @@ export default function AITutorBubble() {
               </div>
 
               {/* Input Area */}
-              <div className="p-4 bg-white border-t-4 border-black shrink-0">
-                <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-white border-t-2 border-black shrink-0">
+                <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={tutorTopic}
@@ -192,14 +192,14 @@ export default function AITutorBubble() {
                     onKeyDown={(e) => e.key === 'Enter' && handleTutorExplain()}
                     placeholder="Enter concept..."
                     disabled={loadingTutor || isStreaming}
-                    className="flex-1 neo-input text-sm"
+                    className="flex-1 neo-input text-xs py-1.5 px-2.5"
                   />
                   <button
                     onClick={handleTutorExplain}
                     disabled={!tutorTopic.trim() || loadingTutor || isStreaming}
-                    className="neo-button neo-button-cyan p-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center h-[46px] w-[46px]"
+                    className="neo-button neo-button-cyan p-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center h-[36px] w-[36px]"
                   >
-                    <ArrowRight size={20} strokeWidth={3} />
+                    <ArrowRight size={16} strokeWidth={2.5} />
                   </button>
                 </div>
               </div>
