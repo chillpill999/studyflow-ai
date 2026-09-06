@@ -57,10 +57,14 @@ export default function StudyTools() {
   // --- Flashcard Handlers ---
   const handleGenerateCards = async () => {
     if (!selectedDocId) return;
-    await generateFlashcards(selectedDocId);
-    setCurrentCardIdx(0);
-    setIsFlipped(false);
-    addStudyHours(0.5); // Add study session value
+    try {
+      await generateFlashcards(selectedDocId);
+      setCurrentCardIdx(0);
+      setIsFlipped(false);
+      addStudyHours(0.5); // Add study session value
+    } catch (err: any) {
+      alert(`Flashcard generation: ${err?.message || "Failed to generate flashcards. Please try again."}`);
+    }
   };
 
   const handleCardReview = async (rating: 'easy' | 'hard') => {

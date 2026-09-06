@@ -17,6 +17,7 @@ export default function MindMap() {
     notes,
     fetchDocuments,
     fetchNotes,
+    fetchDocumentDetails,
   } = useStudyStore();
 
   const [selectedSourceType, setSelectedSourceType] = useState<'document' | 'note'>('document');
@@ -37,53 +38,80 @@ export default function MindMap() {
     fetchNotes();
   }, [fetchDocuments, fetchNotes]);
 
+  function normalizeMindMap(data: any, defaultTitle = 'Central Concept'): MindNode {
+    if (!data || typeof data !== 'object') {
+      return { id: 'root', label: defaultTitle, children: [] };
+    }
+
+    // Support root wrapping like { mindmap: ... } or { tree: ... }
+    const root = data.mindmap || data.tree || data;
+    const rawLabel = root.label || root.name || root.title || defaultTitle;
+    const cleanLabel = String(rawLabel).replace(/\.[^/.]+$/, "").trim();
+
+    const rawChildren = Array.isArray(root.children) 
+      ? root.children 
+      : (Array.isArray(root.subtopics) ? root.subtopics : (Array.isArray(root.nodes) ? root.nodes : []));
+
+    return {
+      id: root.id || 'root',
+      label: cleanLabel || defaultTitle,
+      children: rawChildren.map((child: any, idx: number) => {
+        if (typeof child === 'string') {
+          return { id: `b${idx+1}`, label: child.trim(), children: [] };
+        }
+        const childLabel = child.label || child.name || child.title || `Domain ${idx + 1}`;
+        const subChildren = Array.isArray(child.children) 
+          ? child.children 
+          : (Array.isArray(child.subtopics) ? child.subtopics : []);
+
+        return {
+          id: child.id || `b${idx+1}`,
+          label: String(childLabel).trim(),
+          children: subChildren.map((sub: any, sIdx: number) => {
+            if (typeof sub === 'string') {
+              return { id: `b${idx+1}-${sIdx+1}`, label: sub.trim(), children: [] };
+            }
+            const subLabel = sub.label || sub.name || sub.title || `Concept ${sIdx + 1}`;
+            return {
+              id: sub.id || `b${idx+1}-${sIdx+1}`,
+              label: String(subLabel).trim(),
+              children: []
+            };
+          })
+        };
+      })
+    };
+  }
+
   const handleGenerateMindMap = async () => {
     if (!selectedSourceId) return;
     setLoading(true);
     setTreeData(null);
 
-    const generateMockMindMap = () => {
-      const sourceName = selectedSourceType === 'document'
-        ? documents.find(d => d.id === selectedSourceId)?.filename || 'Document Source'
-        : notes.find(n => n.id === selectedSourceId)?.title || 'Notes Source';
-
-      setTreeData({
-        id: 'root',
-        label: sourceName.split('.')[0],
-        children: [
-          {
-            id: 'c1',
-            label: 'Active Memory',
-            children: [
-              { id: 'c1_1', label: 'Retrieval Practice', children: [] },
-              { id: 'c1_2', label: 'Synaptic Plasticity', children: [] }
-            ]
-          },
-          {
-            id: 'c2',
-            label: 'Scheduling Methods',
-            children: [
-              { id: 'c2_1', label: 'Expanding Gaps', children: [] },
-              { id: 'c2_2', label: 'Leitner Boxes', children: [] }
-            ]
-          },
-          {
-            id: 'c3',
-            label: 'Visual Synthesis',
-            children: [
-              { id: 'c3_1', label: 'Hierarchy Linking', children: [] },
-              { id: 'c3_2', label: 'Chunking Material', children: [] }
-            ]
-          }
-        ]
-      });
-      setLoading(false);
-    };
+    const sourceName = selectedSourceType === 'document'
+      ? documents.find(d => d.id === selectedSourceId)?.filename || 'Document'
+      : notes.find(n => n.id === selectedSourceId)?.title || 'Notes';
 
     try {
-      const requestBody = {
-        summary: selectedSourceId
-      };
+      let requestBody: any = {};
+
+      if (selectedSourceType === 'document') {
+        const docDetails = await fetchDocumentDetails(selectedSourceId);
+        requestBody = {
+          doc_id: selectedSourceId,
+          filename: sourceName,
+          text_content: docDetails?.text_content || null,
+          summary: docDetails?.summary || null
+        };
+      } else {
+        const note = notes.find(n => n.id === selectedSourceId);
+        requestBody = {
+          topic: note?.title || sourceName,
+          text_content: note?.content || '',
+          summary: note?.content || '',
+          filename: note?.title || sourceName
+        };
+      }
 
       const res = await fetch(`/api/generate/mindmap`, {
         method: 'POST',
@@ -91,13 +119,22 @@ export default function MindMap() {
         body: JSON.stringify(requestBody)
       });
 
-      if (!res.ok) throw new Error('API failed');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to generate mind map');
+      }
+
       const data = await res.json();
-      setTreeData(data);
+      const normalized = normalizeMindMap(data, sourceName.replace(/\.[^/.]+$/, ""));
+      setTreeData(normalized);
+      setPanX(0);
+      setPanY(0);
+      setZoom(1);
+    } catch (err: any) {
+      console.error("Mindmap generation error:", err);
+      alert(`Mind Map Generation: ${err?.message || "Failed to generate mind map. Please try again."}`);
+    } finally {
       setLoading(false);
-    } catch (err) {
-      console.error(err);
-      setTimeout(generateMockMindMap, 1000);
     }
   };
 
@@ -167,8 +204,8 @@ export default function MindMap() {
     const links: Array<{ id: string, x1: number, y1: number, x2: number, y2: number, level: number }> = [];
 
     // Root coordinate
-    const centerX = 300;
-    const centerY = 250;
+    const centerX = 450;
+    const centerY = 320;
     
     nodes.push({
       id: treeData.id,
@@ -188,7 +225,7 @@ export default function MindMap() {
       treeData.children.forEach((child, cIdx) => {
         // Spread children in circle branches around center
         const angle = (cIdx * 2 * Math.PI) / childCount;
-        const radius = 150;
+        const radius = 180;
         const cx = centerX + radius * Math.cos(angle);
         const cy = centerY + radius * Math.sin(angle);
 
@@ -216,8 +253,8 @@ export default function MindMap() {
           const subCount = child.children.length;
           child.children.forEach((sub, sIdx) => {
             // Position sub-children branching outwards from the parent branch angle
-            const subAngle = angle + ((sIdx - (subCount - 1) / 2) * Math.PI) / 5;
-            const subRadius = 120;
+            const subAngle = angle + ((sIdx - (subCount - 1) / 2) * Math.PI) / 4.5;
+            const subRadius = 130;
             const sx = cx + subRadius * Math.cos(subAngle);
             const sy = cy + subRadius * Math.sin(subAngle);
 

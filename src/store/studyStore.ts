@@ -323,13 +323,24 @@ export const useStudyStore = create<StudyFlowState>()(
       generateFlashcards: async (docId: string) => {
         set({ loading: true });
         try {
-          const docContent = get().activeDocContent;
+          let docContent = get().activeDocContent;
+          if (!docContent || docContent.id !== docId) {
+            docContent = await get().fetchDocumentDetails(docId);
+          }
           const res = await fetch('/api/generate/flashcards', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ summary: docContent?.summary || docId })
+            body: JSON.stringify({
+              doc_id: docId,
+              summary: docContent?.summary || null,
+              text_content: docContent?.text_content || null,
+              filename: docContent?.filename || null
+            })
           });
-          if (!res.ok) throw new Error("Flashcard generation failed");
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || "Flashcard generation failed");
+          }
           
           const cards = await res.json();
           const newCards: Flashcard[] = cards.map((c: any, idx: number) => ({
@@ -340,10 +351,14 @@ export const useStudyStore = create<StudyFlowState>()(
             box: 1
           }));
           
-          set(state => ({ flashcards: [...newCards, ...state.flashcards], loading: false }));
+          set(state => ({
+            flashcards: [...newCards, ...state.flashcards.filter(f => f.doc_id !== docId)],
+            loading: false
+          }));
         } catch (e) {
-          console.error(e);
+          console.error("Flashcard store error:", e);
           set({ loading: false });
+          throw e;
         }
       },
 
@@ -363,19 +378,30 @@ export const useStudyStore = create<StudyFlowState>()(
       generateQuiz: async (docId: string) => {
         set({ loading: true });
         try {
-          const docContent = get().activeDocContent;
+          let docContent = get().activeDocContent;
+          if (!docContent || docContent.id !== docId) {
+            docContent = await get().fetchDocumentDetails(docId);
+          }
           const res = await fetch('/api/generate/quiz', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ summary: docContent?.summary || docId })
+            body: JSON.stringify({
+              doc_id: docId,
+              summary: docContent?.summary || null,
+              text_content: docContent?.text_content || null,
+              filename: docContent?.filename || null
+            })
           });
-          if (!res.ok) throw new Error("Quiz generation failed");
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || "Quiz generation failed");
+          }
           
           const quiz = await res.json();
           set({ loading: false });
           return quiz;
         } catch (e) {
-          console.error(e);
+          console.error("Quiz store error:", e);
           set({ loading: false });
           return [];
         }
