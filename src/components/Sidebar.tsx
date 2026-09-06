@@ -167,6 +167,14 @@ export default function Sidebar({ isMobileOpen = false, setIsMobileOpen }: Sideb
               )}
             </div>
           )}
+
+          {(!isCollapsed || isMobileOpen) && (
+            <div className="flex items-center justify-center gap-3 text-[10px] font-bold text-gray-500 pt-2.5 uppercase">
+              <Link href="/privacy" className="hover:text-black underline underline-offset-2">Privacy</Link>
+              <span>•</span>
+              <Link href="/terms" className="hover:text-black underline underline-offset-2">Terms</Link>
+            </div>
+          )}
         </div>
 
         <ProfileModal 

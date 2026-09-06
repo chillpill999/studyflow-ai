@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
@@ -128,6 +129,18 @@ export default function LoginForm() {
         >
           {authMode === 'login' ? 'Create an account instead' : 'Already have an account? Sign in'}
         </button>
+      </div>
+
+      <div className="mt-3.5 pt-3 border-t border-gray-200 text-center text-[11px] font-semibold text-gray-600">
+        By continuing, you agree to our{' '}
+        <Link href="/terms" className="underline font-bold text-black hover:text-cyan-600">
+          Terms
+        </Link>{' '}
+        and{' '}
+        <Link href="/privacy" className="underline font-bold text-black hover:text-cyan-600">
+          Privacy Policy
+        </Link>
+        .
       </div>
     </div>
   );

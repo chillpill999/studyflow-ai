@@ -53,9 +53,16 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="text-base sm:text-lg font-black uppercase mb-2">5. Contact Us</h2>
+            <h2 className="text-base sm:text-lg font-black uppercase mb-2">5. Google API User Data Policy Compliance</h2>
             <p>
-              If you have any questions or concerns regarding this policy, please reach out through our project repository or support email.
+              StudyFlow&apos;s use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-cyan-600">Google API Services User Data Policy</a>, including the Limited Use requirements.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base sm:text-lg font-black uppercase mb-2">6. Contact Us</h2>
+            <p>
+              If you have any questions or concerns regarding this policy, please reach out through our project repository at <a href="https://github.com/chillpill999/studyflow-ai" target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-cyan-600">github.com/chillpill999/studyflow-ai</a>.
             </p>
           </section>
         </div>

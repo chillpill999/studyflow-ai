@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FileText, Layers, Network } from 'lucide-react';
 import { createClient } from '@/lib/supabase';
@@ -104,8 +105,8 @@ export default function LandingPage() {
             © 2026 StudyFlow. Developed by Civil Boys.
           </div>
           <div className="flex gap-4 font-bold uppercase text-xs">
-            <a href="#" className="hover:underline underline-offset-2">Privacy</a>
-            <a href="#" className="hover:underline underline-offset-2">Terms</a>
+            <Link href="/privacy" className="hover:underline underline-offset-2">Privacy Policy</Link>
+            <Link href="/terms" className="hover:underline underline-offset-2">Terms of Service</Link>
           </div>
         </div>
       </footer>
