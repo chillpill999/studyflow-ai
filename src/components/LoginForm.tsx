@@ -32,10 +32,27 @@ export default function LoginForm() {
   };
 
   const handleGoogleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` }
-    });
+    try {
+      setLoading(true);
+      setErrorMsg('');
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+      if (error) {
+        setErrorMsg(error.message);
+        setLoading(false);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Failed to initiate Google sign-in.');
+      setLoading(false);
+    }
   };
 
   return (
