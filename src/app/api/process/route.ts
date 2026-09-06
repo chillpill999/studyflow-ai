@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { createClient } from '@/lib/supabaseServer';
+import { getClientIp, checkRateLimit, sanitizeInput } from '@/lib/security';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60; // Prevent Vercel timeout on large doc summarization
+
+const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024; // 15MB max file size
+const MAX_RAW_TEXT_LENGTH = 200000; // 200k characters max
 
 function chunkText(text: string, size = 2000, overlap = 200): string[] {
   const chunks: string[] = [];
@@ -81,6 +85,7 @@ async function getSummaryFromGroq(text: string, groqKey: string): Promise<{ titl
 }
 
 export async function POST(req: Request) {
+  const clientIp = getClientIp(req);
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -88,6 +93,19 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { error: 'Unauthorized: Please sign in or create an account to upload documents.' },
       { status: 401 }
+    );
+  }
+
+  // Rate limit: 12 document uploads per 10 minutes per user
+  const rateLimitKey = `process:user:${user.id}`;
+  const rateCheck = checkRateLimit(rateLimitKey, 12, 10 * 60 * 1000);
+  if (!rateCheck.allowed) {
+    return NextResponse.json(
+      { error: `Upload rate limit exceeded. Please wait ${rateCheck.resetInSeconds}s before uploading another document.` },
+      { 
+        status: 429, 
+        headers: { 'Retry-After': String(rateCheck.resetInSeconds) } 
+      }
     );
   }
 
@@ -110,9 +128,9 @@ export async function POST(req: Request) {
     const contentType = req.headers.get('content-type') || '';
 
     if (contentType.includes('application/json')) {
-      const body = await req.json();
-      rawText = body.text || '';
-      filename = body.filename || 'document.pdf';
+      const body = await req.json().catch(() => ({}));
+      rawText = sanitizeInput(body.text || '', MAX_RAW_TEXT_LENGTH);
+      filename = sanitizeInput(body.filename || 'document.pdf', 100).replace(/[/\\?%*:|"<>]/g, '_');
 
       if (!rawText.trim()) {
         return NextResponse.json(
@@ -128,7 +146,15 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
       }
 
-      filename = file.name;
+      // Enforce file size limit
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        return NextResponse.json(
+          { error: 'File size exceeds the 15MB limit. Please upload a smaller document.' },
+          { status: 413 }
+        );
+      }
+
+      filename = sanitizeInput(file.name, 100).replace(/[/\\?%*:|"<>]/g, '_');
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
       const mimeType = file.type || 'application/octet-stream';

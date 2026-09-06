@@ -13,9 +13,9 @@ create table public.profiles (
 -- Enable RLS
 alter table public.profiles enable row level security;
 
-create policy "Public profiles are viewable by everyone."
+create policy "Users can view own profile."
   on profiles for select
-  using ( true );
+  using ( auth.uid() = id );
 
 create policy "Users can insert their own profile."
   on profiles for insert
