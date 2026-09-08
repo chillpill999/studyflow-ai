@@ -5,7 +5,7 @@ import { ImagePlus, Download, Sparkles, Loader2 } from 'lucide-react';
 
 export default function ImageStudio() {
   const [prompt, setPrompt] = useState('');
-  const [selectedModel, setSelectedModel] = useState<'flux' | 'turbo'>('flux');
+  const [selectedModel, setSelectedModel] = useState<'nanobanana' | 'flux' | 'turbo'>('nanobanana');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -73,9 +73,10 @@ export default function ImageStudio() {
               <label className="block font-black text-xs uppercase mb-1">Select Model</label>
               <select
                 value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value as 'flux' | 'turbo')}
+                onChange={(e) => setSelectedModel(e.target.value as 'nanobanana' | 'flux' | 'turbo')}
                 className="w-full neo-input text-xs py-1.5 px-2.5"
               >
+                <option value="nanobanana">NanoBanana Pro (Google Gemini Image)</option>
                 <option value="flux">FLUX.1 Schnell (High Quality & Detail)</option>
                 <option value="turbo">SDXL Turbo (Ultra-Fast 1-Sec)</option>
               </select>

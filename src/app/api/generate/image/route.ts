@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenAI } from '@google/genai';
 import { getClientIp, checkRateLimit, sanitizeInput } from '@/lib/security';
 
 export async function POST(req: Request) {
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
 
     const body = await req.json().catch(() => ({}));
     const rawPrompt = body?.prompt;
-    const model = body?.model || 'flux'; // 'flux' | 'turbo'
+    const model = body?.model || 'flux'; // 'nanobanana' | 'flux' | 'turbo'
 
     if (!rawPrompt || typeof rawPrompt !== 'string' || !rawPrompt.trim()) {
       return NextResponse.json({ error: 'Prompt is required.' }, { status: 400 });
@@ -28,6 +29,40 @@ export async function POST(req: Request) {
     const cleanPrompt = sanitizeInput(rawPrompt.trim(), 500);
     if (cleanPrompt.length === 0) {
       return NextResponse.json({ error: 'Invalid prompt provided.' }, { status: 400 });
+    }
+
+    // 1. Tier 1: Nano Banana (Google Gemini Image / Imagen) if requested
+    if (model === 'nanobanana') {
+      const geminiKey = process.env.GEMINI_API_KEY;
+      if (geminiKey) {
+        try {
+          const ai = new GoogleGenAI({ apiKey: geminiKey });
+          const geminiRes = await ai.models.generateContent({
+            model: 'nano-banana-pro-preview',
+            contents: `Generate an illustration or diagram: ${cleanPrompt}`,
+          });
+
+          const parts = geminiRes.candidates?.[0]?.content?.parts;
+          if (parts) {
+            for (const part of parts) {
+              if (part.inlineData && part.inlineData.data) {
+                const buffer = Buffer.from(part.inlineData.data, 'base64');
+                return new NextResponse(buffer, {
+                  status: 200,
+                  headers: {
+                    'Content-Type': part.inlineData.mimeType || 'image/png',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'X-Model-Used': 'nano-banana-pro',
+                  },
+                });
+              }
+            }
+          }
+        } catch (geminiErr: any) {
+          console.warn('Google Nano Banana unbilled quota limit reached, falling back to FLUX.1:', geminiErr?.message || geminiErr);
+          // Falls through to FLUX.1 so user request succeeds gracefully
+        }
+      }
     }
 
     // 1. Tier 1: Hugging Face (if key is configured)
