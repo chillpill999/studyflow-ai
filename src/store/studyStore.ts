@@ -99,7 +99,8 @@ interface StudyFlowState {
   isBackendOnline: boolean;
 
   // Actions
-  initUser: (userId?: string, username?: string, email?: string, image?: string) => Promise<void>;
+  initUser: (userId: string, username?: string, email?: string, image?: string) => Promise<void>;
+  clearUser: () => void;
   setOnboarding: (username: string, subject: string) => Promise<void>;
   addStudyHours: (hours: number) => Promise<void>;
   
@@ -154,15 +155,19 @@ export const useStudyStore = create<StudyFlowState>()(
       error: null,
       isBackendOnline: true,
 
-      initUser: async (userId = 'user_demo_123', username = 'Scholar', email = 'scholar@studyflow.ai', image?: string) => {
+      initUser: async (userId: string, username = 'Student', email = '', image?: string) => {
+        if (!userId) {
+          set({ user: null });
+          return;
+        }
         set({ loading: true });
         const currentUser = get().user;
-        if (!currentUser || (userId !== 'user_demo_123' && currentUser.id !== userId)) {
+        if (!currentUser || currentUser.id !== userId) {
           set({
             user: {
               id: userId,
-              username: username || currentUser?.username || 'Scholar',
-              email: email || currentUser?.email || 'scholar@studyflow.ai',
+              username: username || currentUser?.username || 'Student',
+              email: email || currentUser?.email || '',
               streak: currentUser?.streak || 0,
               study_hours: currentUser?.study_hours || 0,
               preference_subject: currentUser?.preference_subject || 'General',
@@ -172,6 +177,23 @@ export const useStudyStore = create<StudyFlowState>()(
           });
         }
         set({ loading: false });
+      },
+
+      clearUser: () => {
+        set({
+          user: null,
+          documents: [],
+          activeDocId: null,
+          activeDocContent: null,
+          notes: [],
+          tasks: [],
+          flashcards: [],
+          quizzes: [],
+          studyPlans: [],
+          activePlan: null,
+          loading: false,
+          error: null,
+        });
       },
 
       setOnboarding: async (username: string, subject: string) => {

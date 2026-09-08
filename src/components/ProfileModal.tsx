@@ -90,6 +90,8 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             <button 
               onClick={async () => {
                 const { createClient } = await import('@/lib/supabase');
+                const { useStudyStore } = await import('@/store/studyStore');
+                useStudyStore.getState().clearUser();
                 const supabase = createClient();
                 await supabase.auth.signOut();
                 window.location.href = '/';

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useStudyStore } from '../store/studyStore';
 import Sidebar from './Sidebar';
 import OnboardingModal from './OnboardingModal';
@@ -9,47 +9,88 @@ import AITutorBubble from './AITutorBubble';
 import { Menu } from 'lucide-react';
 import { createClient } from '@/lib/supabase';
 
+const PUBLIC_ROUTES = ['/', '/privacy', '/terms', '/auth/callback'];
+
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const initUser = useStudyStore(state => state.initUser);
+  const clearUser = useStudyStore(state => state.clearUser);
   const user = useStudyStore(state => state.user);
-  const loading = useStudyStore(state => state.loading);
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const supabase = createClient();
 
+  const isPublicPage = PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(`${route}/`));
+  const isLandingPage = pathname === '/';
+
   useEffect(() => {
-    const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        initUser(session.user.id, session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Student', session.user.email || '', undefined);
-      } else {
-        initUser();
+    let isMounted = true;
+
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!isMounted) return;
+
+        if (session?.user) {
+          await initUser(
+            session.user.id,
+            session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Student',
+            session.user.email || '',
+            session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture
+          );
+          if (pathname === '/') {
+            router.replace('/dashboard');
+          }
+        } else {
+          clearUser();
+          if (!isPublicPage) {
+            router.replace('/?error=unauthorized');
+          }
+        }
+      } catch (err) {
+        console.error('Session verification error:', err);
+        clearUser();
+        if (!isPublicPage) {
+          router.replace('/?error=unauthorized');
+        }
+      } finally {
+        if (isMounted) setAuthChecked(true);
       }
     };
-    
-    fetchSession();
-    
+
+    checkSession();
+
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!isMounted) return;
       if (session?.user) {
-        initUser(session.user.id, session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Student', session.user.email || '', undefined);
+        initUser(
+          session.user.id,
+          session.user.user_metadata?.name || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Student',
+          session.user.email || '',
+          session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture
+        );
       } else {
-        initUser();
+        clearUser();
+        if (!isPublicPage) {
+          router.replace('/?error=unauthorized');
+        }
       }
     });
 
     return () => {
+      isMounted = false;
       authListener.subscription.unsubscribe();
     };
-  }, [initUser, supabase]);
+  }, [pathname, isPublicPage, router, initUser, clearUser, supabase]);
 
-  const isLandingPage = pathname === '/';
-
-  if (loading && !user) {
+  // If on a protected route, never render children until authenticated
+  if (!isPublicPage && (!authChecked || !user)) {
     return (
       <div className="h-screen w-screen bg-neo-yellow flex flex-col items-center justify-center gap-6">
         <div className="h-16 w-16 border-[6px] border-black border-t-white rounded-full animate-spin shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" />
-        <span className="text-black text-2xl font-black uppercase tracking-widest shadow-sm">Loading...</span>
+        <span className="text-black text-2xl font-black uppercase tracking-widest shadow-sm">Verifying session...</span>
       </div>
     );
   }
