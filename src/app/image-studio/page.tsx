@@ -5,7 +5,7 @@ import { ImagePlus, Download, Sparkles, Loader2 } from 'lucide-react';
 
 export default function ImageStudio() {
   const [prompt, setPrompt] = useState('');
-  const [selectedModel, setSelectedModel] = useState<'nanobanana' | 'basic'>('nanobanana');
+  const [selectedModel, setSelectedModel] = useState<'flux' | 'turbo'>('flux');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -16,43 +16,25 @@ export default function ImageStudio() {
     setImageUrl(null);
     
     try {
-      if (selectedModel === 'nanobanana') {
-        const response = await fetch('/api/generate/image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt }),
-        });
+      const response = await fetch('/api/generate/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, model: selectedModel }),
+      });
 
-        if (!response.ok) {
-          let errorText = await response.text();
-          try {
-            const errData = JSON.parse(errorText);
-            errorText = errData.error || errorText;
-          } catch {}
-          throw new Error(errorText || `Server Error: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        setImageUrl(objectUrl);
-        setLoading(false);
-      } else {
-        // Fallback: Pollinations AI. 
-        const seed = Math.floor(Math.random() * 1000000);
-        const encodedPrompt = encodeURIComponent(prompt);
-        const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?seed=${seed}&nologo=true&width=1024&height=1024`;
-        
-        const img = new window.Image();
-        img.onload = () => {
-          setImageUrl(url);
-          setLoading(false);
-        };
-        img.onerror = () => {
-          setLoading(false);
-          alert("The basic image generation service is currently overloaded. Please try again in a few minutes.");
-        };
-        img.src = url;
+      if (!response.ok) {
+        let errorText = await response.text();
+        try {
+          const errData = JSON.parse(errorText);
+          errorText = errData.error || errorText;
+        } catch {}
+        throw new Error(errorText || `Server Error: ${response.status}`);
       }
+
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      setImageUrl(objectUrl);
+      setLoading(false);
     } catch (error) {
       console.error("Image generation failed:", error);
       alert(`Generation Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -91,11 +73,11 @@ export default function ImageStudio() {
               <label className="block font-black text-xs uppercase mb-1">Select Model</label>
               <select
                 value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value as 'nanobanana' | 'basic')}
+                onChange={(e) => setSelectedModel(e.target.value as 'flux' | 'turbo')}
                 className="w-full neo-input text-xs py-1.5 px-2.5"
               >
-                <option value="nanobanana">NanoBanana Pro (3/day)</option>
-                <option value="basic">Basic AI (Unlimited)</option>
+                <option value="flux">FLUX.1 Schnell (High Quality & Detail)</option>
+                <option value="turbo">SDXL Turbo (Ultra-Fast 1-Sec)</option>
               </select>
             </div>
 

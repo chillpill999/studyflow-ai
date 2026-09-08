@@ -16,16 +16,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const hfKey = process.env.HUGGINGFACE_API_KEY;
-    if (!hfKey) {
-      return NextResponse.json(
-        { error: 'Image generation service is currently unavailable.' },
-        { status: 503 }
-      );
-    }
-
     const body = await req.json().catch(() => ({}));
     const rawPrompt = body?.prompt;
+    const model = body?.model || 'flux'; // 'flux' | 'turbo'
+
     if (!rawPrompt || typeof rawPrompt !== 'string' || !rawPrompt.trim()) {
       return NextResponse.json({ error: 'Prompt is required.' }, { status: 400 });
     }
@@ -36,42 +30,60 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid prompt provided.' }, { status: 400 });
     }
 
-    const hfUrl = 'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell';
+    // 1. Tier 1: Hugging Face (if key is configured)
+    const hfKey = process.env.HUGGINGFACE_API_KEY;
+    if (hfKey) {
+      try {
+        const hfRes = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${hfKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ inputs: cleanPrompt }),
+          signal: AbortSignal.timeout(12000)
+        });
 
-    const hfRes = await fetch(hfUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${hfKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ inputs: cleanPrompt })
-    });
-
-    if (!hfRes.ok) {
-      console.error('HuggingFace API Error:', hfRes.status);
-
-      if (hfRes.status === 503) {
-        return NextResponse.json(
-          { error: 'The AI image model is currently initializing. Please try again in 30 seconds.' },
-          { status: 503 }
-        );
+        if (hfRes.ok) {
+          const imageBuffer = await hfRes.arrayBuffer();
+          return new NextResponse(imageBuffer, {
+            status: 200,
+            headers: {
+              'Content-Type': 'image/jpeg',
+              'Cache-Control': 'no-cache, no-store, must-revalidate'
+            }
+          });
+        }
+      } catch (hfErr) {
+        console.warn('Hugging Face inference failed, falling back to Pollinations:', hfErr);
       }
-
-      return NextResponse.json(
-        { error: 'Image generation could not be completed. Please try a different prompt.' },
-        { status: 502 }
-      );
     }
 
-    // Return the image bytes directly
-    const imageBuffer = await hfRes.arrayBuffer();
-    return new NextResponse(imageBuffer, {
-      status: 200,
-      headers: {
-        'Content-Type': 'image/jpeg',
-        'Cache-Control': 'no-cache, no-store, must-revalidate'
-      }
+    // 2. Tier 2: Free Server-Side Pollinations AI (FLUX.1 Schnell & SDXL Turbo)
+    // 100% Free, zero-setup, community backed, server-streamed to avoid browser CORS/blockers
+    const seed = Math.floor(Math.random() * 10000000);
+    const selectedModelParam = model === 'turbo' ? 'turbo' : 'flux';
+    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanPrompt)}?seed=${seed}&model=${selectedModelParam}&width=768&height=768&nologo=true`;
+
+    const polRes = await fetch(pollinationsUrl, {
+      signal: AbortSignal.timeout(25000)
     });
+
+    if (polRes.ok) {
+      const imageBuffer = await polRes.arrayBuffer();
+      return new NextResponse(imageBuffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/jpeg',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+      });
+    }
+
+    return NextResponse.json(
+      { error: 'Image generation service is temporarily busy. Please try again in a few seconds.' },
+      { status: 503 }
+    );
   } catch (err: any) {
     console.error('Image Generation Error:', err);
     return NextResponse.json(
